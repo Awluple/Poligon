@@ -17,8 +17,7 @@ public class EnemyAimPosition : AimPosition {
 
     void Awake() {
         enemy = GetComponentInParent<Enemy>();
-        Debug.Log(enemy);
-        player = GameObject.Find("Player").GetComponent<Player>(); ;
+        player = FindFirstObjectByType<Player>().GetComponent<Player>(); ;
         StartCoroutine(DoCheck());
     }
 
