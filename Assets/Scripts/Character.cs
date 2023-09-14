@@ -29,6 +29,7 @@ public abstract class Character : MonoBehaviour, IKillable {
     protected bool isWalking;
     protected bool isRunning;
     protected bool isAiming;
+    protected bool isCrouching;
     protected bool stunned = false;
 
     [SerializeField] protected float health = 100;
@@ -46,6 +47,8 @@ public abstract class Character : MonoBehaviour, IKillable {
     public event EventHandler OnHeavyLandingEnd;
     public event EventHandler OnAiming;
     public event EventHandler OnAimingEnd;
+    public event EventHandler OnCrouching;
+    public event EventHandler OnCrouchingEnd;
     public event EventHandler OnShoot;
     public event EventHandler OnShootEnd;
 
@@ -57,6 +60,7 @@ public abstract class Character : MonoBehaviour, IKillable {
     }
 
 
+
     //public event Vector2EventHandler OnAimingWalk;
 
     public delegate void Vector2EventHandler(object sender, Vector2EventArgs args);
@@ -65,12 +69,23 @@ public abstract class Character : MonoBehaviour, IKillable {
 
 
     protected void StartRun(object sender, System.EventArgs e) {
-        if (isAiming != true) {
+        if (isAiming != true && isCrouching != true) {
             isRunning = true;
         }
     }
     protected void CancelRun(object sender, System.EventArgs e) {
         isRunning = false;
+    }
+
+    protected void StartCrouch(object sender, System.EventArgs e) {
+        isCrouching = true;
+        isRunning = false;
+        if (OnCrouching != null) OnCrouching(this, EventArgs.Empty);
+
+    }
+    protected void CancelCrouch(object sender, System.EventArgs e) {
+        isCrouching = false;
+        if (OnCrouchingEnd != null) OnCrouchingEnd(this, EventArgs.Empty);
     }
 
     protected void AimStart(object sender, System.EventArgs e) {
@@ -171,6 +186,9 @@ public abstract class Character : MonoBehaviour, IKillable {
     }
     public bool IsAiming() {
         return isAiming;
+    }
+    public bool IsCrouching() {
+        return isCrouching;
     }
 
 }

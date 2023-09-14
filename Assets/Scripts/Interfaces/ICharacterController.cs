@@ -5,6 +5,9 @@ public interface ICharacterController {
     event EventHandler OnAimCancel;
     event EventHandler OnAimPerformed;
     event EventHandler OnAimStart;
+    event EventHandler OnCrouchCancel;
+    event EventHandler OnCrouchPerformed;
+    event EventHandler OnCrouchStart;
     event EventHandler OnJumpCancel;
     event EventHandler OnJumpPerformed;
     event EventHandler OnJumpStart;

@@ -15,6 +15,8 @@ public class CharacterAnimator : MonoBehaviour
         character.OnFalling += Falling;
         character.OnAiming += StartAiming;
         character.OnAimingEnd += StopAiming;
+        character.OnCrouching += StartCrouching;
+        character.OnCrouchingEnd += StopCrouching;
         character.OnShoot += StartShooting;
         character.OnShootEnd += StopShooting;
 
@@ -34,7 +36,7 @@ public class CharacterAnimator : MonoBehaviour
             animator.SetBool("falling", false);
             animator.SetBool("jumped", false);
         }
-        
+
         if(!character.IsAiming() && animator.GetLayerWeight(2) > 0) {
             if(animator.GetLayerWeight(2) < 0.05) {
                 animator.SetLayerWeight(2, 0);
@@ -52,7 +54,12 @@ public class CharacterAnimator : MonoBehaviour
                 m_currentLayerWeight = Mathf.SmoothDamp(m_currentLayerWeight, character.IsAiming() ? 1 : 0, ref yVelocity, aimTransitionTime);
                 animator.SetLayerWeight(2, m_currentLayerWeight);
             }
-        } 
+        }
+
+        //if(character.IsCrouching() && animator.GetLayerWeight(6) > 0) {
+        //    animator.SetLayerWeight(2, 1);
+        //}
+
      }
     protected void Falling(object sender, System.EventArgs e) {
         animator.SetBool("falling", true);
@@ -72,11 +79,21 @@ public class CharacterAnimator : MonoBehaviour
     }
 
     protected void StartAiming(object sender, System.EventArgs e) {
-        animator.SetLayerWeight(4, 1);
+        if(character.IsCrouching()) {
+            animator.SetLayerWeight(6, 1);
+            animator.SetLayerWeight(5, 0);
+        } else {
+            animator.SetLayerWeight(4, 1);
+        }
         animator.SetBool("aiming", true);
     }
     protected void StopAiming(object sender, System.EventArgs e) {
-        animator.SetLayerWeight(4, 0);
+        if (character.IsCrouching()) {
+            animator.SetLayerWeight(6, 0);
+            animator.SetLayerWeight(5, 1);
+        } else {
+            animator.SetLayerWeight(4, 0);
+        }
         animator.SetBool("aiming", false);
     }
 
@@ -91,5 +108,27 @@ public class CharacterAnimator : MonoBehaviour
     protected void AimWalk(object sender, Vector2EventArgs args) {
         animator.SetFloat("xMovement", args.Vector.x);
         animator.SetFloat("yMovement", args.Vector.y);
+    }
+
+    protected void StartCrouching(object sender, System.EventArgs e) {
+        animator.SetLayerWeight(0, 0);
+
+        if (character.IsAiming()) {
+            animator.SetLayerWeight(6, 1);
+            animator.SetLayerWeight(4, 0);
+        } else {
+            animator.SetLayerWeight(5, 1);
+        }
+        animator.SetBool("crouching", true);
+    }
+    protected void StopCrouching(object sender, System.EventArgs e) {
+        animator.SetLayerWeight(0, 1);
+        animator.SetLayerWeight(5, 0);
+
+        if (character.IsAiming()) {
+            animator.SetLayerWeight(4, 1);
+            animator.SetLayerWeight(6, 0);
+        }
+        animator.SetBool("crouching", false);
     }
 }

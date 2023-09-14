@@ -22,6 +22,10 @@ public class EnemyController : MonoBehaviour, ICharacterController {
     public event EventHandler OnAimPerformed;
     public event EventHandler OnAimCancel;
 
+    public event EventHandler OnCrouchStart;
+    public event EventHandler OnCrouchPerformed;
+    public event EventHandler OnCrouchCancel;
+
     public event EventHandler OnShootStart;
     public event EventHandler OnShootPerformed;
     public event EventHandler OnShootCancel;
@@ -197,6 +201,16 @@ public class EnemyController : MonoBehaviour, ICharacterController {
     private void AimCancel() {
         aiming = false;
         if (OnAimCancel != null) OnAimCancel(this, EventArgs.Empty);
+    }
+
+    private void CrouchStart() {
+        if (OnCrouchStart != null) OnCrouchStart(this, EventArgs.Empty);
+    }
+    private void CrouchPerformed() {
+        if (OnCrouchPerformed != null) OnCrouchPerformed(this, EventArgs.Empty);
+    }
+    private void CrouchCancel() {
+        if (OnCrouchCancel != null) OnCrouchCancel(this, EventArgs.Empty);
     }
     private void ShootStart() {
         if (OnShootStart != null) OnShootStart(this, EventArgs.Empty);

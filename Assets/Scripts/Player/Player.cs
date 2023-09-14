@@ -34,6 +34,8 @@ public class Player : Character {
         gameInput.OnAimStart += AimStart;
         gameInput.OnAimCancel += AimCancel;
 
+        gameInput.OnCrouchStart += StartCrouch;
+        gameInput.OnCrouchCancel += CancelCrouch;
 
         gameInput.OnShootPerformed += ShootPerformed;
         gameInput.OnShootCancel += ShootCancel;
@@ -122,7 +124,9 @@ public class Player : Character {
         float speed = IsRunning() == true ? sprintSpeed :
                       isAiming == true ? aimSpeed :
                       moveSpeed;
-        
+
+        if (isCrouching) speed = speed * 0.6f;
+
         if(aimBlendTree != Vector2.zero) {
             if(aimBlendTree.y < -0.35f || Mathf.Abs(aimBlendTree.x) > 0.35f) {
                 speed = speed - speed * 0.3f;

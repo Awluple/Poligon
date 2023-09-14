@@ -16,6 +16,10 @@ public class GameInput : MonoBehaviour, ICharacterController {
     public event EventHandler OnAimPerformed;
     public event EventHandler OnAimCancel;
 
+    public event EventHandler OnCrouchStart;
+    public event EventHandler OnCrouchPerformed;
+    public event EventHandler OnCrouchCancel;
+
     public event EventHandler OnShootStart;
     public event EventHandler OnShootPerformed;
     public event EventHandler OnShootCancel;
@@ -36,6 +40,10 @@ public class GameInput : MonoBehaviour, ICharacterController {
         playerInputActions.Player.Aim.started += AimStart;
         playerInputActions.Player.Aim.canceled += AimPerformed;
         playerInputActions.Player.Aim.canceled += AimCancel;
+
+        playerInputActions.Player.Crouch.started += CrouchStart;
+        playerInputActions.Player.Crouch.canceled += CrouchPerformed;
+        playerInputActions.Player.Crouch.canceled += CrouchCancel;
 
         playerInputActions.Player.Shoot.started += ShootStart;
         playerInputActions.Player.Shoot.canceled += ShootPerformed;
@@ -69,7 +77,15 @@ public class GameInput : MonoBehaviour, ICharacterController {
     private void AimCancel(UnityEngine.InputSystem.InputAction.CallbackContext obj) {
         if (OnAimCancel != null) OnAimCancel(this, EventArgs.Empty);
     }
-
+    private void CrouchStart(UnityEngine.InputSystem.InputAction.CallbackContext obj) {
+        if (OnCrouchStart != null) OnCrouchStart(this, EventArgs.Empty);
+    }
+    private void CrouchPerformed(UnityEngine.InputSystem.InputAction.CallbackContext obj) {
+        if (OnCrouchPerformed != null) OnCrouchPerformed(this, EventArgs.Empty);
+    }
+    private void CrouchCancel(UnityEngine.InputSystem.InputAction.CallbackContext obj) {
+        if (OnCrouchCancel != null) OnCrouchCancel(this, EventArgs.Empty);
+    }
     private void ShootStart(UnityEngine.InputSystem.InputAction.CallbackContext obj) {
         if (OnShootStart != null) OnShootStart(this, EventArgs.Empty);
     }
