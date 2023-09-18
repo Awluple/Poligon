@@ -42695,6 +42695,11 @@ Transform:
   - {fileID: 646255377}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!4 &1363246559 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 554282998967011056, guid: c5d40f27a1b542f459e45a93eae4aaf7, type: 3}
+  m_PrefabInstance: {fileID: 5219777920674618060}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1364008449
 GameObject:
   m_ObjectHideFlags: 0
@@ -69841,6 +69846,17 @@ Mesh:
     offset: 0
     size: 0
     path: 
+--- !u!114 &1961380265 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 8080797095293567779, guid: c5d40f27a1b542f459e45a93eae4aaf7, type: 3}
+  m_PrefabInstance: {fileID: 5219777920674618060}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 70b342d8ce5c2fd48b8fa3147d48d1d1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!43 &1963675719
 Mesh:
   m_ObjectHideFlags: 0
@@ -76639,6 +76655,14 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1356513685650825469, guid: c5d40f27a1b542f459e45a93eae4aaf7, type: 3}
+      propertyPath: m_Data.m_MaintainOffset
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1356513685650825469, guid: c5d40f27a1b542f459e45a93eae4aaf7, type: 3}
+      propertyPath: m_Data.m_SourceObjects.m_Item0.transform
+      value: 
+      objectReference: {fileID: 1363246559}
     - target: {fileID: 4657535447964458076, guid: c5d40f27a1b542f459e45a93eae4aaf7, type: 3}
       propertyPath: m_Name
       value: Enemy ver 2
@@ -76658,7 +76682,7 @@ PrefabInstance:
     - target: {fileID: 5634945032227934599, guid: c5d40f27a1b542f459e45a93eae4aaf7, type: 3}
       propertyPath: rig
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 1961380265}
     - target: {fileID: 5634945032227934599, guid: c5d40f27a1b542f459e45a93eae4aaf7, type: 3}
       propertyPath: groundCheck
       value: 
@@ -76758,6 +76782,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1382805100800266427, guid: cedf5a8ea0bbcd44882ed6b10468336c, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4305313507456187016, guid: cedf5a8ea0bbcd44882ed6b10468336c, type: 3}
+      propertyPath: m_Weight
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5192831956202325638, guid: cedf5a8ea0bbcd44882ed6b10468336c, type: 3}

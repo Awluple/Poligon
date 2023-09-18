@@ -154,22 +154,19 @@ public abstract class Character : MonoBehaviour, IKillable {
     }
 
     protected Vector2 GetAimWalkBlendTreeValues(Vector2 inputVector) {
-        var move_Angle = Vector2.Angle(inputVector, new Vector2(aimingTarget.GetPosition().x - transform.position.x, aimingTarget.GetPosition().z - transform.position.z));
-        if (move_Angle < 0) {
+        var moveAngle = Vector2.Angle(inputVector, new Vector2(aimingTarget.GetPosition().x - transform.position.x, aimingTarget.GetPosition().z - transform.position.z));
 
-            move_Angle = 360 + move_Angle;
-        }
-
-        float radians = (Mathf.PI / 180) * move_Angle;
+        float radians = (Mathf.PI / 180) * moveAngle;
         float x = 1f * Mathf.Sin(radians);
         float y = 1f * Mathf.Cos(radians);
 
-        int xVal = inputVector.x < 0 ? -1 : 1;
-        int yVal = inputVector.y < 0 ? -1 : 1;
+        var moveDirection = Vector2.Angle(new Vector2(transform.right.x, transform.right.z), inputVector);
 
-        x = x * xVal * yVal;
 
-        if (aimingTarget.GetTransform().eulerAngles.y > 45 && aimingTarget.GetTransform().eulerAngles.y < 225) {
+        if (moveDirection <= 90) {
+            // Right
+        } else {
+            // Left
             x = -x;
         }
         return new Vector2(x, y);

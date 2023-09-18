@@ -76,7 +76,7 @@ public class EnemyController : MonoBehaviour, ICharacterController {
     }
 
     private void Update() {
-        Debug.Log(state);
+
     }
     
     public void SetAttackingState(object sender = null, System.EventArgs e = null) {
