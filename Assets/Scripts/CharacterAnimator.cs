@@ -2,11 +2,15 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Poligon.EvetArgs;
+using Poligon.Enums;
+
 
 public class CharacterAnimator : MonoBehaviour
 {
     [SerializeField] protected Animator animator;
     [SerializeField] protected Character character;
+
+    private int leaningPosition = 0;
 
     protected void Awake() {
         animator = GetComponent<Animator>();
@@ -21,6 +25,11 @@ public class CharacterAnimator : MonoBehaviour
         character.OnShootEnd += StopShooting;
 
         character.OnAimingWalk += AimWalk;
+
+        character.OnLeaning += StartLeaning;
+        character.OnLeaningEnd += StopLeaning;
+        character.OnMoving += StopLeaningOnMove;
+        character.OnMovingEnd += ResumeLeaning;
 
 
     }
@@ -38,21 +47,21 @@ public class CharacterAnimator : MonoBehaviour
         }
 
         if(!character.IsAiming() && animator.GetLayerWeight(2) > 0) {
-            if(animator.GetLayerWeight(2) < 0.05) {
-                animator.SetLayerWeight(2, 0);
+            if(animator.GetLayerWeight((int)CharacterAnimatorLayers.Aiming) < 0.05) {
+                animator.SetLayerWeight((int)CharacterAnimatorLayers.Aiming, 0);
             } else {
-                var m_currentLayerWeight = animator.GetLayerWeight(2);
+                var m_currentLayerWeight = animator.GetLayerWeight((int)CharacterAnimatorLayers.Aiming);
                 m_currentLayerWeight = Mathf.SmoothDamp(m_currentLayerWeight, character.IsAiming() ? 1 : 0, ref yVelocity, aimTransitionTime);
-                animator.SetLayerWeight(2, m_currentLayerWeight);
+                animator.SetLayerWeight((int)CharacterAnimatorLayers.Aiming, m_currentLayerWeight);
             }
             
-        } else if (character.IsAiming() && animator.GetLayerWeight(2) < 1) {
-            if (animator.GetLayerWeight(2) > 0.95) {
-                animator.SetLayerWeight(2, 1);
+        } else if (character.IsAiming() && animator.GetLayerWeight((int)CharacterAnimatorLayers.Aiming) < 1) {
+            if (animator.GetLayerWeight((int)CharacterAnimatorLayers.Aiming) > 0.95) {
+                animator.SetLayerWeight((int)CharacterAnimatorLayers.Aiming, 1);
             } else {
-                var m_currentLayerWeight = animator.GetLayerWeight(2);
+                var m_currentLayerWeight = animator.GetLayerWeight((int)CharacterAnimatorLayers.Aiming);
                 m_currentLayerWeight = Mathf.SmoothDamp(m_currentLayerWeight, character.IsAiming() ? 1 : 0, ref yVelocity, aimTransitionTime);
-                animator.SetLayerWeight(2, m_currentLayerWeight);
+                animator.SetLayerWeight((int)CharacterAnimatorLayers.Aiming, m_currentLayerWeight);
             }
         }
 
@@ -69,31 +78,34 @@ public class CharacterAnimator : MonoBehaviour
         animator.SetBool("isRunning", false);
         animator.SetBool("heavyLanding", true);
 
-        animator.SetLayerWeight(3, 1);
+        animator.SetLayerWeight((int)CharacterAnimatorLayers.HeavyLanding, 1);
     }
     protected void HeavyLandingEnd(object sender, System.EventArgs e) {
         animator.SetBool("heavyLanding", false);
         animator.SetBool("falling", false);
         animator.SetBool("jumped", false);
-        animator.SetLayerWeight(3, 0);
+        animator.SetLayerWeight((int)CharacterAnimatorLayers.HeavyLanding, 0);
     }
 
     protected void StartAiming(object sender, System.EventArgs e) {
         if(character.IsCrouching()) {
-            animator.SetLayerWeight(6, 1);
-            animator.SetLayerWeight(5, 0);
+            animator.SetLayerWeight((int)CharacterAnimatorLayers.CrouchingBlend, 1);
+            animator.SetBool("crouching", true);
+            animator.SetLayerWeight((int)CharacterAnimatorLayers.Crouching, 0);
         } else {
-            animator.SetLayerWeight(4, 1);
+            animator.SetLayerWeight((int)CharacterAnimatorLayers.WalkingBlend, 1);
         }
         animator.SetBool("aiming", true);
     }
     protected void StopAiming(object sender, System.EventArgs e) {
         if (character.IsCrouching()) {
-            animator.SetLayerWeight(6, 0);
-            animator.SetLayerWeight(5, 1);
+            animator.SetLayerWeight((int)CharacterAnimatorLayers.CrouchingBlend, 0);
+            animator.SetLayerWeight((int)CharacterAnimatorLayers.Crouching, 1);
+            animator.SetBool("crouching", true);
         } else {
-            animator.SetLayerWeight(4, 0);
+            animator.SetLayerWeight((int)CharacterAnimatorLayers.WalkingBlend, 0);
         }
+        animator.SetLayerWeight((int)CharacterAnimatorLayers.Leaning, 0);
         animator.SetBool("aiming", false);
     }
 
@@ -105,29 +117,55 @@ public class CharacterAnimator : MonoBehaviour
         //animator.SetBool("shoot", false);
     }
 
+    protected void StartLeaning(object sender, InputValueEventArgs args) {
+        if (!character.IsAiming() || character.IsWalking()) {
+            leaningPosition = (int)args.Value;
+            return;
+        };
+        leaningPosition = (int)args.Value;
+        animator.SetLayerWeight((int)CharacterAnimatorLayers.Leaning, 1);
+        animator.SetInteger("leanState", (int)args.Value);
+    }
+
+    protected void ResumeLeaning(object sender, System.EventArgs args) {
+        if(leaningPosition != 0) StartLeaning(null, new InputValueEventArgs(leaningPosition));
+    }
+
+    protected void StopLeaning(object sender, System.EventArgs args) {
+        animator.SetLayerWeight((int)CharacterAnimatorLayers.Leaning, 0);
+        animator.SetInteger("leanState", 0);
+        leaningPosition = 0;
+    }
+    protected void StopLeaningOnMove(object sender, System.EventArgs args) {
+        animator.SetLayerWeight((int)CharacterAnimatorLayers.Leaning, 0);
+        animator.SetInteger("leanState", 0);
+    }
+
     protected void AimWalk(object sender, Vector2EventArgs args) {
         animator.SetFloat("xMovement", args.Vector.x);
         animator.SetFloat("yMovement", args.Vector.y);
     }
 
     protected void StartCrouching(object sender, System.EventArgs e) {
-        animator.SetLayerWeight(0, 0);
+        animator.SetLayerWeight((int)CharacterAnimatorLayers.BaseLayer, 0);
 
         if (character.IsAiming()) {
-            animator.SetLayerWeight(6, 1);
-            animator.SetLayerWeight(4, 0);
+            animator.SetLayerWeight((int)CharacterAnimatorLayers.CrouchingBlend, 1);
+            animator.SetLayerWeight((int)CharacterAnimatorLayers.WalkingBlend, 0);
         } else {
-            animator.SetLayerWeight(5, 1);
+            animator.SetLayerWeight((int)CharacterAnimatorLayers.Crouching, 1);
         }
         animator.SetBool("crouching", true);
+        animator.SetTrigger("positionChange");
     }
     protected void StopCrouching(object sender, System.EventArgs e) {
-        animator.SetLayerWeight(0, 1);
-        animator.SetLayerWeight(5, 0);
+        animator.SetLayerWeight((int)CharacterAnimatorLayers.BaseLayer, 1);
+        animator.SetLayerWeight((int)CharacterAnimatorLayers.Crouching, 0);
+        animator.SetTrigger("positionChange");
 
         if (character.IsAiming()) {
-            animator.SetLayerWeight(4, 1);
-            animator.SetLayerWeight(6, 0);
+            animator.SetLayerWeight((int)CharacterAnimatorLayers.WalkingBlend, 1);
+            animator.SetLayerWeight((int)CharacterAnimatorLayers.CrouchingBlend, 0);
         }
         animator.SetBool("crouching", false);
     }

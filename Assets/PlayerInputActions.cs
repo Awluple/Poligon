@@ -80,6 +80,15 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": true
+                },
+                {
+                    ""name"": ""Leaning"",
+                    ""type"": ""Button"",
+                    ""id"": ""afb9625d-2922-42df-8c45-461d6f7b96ac"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -192,6 +201,39 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                     ""action"": ""Crouch"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": ""Lean"",
+                    ""id"": ""0eb7c0bd-fbd4-4c5d-9d22-b0fa8736318e"",
+                    ""path"": ""1DAxis(minValue=1,maxValue=2)"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Leaning"",
+                    ""isComposite"": true,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": ""negative"",
+                    ""id"": ""e664ded9-a8ba-4eb1-bd8d-eede3ae1a2f9"",
+                    ""path"": ""<Keyboard>/q"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Leaning"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""positive"",
+                    ""id"": ""b1a9a947-c781-4a3e-937a-e50a6c1c205e"",
+                    ""path"": ""<Keyboard>/e"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Leaning"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
                 }
             ]
         }
@@ -206,6 +248,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
         m_Player_Aim = m_Player.FindAction("Aim", throwIfNotFound: true);
         m_Player_Shoot = m_Player.FindAction("Shoot", throwIfNotFound: true);
         m_Player_Crouch = m_Player.FindAction("Crouch", throwIfNotFound: true);
+        m_Player_Leaning = m_Player.FindAction("Leaning", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -273,6 +316,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
     private readonly InputAction m_Player_Aim;
     private readonly InputAction m_Player_Shoot;
     private readonly InputAction m_Player_Crouch;
+    private readonly InputAction m_Player_Leaning;
     public struct PlayerActions
     {
         private @PlayerInputActions m_Wrapper;
@@ -283,6 +327,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
         public InputAction @Aim => m_Wrapper.m_Player_Aim;
         public InputAction @Shoot => m_Wrapper.m_Player_Shoot;
         public InputAction @Crouch => m_Wrapper.m_Player_Crouch;
+        public InputAction @Leaning => m_Wrapper.m_Player_Leaning;
         public InputActionMap Get() { return m_Wrapper.m_Player; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -310,6 +355,9 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
             @Crouch.started += instance.OnCrouch;
             @Crouch.performed += instance.OnCrouch;
             @Crouch.canceled += instance.OnCrouch;
+            @Leaning.started += instance.OnLeaning;
+            @Leaning.performed += instance.OnLeaning;
+            @Leaning.canceled += instance.OnLeaning;
         }
 
         private void UnregisterCallbacks(IPlayerActions instance)
@@ -332,6 +380,9 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
             @Crouch.started -= instance.OnCrouch;
             @Crouch.performed -= instance.OnCrouch;
             @Crouch.canceled -= instance.OnCrouch;
+            @Leaning.started -= instance.OnLeaning;
+            @Leaning.performed -= instance.OnLeaning;
+            @Leaning.canceled -= instance.OnLeaning;
         }
 
         public void RemoveCallbacks(IPlayerActions instance)
@@ -357,5 +408,6 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
         void OnAim(InputAction.CallbackContext context);
         void OnShoot(InputAction.CallbackContext context);
         void OnCrouch(InputAction.CallbackContext context);
+        void OnLeaning(InputAction.CallbackContext context);
     }
 }

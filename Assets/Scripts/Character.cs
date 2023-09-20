@@ -2,6 +2,7 @@ using Poligon.EvetArgs;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Animations.Rigging;
 
@@ -32,6 +33,8 @@ public abstract class Character : MonoBehaviour, IKillable {
     protected bool isCrouching;
     protected bool stunned = false;
 
+    private bool lastFrameMoving = false;
+
     [SerializeField] protected float health = 100;
 
 
@@ -43,6 +46,8 @@ public abstract class Character : MonoBehaviour, IKillable {
         remove => OnFalling -= value;
     }
 
+    public event EventHandler OnMoving;
+    public event EventHandler OnMovingEnd;
     public event EventHandler OnHeavyLanding;
     public event EventHandler OnHeavyLandingEnd;
     public event EventHandler OnAiming;
@@ -51,6 +56,8 @@ public abstract class Character : MonoBehaviour, IKillable {
     public event EventHandler OnCrouchingEnd;
     public event EventHandler OnShoot;
     public event EventHandler OnShootEnd;
+    public event EventHandler<InputValueEventArgs> OnLeaning;
+    public event EventHandler<InputValueEventArgs> OnLeaningEnd;
 
     public Vector2EventHandler OnAimingWalk { get; set; }
 
@@ -59,7 +66,14 @@ public abstract class Character : MonoBehaviour, IKillable {
         remove => OnAimingWalk -= value;
     }
 
-
+    protected virtual void Update() {
+        if ((isWalking || isRunning) && !lastFrameMoving) {
+            if (OnMoving != null) OnMoving(this, EventArgs.Empty);
+        } else if (!(isWalking || isRunning) && lastFrameMoving) {
+            if (OnMovingEnd != null) OnMovingEnd(this, EventArgs.Empty);
+        }
+        lastFrameMoving = isWalking || isRunning;
+    }
 
     //public event Vector2EventHandler OnAimingWalk;
 
@@ -115,6 +129,15 @@ public abstract class Character : MonoBehaviour, IKillable {
     protected void ShootCancel(object sender, System.EventArgs e) {
         if (!isAiming) return;
         if (OnShootEnd != null) OnShootEnd(this, EventArgs.Empty);
+    }
+
+    protected void LeaningStart(object sender, InputValueEventArgs args) {
+        if (OnLeaning != null) OnLeaning(this, args);
+    }
+
+    protected void LeaningCancel(object sender, InputValueEventArgs args) {
+        if (OnLeaningEnd != null) OnLeaningEnd(this, args);
+
     }
 
     protected IEnumerator HeavyFallStun() {

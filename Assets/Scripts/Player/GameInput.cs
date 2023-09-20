@@ -1,7 +1,9 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
+using Poligon.EvetArgs;
 
 public class GameInput : MonoBehaviour, ICharacterController {
     private PlayerInputActions playerInputActions;
@@ -24,6 +26,10 @@ public class GameInput : MonoBehaviour, ICharacterController {
     public event EventHandler OnShootPerformed;
     public event EventHandler OnShootCancel;
 
+    public event EventHandler<InputValueEventArgs> OnLeaningStart;
+    public event EventHandler<InputValueEventArgs> OnLeaningPerformed;
+    public event EventHandler<InputValueEventArgs> OnLeaningCancel;
+
     CameraControl camera;
 
     private void Awake() {
@@ -38,16 +44,21 @@ public class GameInput : MonoBehaviour, ICharacterController {
         playerInputActions.Player.Jump.canceled += JumpCancel;
 
         playerInputActions.Player.Aim.started += AimStart;
-        playerInputActions.Player.Aim.canceled += AimPerformed;
+        playerInputActions.Player.Aim.performed += AimPerformed;
         playerInputActions.Player.Aim.canceled += AimCancel;
 
         playerInputActions.Player.Crouch.started += CrouchStart;
-        playerInputActions.Player.Crouch.canceled += CrouchPerformed;
+        playerInputActions.Player.Crouch.performed += CrouchPerformed;
         playerInputActions.Player.Crouch.canceled += CrouchCancel;
 
         playerInputActions.Player.Shoot.started += ShootStart;
-        playerInputActions.Player.Shoot.canceled += ShootPerformed;
+        playerInputActions.Player.Shoot.performed += ShootPerformed;
         playerInputActions.Player.Shoot.canceled += ShootCancel;
+
+        playerInputActions.Player.Leaning.started += LeaningStart;
+        playerInputActions.Player.Leaning.performed += LeaningPerformed;
+        playerInputActions.Player.Leaning.canceled += LeaningCancel;
+
 
         camera = FindObjectOfType<CameraControl>();
     }
@@ -94,6 +105,16 @@ public class GameInput : MonoBehaviour, ICharacterController {
     }
     private void ShootCancel(UnityEngine.InputSystem.InputAction.CallbackContext obj) {
         if (OnShootCancel != null) OnShootCancel(this, EventArgs.Empty);
+    }
+
+    private void LeaningStart(UnityEngine.InputSystem.InputAction.CallbackContext obj) {
+        if (OnLeaningStart != null) OnLeaningStart(this, new InputValueEventArgs(obj.ReadValue<float>()));
+    }
+    private void LeaningPerformed(UnityEngine.InputSystem.InputAction.CallbackContext obj) {
+        if (OnLeaningPerformed != null) OnLeaningPerformed(this, new InputValueEventArgs(obj.ReadValue<float>()));
+    }
+    private void LeaningCancel(UnityEngine.InputSystem.InputAction.CallbackContext obj) {
+        if (OnLeaningCancel != null) OnLeaningCancel(this, new InputValueEventArgs(obj.ReadValue<float>()));
     }
 
     public Vector2 GetMovementVectorNormalized() {

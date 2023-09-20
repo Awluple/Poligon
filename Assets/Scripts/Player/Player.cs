@@ -40,6 +40,9 @@ public class Player : Character {
         gameInput.OnShootPerformed += ShootPerformed;
         gameInput.OnShootCancel += ShootCancel;
 
+        gameInput.OnLeaningStart += LeaningStart;
+        gameInput.OnLeaningCancel += LeaningCancel;
+
 
         characterController = GetComponent<CharacterController>();
         originalStepOffset = characterController.stepOffset;
@@ -49,7 +52,8 @@ public class Player : Character {
 
 
     // Update is called once per frame
-    void Update() {
+    protected override void Update() {
+        base.Update();
         if(!stunned) {
             Move();
         } else {

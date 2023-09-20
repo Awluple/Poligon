@@ -58,6 +58,15 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": true
+                },
+                {
+                    "name": "Leaning",
+                    "type": "Button",
+                    "id": "afb9625d-2922-42df-8c45-461d6f7b96ac",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -170,6 +179,39 @@
                     "action": "Crouch",
                     "isComposite": false,
                     "isPartOfComposite": false
+                },
+                {
+                    "name": "Lean",
+                    "id": "0eb7c0bd-fbd4-4c5d-9d22-b0fa8736318e",
+                    "path": "1DAxis(minValue=1,maxValue=2)",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Leaning",
+                    "isComposite": true,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "negative",
+                    "id": "e664ded9-a8ba-4eb1-bd8d-eede3ae1a2f9",
+                    "path": "<Keyboard>/q",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Leaning",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "positive",
+                    "id": "b1a9a947-c781-4a3e-937a-e50a6c1c205e",
+                    "path": "<Keyboard>/e",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Leaning",
+                    "isComposite": false,
+                    "isPartOfComposite": true
                 }
             ]
         }
