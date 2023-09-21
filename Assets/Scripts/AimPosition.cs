@@ -10,5 +10,8 @@ public abstract class AimPosition : MonoBehaviour
     public Transform GetTransform() {
         return transform;
     }
+    public virtual void Reposition(Vector3 newPosition) {
+        transform.position = newPosition;
+    }
 
 }

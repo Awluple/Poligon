@@ -14,11 +14,14 @@ public class EnemyAimPosition : AimPosition {
 
     public bool sightEventsCalled = false;
 
+    private IEnumerator checkCoroutine;
+
 
     void Awake() {
         enemy = GetComponentInParent<Enemy>();
-        player = FindFirstObjectByType<Player>().GetComponent<Player>(); ;
-        StartCoroutine(DoCheck());
+        player = FindFirstObjectByType<Player>().GetComponent<Player>();
+        checkCoroutine = DoCheck();
+        StartCoroutine(checkCoroutine);
     }
 
     // Update is called once per frame
@@ -43,6 +46,13 @@ public class EnemyAimPosition : AimPosition {
 
     public void Reset() {
         transform.position = enemy.transform.position;
+        aimingAtPlayer = false;
+        sightEventsCalled = false;
+    }
+
+    public override void Reposition(Vector3 newPosition) {
+        base.Reposition(newPosition);
+        StopCoroutine(checkCoroutine);
         aimingAtPlayer = false;
         sightEventsCalled = false;
     }

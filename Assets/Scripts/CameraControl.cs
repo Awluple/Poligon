@@ -34,21 +34,21 @@ public class CameraControl : MonoBehaviour {
             }
         }
 
-        //if (Input.GetKey(KeyCode.E)) {
-        //    rotation += rotationSensitivity * Time.deltaTime;
-        //    if (componentBase is CinemachineFramingTransposer) {
-        //        Vector3 newRotation = virtualCamera.transform.rotation.eulerAngles;
-        //        newRotation.y = rotation;
-        //        virtualCamera.transform.rotation = Quaternion.Euler(newRotation);
-        //    }
-        //}
-        //if (Input.GetKey(KeyCode.Q)) {
-        //    rotation -= rotationSensitivity * Time.deltaTime;
-        //    if (componentBase is CinemachineFramingTransposer) {
-        //        Vector3 newRotation = virtualCamera.transform.rotation.eulerAngles;
-        //        newRotation.y = rotation;
-        //        virtualCamera.transform.rotation = Quaternion.Euler(newRotation);
-        //    }
-        //}
+        if (Input.GetKey(KeyCode.T)) {
+            rotation += rotationSensitivity * Time.deltaTime;
+            if (componentBase is CinemachineFramingTransposer) {
+                Vector3 newRotation = virtualCamera.transform.rotation.eulerAngles;
+                newRotation.y = rotation;
+                virtualCamera.transform.rotation = Quaternion.Euler(newRotation);
+            }
+        }
+        if (Input.GetKey(KeyCode.Y)) {
+            rotation -= rotationSensitivity * Time.deltaTime;
+            if (componentBase is CinemachineFramingTransposer) {
+                Vector3 newRotation = virtualCamera.transform.rotation.eulerAngles;
+                newRotation.y = rotation;
+                virtualCamera.transform.rotation = Quaternion.Euler(newRotation);
+            }
+        }
     }
 }

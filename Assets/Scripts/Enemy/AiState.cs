@@ -1,4 +1,4 @@
-enum AiState {
+public enum AiState {
     None,
     Patrolling,
     BehindCover,

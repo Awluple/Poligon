@@ -7,6 +7,8 @@ using UnityEngine.Animations.Rigging;
 using Poligon.Extensions;
 using TMPro;
 using Poligon.EvetArgs;
+using UnityEngine.UIElements;
+using UnityEngine.EventSystems;
 
 public class Enemy : Character {
 
@@ -27,9 +29,11 @@ public class Enemy : Character {
         enemyController.OnAimStart += AimStart;
         enemyController.OnAimCancel += AimCancel;
 
-
         enemyController.OnShootPerformed += ShootPerformed;
         enemyController.OnShootCancel += ShootCancel;
+
+        enemyController.OnCrouchStart += StartCrouch;
+        enemyController.OnCrouchCancel += CancelCrouch;
 
 
         characterController = GetComponent<CharacterController>();
@@ -42,7 +46,8 @@ public class Enemy : Character {
 
 
     // Update is called once per frame
-    void Update() {
+    protected override void Update() {
+        base.Update();
         if (!stunned) {
             Move();
             }// else {
@@ -61,7 +66,8 @@ public class Enemy : Character {
         //}
 
         if ((isWalking && !stunned) || isAiming) {
-            Rotate(new Vector3(movement.x, 0f, movement.z));
+            //Rotate(new Vector3(movement.x, 0f, movement.z));
+            Rotate(aimingTarget.transform.position);
         }
         characterController.Move(movement * Time.deltaTime);
 
@@ -81,6 +87,11 @@ public class Enemy : Character {
         //    if (OnFalling != null) OnFalling(this, EventArgs.Empty);
         //}
 
+    }
+
+    public void RotateSelf(Vector3 direction) {
+        Vector3 newDirection = Vector3.RotateTowards(transform.forward, direction, rotationSpeed * Time.deltaTime, 0f);
+        transform.rotation = Quaternion.LookRotation(newDirection);
     }
     protected override void Rotate(Vector3 moveDir) {
         Quaternion? toRotation;

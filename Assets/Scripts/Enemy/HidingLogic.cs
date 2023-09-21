@@ -25,6 +25,8 @@ public class HidingLogic : MonoBehaviour {
 
     private LineRenderer pathLine;
 
+    public CoverPosition currentCoverPosition { get; private set; }
+
 
     private void Awake() {
         agent = gameObject.transform.parent.GetComponent<NavMeshAgent>();
@@ -74,6 +76,7 @@ public class HidingLogic : MonoBehaviour {
                     for (int i = 1; i < path.corners.Length; i++) {
                         pathLine.SetPosition(i, path.corners[i]);
                     }
+                    currentCoverPosition = cover.otherCollider.gameObject.GetComponent<CoverPosition>();
                     return cover.otherCollider.gameObject.transform.position;
                 }
             }

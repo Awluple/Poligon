@@ -30,14 +30,14 @@ public class EnemyController : MonoBehaviour, ICharacterController {
     public event EventHandler OnShootPerformed;
     public event EventHandler OnShootCancel;
 
-    private event EventHandler OnFinalPositionEvent;
+    public event EventHandler OnFinalPositionEvent;
 
 
-    [SerializeField] private Enemy enemy;
+    public Enemy enemy { get; private set; }
 
     [SerializeField] private GameObject[] patrolPositions;
     [SerializeField] private Transform groundSpot;
-    [SerializeField] private Transform eyes;
+    public Transform eyes;
 
 
     private LineRenderer pathLine;
@@ -46,183 +46,118 @@ public class EnemyController : MonoBehaviour, ICharacterController {
     private NavMeshAgent navAgent;
     private NavMeshPath destination;
 
-    private int currentPatrolPosition = -1;
-    private bool onFinalPosition = false;
+    public int currentPatrolPosition = -1;
+    public bool onFinalPosition { get; private set; } = false;
     private int currentCorner = 1;
 
     private Vector3 moveDir;
     private IEnumerator pathRecalc;
-    private IEnumerator attackCoroutine;
-    private IEnumerator checkLastSeen;
 
     // AI
-    [SerializeField]private AiState state = AiState.Patrolling;
-    private float lastSeen;
-    private Vector3 lastKnownPosition;
-    private bool alerted = false;
+    public AiState state = AiState.Patrolling;
     private bool aiming = false;
 
-    private HidingLogic hidingLogic;
+    public HidingLogic hidingLogic { get; private set; }
+    [SerializeField] private AttackingLogic attackingLogic;
 
     void Awake() {
         navAgent = gameObject.transform.parent.GetComponent<NavMeshAgent>();
         destination = new NavMeshPath();
         hidingLogic = transform.GetComponent<HidingLogic>();
+        attackingLogic = transform.AddComponent<AttackingLogic>();
+        enemy = transform.GetComponentInParent<Enemy>();
     }
 
     private void Start() {
         SetPatrollingPath();
-        enemy.getAimPosition().OnLineOfSight += SetAttackingState;
+        enemy.getAimPosition().OnLineOfSight += SetAiState;
     }
 
     private void Update() {
 
     }
     
-    public void SetAttackingState(object sender = null, System.EventArgs e = null) {
-        alerted = true;
+    public void SetAiState(object sender = null, System.EventArgs e = null) {
         //enemy.getAimPosition().OnLineOfSightLost += StopAttacking;
         switch (state) {
             case AiState.Patrolling:
-                EnemySpotted();
+            case AiState.None:
+                attackingLogic.EnemySpotted();
                 break;
             case AiState.Chasing:
-                EnemySpotted();
+                attackingLogic.EnemySpotted();
                 break;
             case AiState.Hiding:
+                attackingLogic.SetBehindCoverPosition();
                 state = AiState.BehindCover;
                 break;
         }
     }
 
-    public void StopAttacking(object sender = null, System.EventArgs e = null) {
-        if (attackCoroutine != null) StopCoroutine(attackCoroutine);
-        if (attackCoroutine != null) StopCoroutine(checkLastSeen);
-        alerted = false;
-        AimCancel();
-        state = AiState.Patrolling;
-        currentPatrolPosition = -1;
-        SetPatrollingPath();
-    }
-
-    private void EnemySpotted() {
-        Vector3 hidingSpot = hidingLogic.GetHidingPosition();
-
-        if(checkLastSeen != null) { StopCoroutine(checkLastSeen); }
-        checkLastSeen = CheckLastSeen();
-        StartCoroutine(checkLastSeen);
-        state = AiState.Hiding;
-
-
-        if (hidingSpot != Vector3.zero ) {
-            //AimStart();
-            SetNewDestinaction(hidingSpot);
-        } else {
-            SetNewDestinaction(transform.position);
-        }
-        OnFinalPositionEvent += SetAttackingState;
-        OnFinalPositionEvent += (object sender, System.EventArgs e) => { RunCancel(); };
-
-        //AimStart();
-        if(attackCoroutine != null) StopCoroutine(attackCoroutine);
-        attackCoroutine = ContinueAttacking();
-        StartCoroutine(attackCoroutine);
-    }
-
-    IEnumerator CheckLastSeen() {
-        for (; ; ) {
-            if (Time.time - lastSeen > 10f && state != AiState.Chasing) {
-                state = AiState.Chasing;
-                SetNewDestinaction(lastKnownPosition);
-                if (attackCoroutine != null) StopCoroutine(attackCoroutine);
-                RunCancel();
-                enemy.getAimPosition().Reset();
-            } else if (Time.time - lastSeen > 20f) {
-                StopAttacking();
-            }
-            yield return new WaitForSeconds(1f);
-        }
-    }
-
-    IEnumerator ContinueAttacking() {
-        for (; ; ) {
-            Ray ray = new Ray(eyes.transform.position, enemy.getAimPosition().transform.position - eyes.transform.position);
-
-            if (Physics.Raycast(ray, out RaycastHit hit, 40f)) {
-                if(hit.collider.gameObject.TryGetComponent<Character>(out Character character)) {
-                    if (!aiming) AimStart();
-                    if(character == enemy) { yield return new WaitForSeconds(0.3f); } // don't shoot yourself...
-                    lastSeen = Time.time;
-                    lastKnownPosition = character.transform.position;
-                    ShootPerformed();
-                } else if(state != AiState.Chasing) {
-                    AimCancel();
-                }
-                
-            }
-            yield return new WaitForSeconds(0.3f);
-        }
-    }
-
-    private void SetNewDestinaction(Vector3 spot) {
+    public void SetNewDestinaction(Vector3 spot) {
         currentCorner = 1;
         onFinalPosition = false;
         OnFinalPositionEvent = null;
         navAgent.CalculatePath(spot, destination);
     }
 
-    private void FinalPosition() {
+    public void FinalPosition() {
         if (OnFinalPositionEvent != null) OnFinalPositionEvent(this, EventArgs.Empty);
     }
-    private void RunStart() {
+    public void RunStart() {
         if (OnRunStart != null) OnRunStart(this, EventArgs.Empty);
     }
-    private void RunCancel() {
+    public void RunCancel() {
         if (OnRunCancel != null) OnRunCancel(this, EventArgs.Empty);
     }
 
-    private void JumpStart() {
+    public void JumpStart() {
         if (OnJumpStart != null) OnJumpStart(this, EventArgs.Empty);
     }
-    private void JumpPerformed() {
+    public void JumpPerformed() {
         if (OnJumpPerformed != null) OnJumpPerformed(this, EventArgs.Empty);
     }
-    private void JumpCancel() {
+    public void JumpCancel() {
         if (OnJumpCancel != null) OnJumpCancel(this, EventArgs.Empty);
     }
-    private void AimStart() {
+    public void AimStart() {
         aiming = true;
         if (OnAimStart != null) OnAimStart(this, EventArgs.Empty);
     }
-    private void AimPerformed() {
+    public void AimPerformed() {
         aiming = true;
         if (OnAimPerformed != null) OnAimPerformed(this, EventArgs.Empty);
     }
-    private void AimCancel() {
+    public void AimCancel() {
         aiming = false;
         if (OnAimCancel != null) OnAimCancel(this, EventArgs.Empty);
     }
 
-    private void CrouchStart() {
+    public void CrouchStart() {
         if (OnCrouchStart != null) OnCrouchStart(this, EventArgs.Empty);
     }
-    private void CrouchPerformed() {
+    public void CrouchPerformed() {
         if (OnCrouchPerformed != null) OnCrouchPerformed(this, EventArgs.Empty);
     }
-    private void CrouchCancel() {
+    public void CrouchCancel() {
         if (OnCrouchCancel != null) OnCrouchCancel(this, EventArgs.Empty);
     }
-    private void ShootStart() {
+    public void ShootStart() {
         if (OnShootStart != null) OnShootStart(this, EventArgs.Empty);
     }
-    private void ShootPerformed() {
+    public void ShootPerformed() {
         if (OnShootPerformed != null) OnShootPerformed(this, EventArgs.Empty);
     }
-    private void ShootCancel() {
+    public void ShootCancel() {
         if (OnShootCancel != null) OnShootCancel(this, EventArgs.Empty);
     }
 
-    private void SetPatrollingPath(object sender = null, System.EventArgs e = null) {
+    public void SetPatrollingPath(object sender = null, System.EventArgs e = null) {
+        if (patrolPositions.Length == 0) {
+            onFinalPosition = true;
+            state = AiState.None;
+            return;
+        };
         if ((currentPatrolPosition == -1 || onFinalPosition) && state == AiState.Patrolling) {
             patrolPointSelection();
             if(pathRecalc != null) StopCoroutine(pathRecalc);
@@ -262,6 +197,8 @@ public class EnemyController : MonoBehaviour, ICharacterController {
     public Vector2 GetMovementVectorNormalized() {
 
         if (state == AiState.Patrolling) SetPatrollingPath();
+
+        if(destination == null || destination.corners.Length == 0) return Vector2.zero;
 
         if (Vector3.Distance(groundSpot.position, destination.corners[destination.corners.Length - 1]) < 0.2f) {
             onFinalPosition = true;
