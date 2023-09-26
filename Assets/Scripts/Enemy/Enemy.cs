@@ -40,8 +40,11 @@ public class Enemy : Character {
 
     }
 
-    public EnemyAimPosition getAimPosition() {
+    public EnemyAimPosition GetAimPosition() {
         return (EnemyAimPosition)aimingTarget;
+    }
+    public EnemyController GetController() {
+        return enemyController;
     }
 
 
@@ -66,8 +69,8 @@ public class Enemy : Character {
         //}
 
         if ((isWalking && !stunned) || isAiming) {
-            //Rotate(new Vector3(movement.x, 0f, movement.z));
-            Rotate(aimingTarget.transform.position);
+            Rotate(new Vector3(movement.x, 0f, movement.z));
+            //Rotate(aimingTarget.transform.position);
         }
         characterController.Move(movement * Time.deltaTime);
 

@@ -19,16 +19,22 @@ public class EnemyAimPosition : AimPosition {
 
     void Awake() {
         enemy = GetComponentInParent<Enemy>();
+        enemy.OnDeath += RemoveTarget;
         player = FindFirstObjectByType<Player>().GetComponent<Player>();
-        checkCoroutine = DoCheck();
+        checkCoroutine = DoCheck(true);
         StartCoroutine(checkCoroutine);
+        transform.SetParent(null);
     }
 
     // Update is called once per frame
     void Update() {
     }
 
-    IEnumerator DoCheck() {
+    void RemoveTarget(object sender, EventArgs args) {
+        Destroy(gameObject);
+    }
+
+    IEnumerator DoCheck(bool repositionOnFailed) {
             for (; ; ) {
                 if (ProximityCheck()) {
                     Vector3 position = player.transform.position;
@@ -37,7 +43,9 @@ public class EnemyAimPosition : AimPosition {
                     transform.position = position;
                     yield return new WaitForSeconds(0f);
                 } else {
-                    transform.position = enemy.transform.position;
+                    if(repositionOnFailed) {
+                        transform.position = enemy.transform.position;
+                    }
                     aimingAtPlayer = false;
                     yield return new WaitForSeconds(.4f);
                 }
@@ -55,6 +63,8 @@ public class EnemyAimPosition : AimPosition {
         StopCoroutine(checkCoroutine);
         aimingAtPlayer = false;
         sightEventsCalled = false;
+        checkCoroutine = DoCheck(false);
+        StartCoroutine(checkCoroutine);
     }
 
     bool ProximityCheck() {
@@ -74,13 +84,16 @@ public class EnemyAimPosition : AimPosition {
             return true;
         } else if (Vector3.Distance(enemy.transform.position, player.transform.position) < 20f &&
             Vector3.Angle(player.transform.position - enemy.transform.position, enemy.transform.forward) < 75) { // Detect within 20f if visable
-            Vector3 startPoint = enemy.transform.position;
+            Vector3 startPoint = enemy.GetController().eyes.transform.position;
             startPoint.y += 1f;
             Vector3 target = player.transform.position;
             target.y += 1.6f;
             Ray ray = new Ray(startPoint, target - startPoint);
             if (Physics.Raycast(ray, out RaycastHit hit, 25f)) {
-                return false;
+                if(!hit.collider.gameObject.TryGetComponent<Player>(out Player player)) {
+                    return false;
+                }
+                
             }
 
             if (OnLineOfSight != null && sightEventsCalled == false) {

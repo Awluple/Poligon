@@ -9,6 +9,8 @@ public class AttackingLogic : MonoBehaviour
     private IEnumerator movingAttackCoroutine;
     private IEnumerator coveredAttackCoroutine;
     private IEnumerator checkLastSeen;
+    private IEnumerator shootingCoroutine;
+
 
 
     private float lastSeen;
@@ -28,7 +30,6 @@ public class AttackingLogic : MonoBehaviour
 
         enemyController.enemy.RotateSelf(-coverPosition.transform.forward);
         List<CoverPose> poses = coverPosition.GetCoverPoses();
-        Debug.Log(poses.Count);
         if (poses.Count == 1 ) {
             
             if (poses[0] == CoverPose.Standing) {
@@ -79,13 +80,13 @@ public class AttackingLogic : MonoBehaviour
 
     IEnumerator CheckLastSeen() {
         for (; ; ) {
-            if (Time.time - lastSeen > 18f && enemyController.state != AiState.Chasing) {
+            if (Time.time - lastSeen > 60f && enemyController.state != AiState.Chasing) {
                 enemyController.state = AiState.Chasing;
                 enemyController.SetNewDestinaction(lastKnownPosition);
                 if (movingAttackCoroutine != null) StopCoroutine(movingAttackCoroutine);
                 enemyController.RunCancel();
-                enemyController.enemy.getAimPosition().Reset();
-            } else if (Time.time - lastSeen > 20f) {
+                enemyController.enemy.GetAimPosition().Reset();
+            } else if (Time.time - lastSeen > 60f) {
                 StopAttacking();
             }
             yield return new WaitForSeconds(1f);
@@ -95,7 +96,7 @@ public class AttackingLogic : MonoBehaviour
     IEnumerator ContinueAttackingWhileMoving() {
         for (; ; ) {
             Vector3 eyesPosition = enemyController.eyes.transform.position;
-            Ray ray = new Ray(eyesPosition, enemyController.enemy.getAimPosition().transform.position - eyesPosition);
+            Ray ray = new Ray(eyesPosition, enemyController.enemy.GetAimPosition().transform.position - eyesPosition);
 
             if (Physics.Raycast(ray, out RaycastHit hit, 40f)) {
                 if (hit.collider.gameObject.TryGetComponent<Character>(out Character character)) {
@@ -114,24 +115,10 @@ public class AttackingLogic : MonoBehaviour
         }
     }
 
-    private void PeekFromTheCover() {
-
-    }
-
-    IEnumerator ContinueAttackingWhileCovered() {
+    IEnumerator ShootingCoroutine() {
         for (; ; ) {
-            yield return new WaitForSeconds(Random.Range(4f, 8f));
-
-
             Vector3 eyesPosition = enemyController.eyes.transform.position;
-            Ray ray = new Ray(eyesPosition, enemyController.enemy.getAimPosition().transform.position - eyesPosition);
-            enemyController.CrouchCancel();
-            enemyController.AimStart();
-
-            //enemyController.enemy.getAimPosition().Reposition();
-            enemyController.enemy.RotateSelf(coverPosition.transform.forward);
-            yield return new WaitForSeconds(0.8f);
-
+            Ray ray = new Ray(eyesPosition, enemyController.enemy.GetAimPosition().transform.position - eyesPosition);
             if (Physics.Raycast(ray, out RaycastHit hit, 40f)) {
                 if (hit.collider.gameObject.TryGetComponent<Character>(out Character character)) {
                     if (!aiming) enemyController.AimStart();
@@ -139,12 +126,44 @@ public class AttackingLogic : MonoBehaviour
                     lastSeen = Time.time;
                     lastKnownPosition = character.transform.position;
                     enemyController.ShootPerformed();
-                } else {
-                    
-                    
                 }
 
             }
+            yield return new WaitForSeconds(Random.Range(0.5f, 1f));
+        }
+        
+    }
+
+    IEnumerator ContinueAttackingWhileCovered() {
+        bool covered = true;
+        if (shootingCoroutine == null) {
+            shootingCoroutine = ShootingCoroutine();
+            StartCoroutine(shootingCoroutine);
+        }
+        for (; ; ) {
+            yield return new WaitForSeconds(Random.Range(4f, 8f));
+
+            if(covered) {
+                enemyController.CrouchCancel();
+                enemyController.AimStart();
+
+                Vector3 pos = coverPosition.transform.forward * 4 + enemyController.eyes.transform.position;
+
+                enemyController.enemy.GetAimPosition().Reposition(pos);
+                enemyController.enemy.RotateSelf(coverPosition.transform.forward);
+                covered = false;
+            } else {
+                //StopCoroutine(shootingCoroutine);
+                enemyController.CrouchStart();
+                enemyController.AimCancel();
+
+                enemyController.enemy.RotateSelf(-coverPosition.transform.forward);
+                covered = true;
+            }
+
+            yield return new WaitForSeconds(0.8f);
+            
+
         }
     }
 }

@@ -70,7 +70,7 @@ public class EnemyController : MonoBehaviour, ICharacterController {
 
     private void Start() {
         SetPatrollingPath();
-        enemy.getAimPosition().OnLineOfSight += SetAiState;
+        enemy.GetAimPosition().OnLineOfSight += SetAiState;
     }
 
     private void Update() {

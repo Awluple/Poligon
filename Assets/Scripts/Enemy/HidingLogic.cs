@@ -65,19 +65,19 @@ public class HidingLogic : MonoBehaviour {
 
     public Vector3 GetHidingPosition() {
         if (Vector3.Distance(transform.position, player.transform.position) < 20f) {
-            ContactPoint[] values = hidingSphere.GetCovers().Values.ToArray();
-            Array.Sort(values, (a, b) => Vector3.Distance(a.point, transform.position).CompareTo(Vector3.Distance(b.point, transform.position)));
-            foreach (ContactPoint cover in values) {
-                Vector3 direction = Vector3.Normalize(player.transform.position - cover.point);
-                float dot = Vector3.Dot(cover.otherCollider.gameObject.transform.forward, direction);
-                if (Vector3.Distance(player.transform.position, cover.point) > minDistanceFromPlayer && dot > 0.3f && isCloseCover(cover.point, out NavMeshPath path)) {
+            GameObject[] values = hidingSphere.GetCovers().Values.ToArray();
+            Array.Sort(values, (a, b) => Vector3.Distance(a.transform.position, transform.position).CompareTo(Vector3.Distance(b.transform.position, transform.position)));
+            foreach (GameObject cover in values) {
+                Vector3 direction = Vector3.Normalize(player.transform.position - cover.transform.position);
+                float dot = Vector3.Dot(cover.transform.forward, direction);
+                if (Vector3.Distance(player.transform.position, cover.transform.position) > minDistanceFromPlayer && dot > 0.3f && isCloseCover(cover.transform.position, out NavMeshPath path)) {
                     pathLine.positionCount = path.corners.Length;
                     pathLine.SetPosition(0, transform.position);
                     for (int i = 1; i < path.corners.Length; i++) {
                         pathLine.SetPosition(i, path.corners[i]);
                     }
-                    currentCoverPosition = cover.otherCollider.gameObject.GetComponent<CoverPosition>();
-                    return cover.otherCollider.gameObject.transform.position;
+                    currentCoverPosition = cover.GetComponent<CoverPosition>();
+                    return cover.transform.position;
                 }
             }
         }
@@ -91,13 +91,13 @@ public class HidingLogic : MonoBehaviour {
             hidingSphere = character.GetComponentInChildren<HidingCollisionSphere>();
         }
         Gizmos.DrawWireSphere(transform.position, 36f);
-        foreach (ContactPoint cover in hidingSphere.GetCovers().Values) {
-            Vector3 direction = Vector3.Normalize(player.transform.position - cover.point);
-            float dot = Vector3.Dot(cover.otherCollider.gameObject.transform.forward, direction);
-            if (Vector3.Distance(player.transform.position, cover.point) > minDistanceFromPlayer && dot > 0.3f) {
-                Debug.DrawLine(transform.position, cover.point, Color.cyan);
+        foreach (GameObject cover in hidingSphere.GetCovers().Values) {
+            Vector3 direction = Vector3.Normalize(player.transform.position - cover.transform.position);
+            float dot = Vector3.Dot(cover.transform.forward, direction);
+            if (Vector3.Distance(player.transform.position, cover.transform.position) > minDistanceFromPlayer && dot > 0.3f) {
+                Debug.DrawLine(transform.position, cover.transform.position, Color.cyan);
             } else {
-                Debug.DrawLine(transform.position, cover.point, Color.black);
+                Debug.DrawLine(transform.position, cover.transform.position, Color.black);
             }
         }
     }
