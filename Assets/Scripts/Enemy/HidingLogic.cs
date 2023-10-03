@@ -16,9 +16,6 @@ public class HidingLogic : MonoBehaviour {
     private NavMeshAgent agent;
     [SerializeField] private LayerMask hidableLayers;
 
-    [SerializeField] float minDistanceFromPlayer = 8f;
-    [SerializeField] float maxCoverDistance = 16f;
-
     [SerializeField] HidingCollisionSphere hidingSphere;
 
     private Mesh mesh;
@@ -49,7 +46,7 @@ public class HidingLogic : MonoBehaviour {
 
     }
 
-    bool isCloseCover(Vector3 position, out NavMeshPath path) {
+    bool isCloseCover(Vector3 position, float maxCoverDistance, out NavMeshPath path) {
         path = new NavMeshPath();
 
         if(!agent.CalculatePath(position, path)) {
@@ -63,14 +60,18 @@ public class HidingLogic : MonoBehaviour {
         return distance < maxCoverDistance;
     }
 
-    public Vector3 GetHidingPosition() {
-        if (Vector3.Distance(transform.position, player.transform.position) < 20f) {
+    public Vector3 GetHidingPosition(Vector3 hidingSourcePosition, Vector3? originPosition = null, float minDistanceFromSource = 8f, float maxCoverDistance = 20f, float maxSearchDistance = 21f ) {
+        Vector3 originPos = Vector3.zero;
+        if (originPosition == null) originPos = transform.position;
+        else { originPos = originPosition.GetValueOrDefault(); }
+
+        if (Vector3.Distance(originPos, hidingSourcePosition) < maxSearchDistance) {
             GameObject[] values = hidingSphere.GetCovers().Values.ToArray();
-            Array.Sort(values, (a, b) => Vector3.Distance(a.transform.position, transform.position).CompareTo(Vector3.Distance(b.transform.position, transform.position)));
+            Array.Sort(values, (a, b) => Vector3.Distance(a.transform.position, hidingSourcePosition).CompareTo(Vector3.Distance(b.transform.position, hidingSourcePosition)));
             foreach (GameObject cover in values) {
-                Vector3 direction = Vector3.Normalize(player.transform.position - cover.transform.position);
+                Vector3 direction = Vector3.Normalize(hidingSourcePosition - cover.transform.position);
                 float dot = Vector3.Dot(cover.transform.forward, direction);
-                if (Vector3.Distance(player.transform.position, cover.transform.position) > minDistanceFromPlayer && dot > 0.3f && isCloseCover(cover.transform.position, out NavMeshPath path)) {
+                if (Vector3.Distance(hidingSourcePosition, cover.transform.position) > minDistanceFromSource && dot > 0.3f && isCloseCover(cover.transform.position, maxCoverDistance, out NavMeshPath path)) {
                     pathLine.positionCount = path.corners.Length;
                     pathLine.SetPosition(0, transform.position);
                     for (int i = 1; i < path.corners.Length; i++) {
@@ -94,7 +95,7 @@ public class HidingLogic : MonoBehaviour {
         foreach (GameObject cover in hidingSphere.GetCovers().Values) {
             Vector3 direction = Vector3.Normalize(player.transform.position - cover.transform.position);
             float dot = Vector3.Dot(cover.transform.forward, direction);
-            if (Vector3.Distance(player.transform.position, cover.transform.position) > minDistanceFromPlayer && dot > 0.3f) {
+            if (Vector3.Distance(player.transform.position, cover.transform.position) > 8f && dot > 0.3f) {
                 Debug.DrawLine(transform.position, cover.transform.position, Color.cyan);
             } else {
                 Debug.DrawLine(transform.position, cover.transform.position, Color.black);

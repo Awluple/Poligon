@@ -14,7 +14,7 @@ public class BulletRaycast : MonoBehaviour
         Physics.Raycast(transform.position, targetPosition, out RaycastHit hitInfo, 999f);
         this.targetPosition = hitInfo.point;
 
-        if(hitInfo.collider.gameObject.TryGetComponent(out IKillable component)) {
+        if(hitInfo.collider != null && hitInfo.collider.gameObject.TryGetComponent(out IKillable component)) {
             component.ApplyDamage(50);
         }
 
