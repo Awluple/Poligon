@@ -8,7 +8,7 @@ using UnityEngine.UIElements;
 public class EnemyAimPosition : AimPosition {
     Player player;
     Enemy enemy;
-    public bool aimingAtPlayer = false;
+    public bool aimingAtCharacter = false;
 
     public event EventHandler OnLineOfSight;
     public event EventHandler OnLineOfSightLost;
@@ -36,7 +36,6 @@ public class EnemyAimPosition : AimPosition {
     // Update is called once per frame
     void Update() {
         if(movePosition != Vector3.zero) {
-            Debug.Log("Moving?");
             float step = moveSpeed * Time.deltaTime;
             transform.position = Vector3.MoveTowards(transform.position, movePosition, step);
         }
@@ -50,41 +49,69 @@ public class EnemyAimPosition : AimPosition {
         Destroy(gameObject);
     }
 
+    void MoveToCharacter(Character character, ref bool moveAimCalled) {
+        Vector3 position = character.transform.position;
+
+        if (character.IsCrouching()) {
+            position.y += 1.2f;
+        } else {
+            position.y += 1.8f;
+        }
+        aimingAtCharacter = true;
+        if (justNoticed) {
+            if (!moveAimCalled) {
+                Vector3 initialPosition = enemy.transform.forward * 4f + enemy.transform.position;
+                if (enemy.IsCrouching()) {
+                    initialPosition.y += 1.2f;
+                } else {
+                    initialPosition.y += 1.8f;
+                }
+                transform.position = initialPosition;
+                MoveAim(position, 80f, () => { Debug.Log("Callback?"); justNoticed = false; });
+                moveAimCalled = true;
+            }
+
+        } else {
+            transform.position = position;
+        }
+    }
+
     IEnumerator DoCheck(bool repositionOnFailed) {
         bool moveAimCalled = false;
         for (; ; ) {
             if (ProximityCheck()) {
-                Vector3 position = player.transform.position;
+                MoveToCharacter(player, ref moveAimCalled);
+                //Vector3 position = player.transform.position;
                 
-                if (player.IsCrouching()) {
-                    position.y += 1.2f;
-                } else {
-                    position.y += 1.8f;
-                }
-                aimingAtPlayer = true;
-                if (justNoticed) {
-                    if(!moveAimCalled) {
-                        Vector3 initialPosition = enemy.transform.forward * 4f + enemy.transform.position;
-                        if(enemy.IsCrouching()) {
-                            initialPosition.y += 1.2f;
-                        } else {
-                            initialPosition.y += 1.8f;
-                        }
-                        transform.position = initialPosition;
-                        MoveAim(position, 80f, () => { Debug.Log("Callback?"); justNoticed = false; });
-                        moveAimCalled = true;
-                    }
+                //if (player.IsCrouching()) {
+                //    position.y += 1.2f;
+                //} else {
+                //    position.y += 1.8f;
+                //}
+                //aimingAtCharacter = true;
+                //if (justNoticed) {
+                //    if(!moveAimCalled) {
+                //        Vector3 initialPosition = enemy.transform.forward * 4f + enemy.transform.position;
+                //        if(enemy.IsCrouching()) {
+                //            initialPosition.y += 1.2f;
+                //        } else {
+                //            initialPosition.y += 1.8f;
+                //        }
+                //        transform.position = initialPosition;
+                //        MoveAim(position, 80f, () => { Debug.Log("Callback?"); justNoticed = false; });
+                //        moveAimCalled = true;
+                //    }
                     
-                } else {
-                    transform.position = position;
-                }
+                //} else {
+                //    transform.position = position;
+                //}
                 yield return new WaitForSeconds(0f);
             } else {
                 if (repositionOnFailed) {
                     transform.position = enemy.transform.position;
                 }
                 justNoticed = true;
-                aimingAtPlayer = false;
+                aimingAtCharacter = false;
                 yield return new WaitForSeconds(.4f);
             }
         }
@@ -92,14 +119,14 @@ public class EnemyAimPosition : AimPosition {
 
     public void Reset() {
         transform.position = enemy.transform.position;
-        aimingAtPlayer = false;
+        aimingAtCharacter = false;
         sightEventsCalled = false;
     }
 
     public override void Reposition(Vector3 newPosition) {
         base.Reposition(newPosition);
         StopCoroutine(checkCoroutine);
-        aimingAtPlayer = false;
+        aimingAtCharacter = false;
         sightEventsCalled = false;
         checkCoroutine = DoCheck(false);
         StartCoroutine(checkCoroutine);
@@ -118,11 +145,22 @@ public class EnemyAimPosition : AimPosition {
         }
     }
 
+    public void LockOnTarget(Character character) {
+        bool moveAimCalled = false;
+        StopCoroutine(checkCoroutine);
+        MoveToCharacter(character, ref moveAimCalled);
+        if (OnLineOfSight != null) {
+            OnLineOfSight(this, EventArgs.Empty);
+            sightEventsCalled = true;
+        };
+        StartCoroutine(checkCoroutine);
+    }
+
     bool ProximityCheck() {
-        //if (aimingAtPlayer && Vector3.Distance(enemy.transform.position, player.transform.position) < 40f) { // keep track of the target if detected
+        //if (aimingAtCharacter && Vector3.Distance(enemy.transform.position, player.transform.position) < 40f) { // keep track of the target if detected
         //    return true;
         //}
-        if (aimingAtPlayer) { // keep track of the target if detected
+        if (aimingAtCharacter) { // keep track of the target if detected
             return true;
         }
 
@@ -153,7 +191,7 @@ public class EnemyAimPosition : AimPosition {
             };
             return true;
         }
-        if (aimingAtPlayer) {
+        if (aimingAtCharacter) {
             if (OnLineOfSightLost != null) OnLineOfSightLost(this, EventArgs.Empty);
             sightEventsCalled = false;
         }

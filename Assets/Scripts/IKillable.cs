@@ -7,4 +7,5 @@ public interface IKillable
 {
     public void ApplyDamage(float damage);
     public event EventHandler OnDeath;
+    public event EventHandler OnHealthLoss;
 }

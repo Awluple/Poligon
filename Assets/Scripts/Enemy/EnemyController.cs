@@ -71,18 +71,27 @@ public class EnemyController : MonoBehaviour, ICharacterController {
     private void Start() {
         SetPatrollingPath();
         enemy.GetAimPosition().OnLineOfSight += SetAiState;
+        enemy.OnHealthLoss += HealthLoss;
     }
 
     private void Update() {
-
+        Debug.Log(state);
     }
     
+    public void HealthLoss(object sender = null, System.EventArgs e = null) {
+        if (!enemy.GetAimPosition().aimingAtCharacter) {
+            Player player = FindFirstObjectByType<Player>(); // TEMP
+            enemy.GetAimPosition().LockOnTarget(player);
+        }
+    }
+
     public void SetAiState(object sender = null, System.EventArgs e = null) {
         //enemy.getAimPosition().OnLineOfSightLost += StopAttacking;
         switch (state) {
             case AiState.Patrolling:
             case AiState.None:
                 attackingLogic.EnemySpotted();
+                enemy.GetAimPosition().OnLineOfSight -= SetAiState;
                 break;
             case AiState.Chasing:
                 attackingLogic.EnemySpotted();

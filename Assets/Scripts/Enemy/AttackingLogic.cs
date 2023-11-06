@@ -62,7 +62,8 @@ public class AttackingLogic : MonoBehaviour
 
     public void EnemySpotted() {
         Player player = FindFirstObjectByType<Player>();
-        Vector3 hidingSpot = enemyController.hidingLogic.GetHidingPosition(player.transform.position);
+        Vector3 hidingSpot = enemyController.hidingLogic.GetHidingPosition(player.transform.position, transform.position, 8f, 2f, 2f);
+
         coverPosition = enemyController.hidingLogic.currentCoverPosition;
         if (checkLastSeen != null) { StopCoroutine(checkLastSeen); }
         checkLastSeen = CheckLastSeen();
@@ -74,15 +75,19 @@ public class AttackingLogic : MonoBehaviour
 
 
         if (hidingSpot != Vector3.zero) {
+            //Vector3 towards = Vector3.RotateTowards(transform.forward, player.transform.position- transform.position, 999f, 999f);
+            //Debug.DrawRay(transform.position, towards * 10, Color.red, 40f);
+            //Debug.Log(Vector3.Angle(towards, hidingSpot - transform.position));
             enemyController.SetNewDestinaction(hidingSpot);
+            enemyController.OnFinalPositionEvent += enemyController.SetAiState;
+            enemyController.OnFinalPositionEvent += (object sender, System.EventArgs e) => { enemyController.RunCancel(); };
+
         } else {
             enemyController.SetNewDestinaction(transform.position);
+            enemyController.CrouchStart();
+            //enemyController.SetAiState();
         }
-
-
-
-        enemyController.OnFinalPositionEvent += enemyController.SetAiState;
-        enemyController.OnFinalPositionEvent += (object sender, System.EventArgs e) => { enemyController.RunCancel(); };
+        
 
         //AimStart();
         if (movingAttackCoroutine != null) StopCoroutine(movingAttackCoroutine);
@@ -92,7 +97,7 @@ public class AttackingLogic : MonoBehaviour
 
     IEnumerator CheckLastSeen() {
         for (; ; ) {
-            if (Time.time - lastSeen > 60f && enemyController.state != AiState.Chasing) {
+            if (Time.time - lastSeen > 50f && enemyController.state != AiState.Chasing) {
                 enemyController.state = AiState.Chasing;
                 enemyController.SetNewDestinaction(lastKnownPosition);
                 if (movingAttackCoroutine != null) StopCoroutine(movingAttackCoroutine);
@@ -201,6 +206,7 @@ public class AttackingLogic : MonoBehaviour
 
                     enemyController.SetNewDestinaction(hidingSpot);
                     StopCoroutine(coveredAttackCoroutine);
+                    lastSeen = 30f;
                 }
                 goto End;
             }

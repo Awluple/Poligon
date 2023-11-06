@@ -60,6 +60,7 @@ public abstract class Character : MonoBehaviour, IKillable {
     public event EventHandler<InputValueEventArgs> OnLeaningEnd;
 
     public event EventHandler OnDeath;
+    public event EventHandler OnHealthLoss;
 
     public Vector2EventHandler OnAimingWalk { get; set; }
 
@@ -158,8 +159,9 @@ public abstract class Character : MonoBehaviour, IKillable {
     }
     public void ApplyDamage(float damage) {
         this.health -= damage;
+        if (OnHealthLoss != null) OnHealthLoss(this, EventArgs.Empty);
 
-        if(this.health <= 0) {
+        if (this.health <= 0) {
             if (OnDeath != null) OnDeath(this, EventArgs.Empty);
             Destroy(gameObject);
         }
