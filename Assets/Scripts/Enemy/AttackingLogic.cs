@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.TextCore.Text;
+using Poligon.Ai.EnemyStates;
 using static UnityEditor.PlayerSettings;
 
 public class AttackingLogic : MonoBehaviour
@@ -46,29 +47,25 @@ public class AttackingLogic : MonoBehaviour
         StartCoroutine(coveredAttackCoroutine);
     }
 
-    private void ChangeCover() {
-
-    }
-
     private void StopAttacking(object sender = null, System.EventArgs e = null) {
         if (movingAttackCoroutine != null) StopCoroutine(movingAttackCoroutine);
         if (movingAttackCoroutine != null) StopCoroutine(checkLastSeen);
         alerted = false;
         enemyController.AimCancel();
-        enemyController.state = AiState.Patrolling;
+        enemyController.aiState = AiState.Patrolling;
         enemyController.currentPatrolPosition = -1;
         enemyController.SetPatrollingPath();
     }
 
     public void EnemySpotted() {
         Player player = FindFirstObjectByType<Player>();
-        Vector3 hidingSpot = enemyController.hidingLogic.GetHidingPosition(player.transform.position, transform.position, 8f, 2f, 2f);
+        Vector3 hidingSpot = enemyController.hidingLogic.GetHidingPosition(player.transform.position);
 
         coverPosition = enemyController.hidingLogic.currentCoverPosition;
         if (checkLastSeen != null) { StopCoroutine(checkLastSeen); }
         checkLastSeen = CheckLastSeen();
         StartCoroutine(checkLastSeen);
-        enemyController.state = AiState.Hiding;
+        enemyController.aiState = AiState.Hiding;
 
         keepTrackOnEnemyCoroutine = KeepTrackOnEnemy();
         StartCoroutine(keepTrackOnEnemyCoroutine);
@@ -97,8 +94,8 @@ public class AttackingLogic : MonoBehaviour
 
     IEnumerator CheckLastSeen() {
         for (; ; ) {
-            if (Time.time - lastSeen > 50f && enemyController.state != AiState.Chasing) {
-                enemyController.state = AiState.Chasing;
+            if (Time.time - lastSeen > 50f && enemyController.aiState != AiState.Chasing) {
+                enemyController.aiState = AiState.Chasing;
                 enemyController.SetNewDestinaction(lastKnownPosition);
                 if (movingAttackCoroutine != null) StopCoroutine(movingAttackCoroutine);
                 enemyController.RunCancel();
@@ -192,13 +189,12 @@ public class AttackingLogic : MonoBehaviour
             }
             lastSeenIteration++;
             if (lastSeenIteration == 5) {
-                Vector3 hidingSpot = enemyController.hidingLogic.GetHidingPosition(enemyController.enemy.GetAimPosition().transform.position, null, 2f, 30f, 40f);
+                Vector3 hidingSpot = enemyController.hidingLogic.GetHidingPosition(enemyController.enemy.GetAimPosition().transform.position, enemyController.enemy.GetAimPosition().transform.position, true, true, 3f, 30f, 11f);
                 coverPosition = enemyController.hidingLogic.currentCoverPosition;
                 if (hidingSpot != Vector3.zero) {
                     enemyController.enemy.GetAimPosition().Reposition(lastKnownPosition);
                     enemyController.AimStart();
                     enemyController.CrouchCancel();
-                    //enemyController.SetAiState();
 
                     if (movingAttackCoroutine != null) StopCoroutine(movingAttackCoroutine);
                     movingAttackCoroutine = ContinueAttackingWhileMoving(false);
@@ -215,7 +211,7 @@ public class AttackingLogic : MonoBehaviour
             if (covered) {
                 enemyController.CrouchCancel();
                 enemyController.AimStart();
-
+                enemyController.aiState = AiState.Attacking;
                 Vector3 pos = coverPosition.transform.forward * 4 + enemyController.eyes.transform.position;
 
                 enemyController.enemy.GetAimPosition().Reposition(lastKnownPosition == Vector3.zero ? pos : lastKnownPosition);
@@ -228,7 +224,7 @@ public class AttackingLogic : MonoBehaviour
             } else {
                 enemyController.CrouchStart();
                 enemyController.AimCancel();
-
+                enemyController.aiState = AiState.BehindCover;
                 enemyController.enemy.RotateSelf(-coverPosition.transform.forward);
                 covered = true;
                 

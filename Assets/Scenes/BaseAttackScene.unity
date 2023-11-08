@@ -81116,6 +81116,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: abb53408166b1a64787df28875b5dff6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  aiEnabled: 0
   patrolPositions:
   - {fileID: 954814440}
   - {fileID: 2011013061}
@@ -81123,7 +81124,6 @@ MonoBehaviour:
   groundSpot: {fileID: 3076249970038054422}
   eyes: {fileID: 3326206275487339568}
   currentPatrolPosition: -1
-  state: 1
   attackingLogic: {fileID: 0}
 --- !u!1 &911515840316220539
 GameObject:
@@ -83302,7 +83302,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 08df6d997939ca940b4bb5ed3779cdb3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  aimingAtPlayer: 0
+  aimingAtCharacter: 0
   sightEventsCalled: 0
 --- !u!1 &4637438092800276214
 GameObject:
@@ -83557,11 +83557,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: abb53408166b1a64787df28875b5dff6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  aiEnabled: 1
   patrolPositions: []
   groundSpot: {fileID: 7116084685793240402}
   eyes: {fileID: 7375047503306567540}
   currentPatrolPosition: -1
-  state: 1
   attackingLogic: {fileID: 0}
 --- !u!1 &5005955353308448581
 GameObject:
@@ -85778,7 +85778,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 08df6d997939ca940b4bb5ed3779cdb3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  aimingAtPlayer: 0
+  aimingAtCharacter: 0
   sightEventsCalled: 0
 --- !u!1 &8637940891341862388
 GameObject:

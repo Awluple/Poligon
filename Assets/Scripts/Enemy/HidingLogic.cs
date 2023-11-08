@@ -60,49 +60,52 @@ public class HidingLogic : MonoBehaviour {
         return distance < maxCoverDistance;
     }
 
-    public Vector3 GetHidingPosition(Vector3 hidingSourcePosition, Vector3? originPosition = null, float minDistanceFromSource = 8f, float maxCoverPathDistance = 20f, float maxSearchDistance = 21f ) {
+    public Vector3 GetHidingPosition(Vector3 hidingSourcePosition, Vector3? originPosition = null, bool closestCover = true, bool ignoreDot = false, float minDistanceFromSource = 8f, float maxCoverPathDistance = 20f, float maxSearchDistance = 21f) {
         Vector3 originPos = Vector3.zero;
         if (originPosition == null) originPos = transform.position;
         else { originPos = originPosition.GetValueOrDefault(); }
 
         //if (Vector3.Distance(originPos, hidingSourcePosition) < maxSearchDistance) {
-            GameObject[] values = hidingSphere.GetCovers().Values.ToArray();
+        GameObject[] values = hidingSphere.GetCovers().Values.ToArray();
+        if (closestCover) {
             Array.Sort(values, (a, b) => Vector3.Distance(a.transform.position, originPos).CompareTo(Vector3.Distance(b.transform.position, originPos)));
-            foreach (GameObject cover in values) {
-            if (Vector3.Distance(originPos, cover.transform.position) > maxSearchDistance) { Debug.Log(Vector3.Distance(originPos, cover.transform.position)); continue; };
+        } else {
+            Array.Sort(values, (a, b) => Vector3.Distance(b.transform.position, originPos).CompareTo(Vector3.Distance(a.transform.position, originPos)));
+        }
+        foreach (GameObject cover in values) {
+            if (Vector3.Distance(originPos, cover.transform.position) > maxSearchDistance) { continue; };
 
-                Vector3 direction = Vector3.Normalize(hidingSourcePosition - cover.transform.position);
-                float dotToPlayer = Vector3.Dot(cover.transform.forward, direction);
+            Vector3 direction = Vector3.Normalize(hidingSourcePosition - cover.transform.position);
+            float dotToPlayer = Vector3.Dot(cover.transform.forward, direction);
 
-                if (Vector3.Distance(hidingSourcePosition, cover.transform.position) > minDistanceFromSource && dotToPlayer > 0.3f && isCloseCover(cover.transform.position, maxCoverPathDistance, out NavMeshPath path)) {
+            if (Vector3.Distance(hidingSourcePosition, cover.transform.position) > minDistanceFromSource && dotToPlayer > 0.3f && isCloseCover(cover.transform.position, maxCoverPathDistance, out NavMeshPath path)) {
 
-                    Vector3 towards = Vector3.RotateTowards(transform.forward, player.transform.position - transform.position, 999f, 999f);
-                    Debug.DrawRay(transform.position, towards * 10, Color.red, 40f);
-                    Debug.Log(Vector3.Angle(towards, cover.transform.position - transform.position));
+                Vector3 towards = Vector3.RotateTowards(transform.forward, hidingSourcePosition - transform.position, 999f, 999f);
+                Debug.DrawRay(transform.position, towards * 10, Color.red, 40f);
 
-                    Vector3 vectorTowardsPlayer = Vector3.RotateTowards(transform.forward, player.transform.position - transform.position, 999f, 999f);
+                Vector3 vectorTowardsSource = Vector3.RotateTowards(transform.forward, hidingSourcePosition - transform.position, 999f, 999f);
 
-                    Vector3 directionToMe = Vector3.Normalize(transform.position - cover.transform.position);
-                    float dotToMe = Vector3.Dot(cover.transform.forward, directionToMe);
+                Vector3 directionToMe = Vector3.Normalize(transform.position - cover.transform.position);
+                float dotToMe = Vector3.Dot(cover.transform.forward, directionToMe);
 
-                    if (Vector3.Angle(vectorTowardsPlayer, cover.transform.position - transform.position) < 60) {
-                        if (dotToPlayer > 0.6f && dotToMe < 0.25f) {
-                            
-                        } else {
-                            continue;
-                        }
+                if (!ignoreDot && Vector3.Angle(vectorTowardsSource, cover.transform.position - transform.position) < 60) {
+                    if (dotToPlayer > 0.6f && dotToMe < 0.25f) {
+
                     } else {
-                        
+                        continue;
                     }
+                } else {
 
-                    pathLine.positionCount = path.corners.Length;
-                    pathLine.SetPosition(0, transform.position);
-                    for (int i = 1; i < path.corners.Length; i++) {
-                        pathLine.SetPosition(i, path.corners[i]);
-                    }
-                    currentCoverPosition = cover.GetComponent<CoverPosition>();
-                    return cover.transform.position;
                 }
+
+                pathLine.positionCount = path.corners.Length;
+                pathLine.SetPosition(0, transform.position);
+                for (int i = 1; i < path.corners.Length; i++) {
+                    pathLine.SetPosition(i, path.corners[i]);
+                }
+                currentCoverPosition = cover.GetComponent<CoverPosition>();
+                return cover.transform.position;
+            }
             //}
         }
 

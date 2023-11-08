@@ -5,6 +5,9 @@ using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.AI;
 using System.Linq;
+using Poligon.Ai;
+using Poligon.Ai.EnemyStates;
+
 
 using static Cinemachine.CinemachineOrbitalTransposer;
 using static UnityEngine.UI.GridLayoutGroup;
@@ -35,6 +38,9 @@ public class EnemyController : MonoBehaviour, ICharacterController {
 
     public Enemy enemy { get; private set; }
 
+    [SerializeField] private bool aiEnabled = true;
+
+
     [SerializeField] private GameObject[] patrolPositions;
     [SerializeField] private Transform groundSpot;
     public Transform eyes;
@@ -54,8 +60,11 @@ public class EnemyController : MonoBehaviour, ICharacterController {
     private IEnumerator pathRecalc;
 
     // AI
-    public AiState state = AiState.Patrolling;
+    public AiState aiState { get => stateMashine.GetState(); set {
+            stateMashine.MoveNext(value);
+        } }
     private bool aiming = false;
+    private AiStateMashine<AiState> stateMashine;
 
     public HidingLogic hidingLogic { get; private set; }
     [SerializeField] private AttackingLogic attackingLogic;
@@ -66,16 +75,58 @@ public class EnemyController : MonoBehaviour, ICharacterController {
         hidingLogic = transform.GetComponent<HidingLogic>();
         attackingLogic = transform.AddComponent<AttackingLogic>();
         enemy = transform.GetComponentInParent<Enemy>();
+
+        
+        NoneState none = new();
+        PatrollingState patrolling = new();
+        HidingState hiding = new();
+        BehindCoverState behindCover = new();
+        AttackingState attacking = new();
+        ChasingState chasing = new();
+
+
+        stateMashine = new AiStateMashine<AiState>(none);
+
+        Dictionary<StateTransition<AiState>, State<AiState>> transitions = new Dictionary<StateTransition<AiState>, State<AiState>>
+        {
+            { new StateTransition<AiState>(AiState.None, AiState.Patrolling), patrolling },
+
+            { new StateTransition<AiState>(AiState.Patrolling, AiState.None), none },
+            { new StateTransition<AiState>(AiState.Patrolling, AiState.Hiding), hiding },
+            { new StateTransition<AiState>(AiState.Patrolling, AiState.Attacking), attacking },
+
+            { new StateTransition<AiState>(AiState.Hiding, AiState.Attacking), attacking },
+            { new StateTransition<AiState>(AiState.Hiding, AiState.BehindCover), behindCover },
+
+            { new StateTransition<AiState>(AiState.BehindCover, AiState.Attacking), attacking },
+            { new StateTransition<AiState>(AiState.BehindCover, AiState.Chasing), attacking },
+
+            { new StateTransition<AiState>(AiState.Attacking, AiState.Chasing), chasing },
+            { new StateTransition<AiState>(AiState.Attacking, AiState.BehindCover), behindCover },
+
+            { new StateTransition<AiState>(AiState.Chasing, AiState.Hiding), hiding },
+            { new StateTransition<AiState>(AiState.Chasing, AiState.Attacking), attacking },
+            { new StateTransition<AiState>(AiState.Chasing, AiState.Patrolling), patrolling },
+
+
+        };
+        stateMashine.SetupTransitions(transitions);
+
     }
 
     private void Start() {
-        SetPatrollingPath();
-        enemy.GetAimPosition().OnLineOfSight += SetAiState;
-        enemy.OnHealthLoss += HealthLoss;
+        if(aiEnabled) {
+            SetPatrollingPath();
+            enemy.GetAimPosition().OnLineOfSight += SetAiState;
+            enemy.OnHealthLoss += HealthLoss;
+            aiState = AiState.Patrolling;
+        }
     }
 
     private void Update() {
-        Debug.Log(state);
+        if (!aiEnabled) return;
+
+        Debug.Log(aiState);
     }
     
     public void HealthLoss(object sender = null, System.EventArgs e = null) {
@@ -87,7 +138,7 @@ public class EnemyController : MonoBehaviour, ICharacterController {
 
     public void SetAiState(object sender = null, System.EventArgs e = null) {
         //enemy.getAimPosition().OnLineOfSightLost += StopAttacking;
-        switch (state) {
+        switch (aiState) {
             case AiState.Patrolling:
             case AiState.None:
                 attackingLogic.EnemySpotted();
@@ -98,7 +149,7 @@ public class EnemyController : MonoBehaviour, ICharacterController {
                 break;
             case AiState.Hiding:
                 attackingLogic.SetBehindCoverPosition();
-                state = AiState.BehindCover;
+                aiState = AiState.BehindCover;
                 break;
         }
     }
@@ -164,10 +215,11 @@ public class EnemyController : MonoBehaviour, ICharacterController {
     public void SetPatrollingPath(object sender = null, System.EventArgs e = null) {
         if (patrolPositions.Length == 0) {
             onFinalPosition = true;
-            state = AiState.None;
+            //aiState = AiState.None;
+
             return;
         };
-        if ((currentPatrolPosition == -1 || onFinalPosition) && state == AiState.Patrolling) {
+        if ((currentPatrolPosition == -1 || onFinalPosition) && aiState == AiState.Patrolling) {
             patrolPointSelection();
             if(pathRecalc != null) StopCoroutine(pathRecalc);
             pathRecalc = RecalculatePath();
@@ -205,7 +257,7 @@ public class EnemyController : MonoBehaviour, ICharacterController {
 
     public Vector2 GetMovementVectorNormalized() {
 
-        if (state == AiState.Patrolling) SetPatrollingPath();
+        if (aiState == AiState.Patrolling) SetPatrollingPath();
 
         if(destination == null || destination.corners.Length == 0) return Vector2.zero;
 
