@@ -9,13 +9,13 @@ public class BulletRaycast : MonoBehaviour
     private float moveSpeed = 300f;
 
 
-    // Update is called once per frame
-    public void Setup(Vector3 targetPosition) {
-        Physics.Raycast(transform.position, targetPosition, out RaycastHit hitInfo, 999f);
+
+    public void Setup(BulletData bulletData) {
+        Physics.Raycast(transform.position, bulletData.targetPosition, out RaycastHit hitInfo, 999f);
         this.targetPosition = hitInfo.point;
 
         if(hitInfo.collider != null && hitInfo.collider.gameObject.TryGetComponent(out IKillable component)) {
-            component.ApplyDamage(50);
+            component.ApplyDamage(bulletData);
         }
 
     }

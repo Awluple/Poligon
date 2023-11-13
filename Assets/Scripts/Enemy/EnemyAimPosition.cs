@@ -67,7 +67,7 @@ public class EnemyAimPosition : AimPosition {
                     initialPosition.y += 1.8f;
                 }
                 transform.position = initialPosition;
-                MoveAim(position, 80f, () => { Debug.Log("Callback?"); justNoticed = false; });
+                MoveAim(position, 80f, () => { justNoticed = false; });
                 moveAimCalled = true;
             }
 
@@ -81,30 +81,6 @@ public class EnemyAimPosition : AimPosition {
         for (; ; ) {
             if (ProximityCheck()) {
                 MoveToCharacter(player, ref moveAimCalled);
-                //Vector3 position = player.transform.position;
-                
-                //if (player.IsCrouching()) {
-                //    position.y += 1.2f;
-                //} else {
-                //    position.y += 1.8f;
-                //}
-                //aimingAtCharacter = true;
-                //if (justNoticed) {
-                //    if(!moveAimCalled) {
-                //        Vector3 initialPosition = enemy.transform.forward * 4f + enemy.transform.position;
-                //        if(enemy.IsCrouching()) {
-                //            initialPosition.y += 1.2f;
-                //        } else {
-                //            initialPosition.y += 1.8f;
-                //        }
-                //        transform.position = initialPosition;
-                //        MoveAim(position, 80f, () => { Debug.Log("Callback?"); justNoticed = false; });
-                //        moveAimCalled = true;
-                //    }
-                    
-                //} else {
-                //    transform.position = position;
-                //}
                 yield return new WaitForSeconds(0f);
             } else {
                 if (repositionOnFailed) {

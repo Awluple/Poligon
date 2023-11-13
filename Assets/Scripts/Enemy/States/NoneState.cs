@@ -13,7 +13,9 @@ namespace Poligon.Ai.EnemyStates {
         Attacking
     }
 
-    public class NoneState : State<AiState> {
+    public class NoneState : EnemyBaseState {
+        public NoneState(EnemyController controller) : base(controller) {
+        }
         public override AiState state { get; protected set; } = AiState.None;
     }
 }

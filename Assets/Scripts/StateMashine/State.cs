@@ -9,7 +9,6 @@ namespace Poligon.Ai {
         public abstract T state { get; protected set; }
 
         public virtual void EnterState() {
-            Debug.Log("Hello! I am: " + state);
         }
 
         public virtual void ExitState() {

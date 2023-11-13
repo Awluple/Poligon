@@ -60,7 +60,7 @@ public abstract class Character : MonoBehaviour, IKillable {
     public event EventHandler<InputValueEventArgs> OnLeaningEnd;
 
     public event EventHandler OnDeath;
-    public event EventHandler OnHealthLoss;
+    public event EventHandler<BulletDataEventArgs> OnHealthLoss;
 
     public Vector2EventHandler OnAimingWalk { get; set; }
 
@@ -157,9 +157,9 @@ public abstract class Character : MonoBehaviour, IKillable {
 
         if (OnHeavyLandingEnd != null) OnHeavyLandingEnd(this, EventArgs.Empty);
     }
-    public void ApplyDamage(float damage) {
-        this.health -= damage;
-        if (OnHealthLoss != null) OnHealthLoss(this, EventArgs.Empty);
+    public void ApplyDamage(BulletData bulletData) {
+        this.health -= bulletData.damage;
+        if (OnHealthLoss != null) OnHealthLoss(this, new BulletDataEventArgs(bulletData));
 
         if (this.health <= 0) {
             if (OnDeath != null) OnDeath(this, EventArgs.Empty);

@@ -1,11 +1,13 @@
+using TMPro;
 using UnityEngine;
+using static Unity.VisualScripting.Member;
 
 namespace Poligon.Extensions {
     public static class PoligonExtensions {
-        public static Object Instantiate(this Object thisObj, Object original, Vector3 position, Quaternion rotation, Vector3 targetPosition) {
+        public static Object Instantiate(this Object thisObj, Object original, Vector3 position, Quaternion rotation, BulletData bulletData) {
             GameObject bullet = Object.Instantiate(original, position, rotation) as GameObject;
             BulletRaycast scr = bullet.GetComponent<BulletRaycast>();
-            scr.Setup(targetPosition);
+            scr.Setup(bulletData);
             return bullet;
         }
         public static GameObject Instantiate(this Object thisObj, Object original, Vector3 position, Quaternion rotation, CoverParams coverParams) {

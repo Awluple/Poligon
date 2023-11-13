@@ -4,6 +4,25 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+public struct BulletData {
+    public BulletData(Vector3 targetPos, Character src, float dmg) {
+        targetPosition = targetPos;
+        source = src;
+        damage = dmg;
+    }
+
+    public Vector3 targetPosition;
+    public Character source;
+    public float damage;
+}
+public class BulletDataEventArgs : EventArgs {
+    public BulletDataEventArgs(BulletData bulletData) {
+        BulletData = bulletData;
+    }
+
+    public BulletData BulletData { get; set; }
+}
+
 public abstract class Gun : MonoBehaviour
 {
 
@@ -35,7 +54,7 @@ public abstract class Gun : MonoBehaviour
 
         if(CanShoot()) {
             Vector3 target = aimingTarget.GetPosition();
-            bullet.Instantiate(bullet, spawnBulletPosition.position, Quaternion.LookRotation(target, Vector3.up), target - spawnBulletPosition.transform.position);
+            bullet.Instantiate(bullet, spawnBulletPosition.position, Quaternion.LookRotation(target, Vector3.up), new BulletData(target - spawnBulletPosition.transform.position, GetComponentInParent<Character>(), 50));
             nextShootTime = Time.time + fireRate;
             audioSource.PlayOneShot(shotSound);
         }

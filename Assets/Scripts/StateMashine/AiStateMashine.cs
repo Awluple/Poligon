@@ -5,26 +5,6 @@ using UnityEditor.MPE;
 using UnityEngine;
 
 namespace Poligon.Ai {
-    //public enum AiState {
-    //    None,
-    //    Patrolling,
-    //    BehindCover,
-    //    Hiding,
-    //    Chasing,
-    //    Attacking
-    //}
-
-    //public enum Command {
-    //    Start,
-    //    Patrol,
-    //    Attack,
-    //    Hide,
-    //    Chase,
-    //    HideBehindCover,
-    //    PeekFromCover,
-    //    Exit
-    //}
-
     public struct StateTransition<T> {
         readonly T CurrentState;
         readonly T NextState;
@@ -46,19 +26,21 @@ namespace Poligon.Ai {
     }
 
 
-    public class AiStateMashine<T>
+    public class AiStateMashine<T> 
         {
 
         Dictionary<StateTransition<T>, State<T>> transitions;
         public State<T> CurrentState { get; private set; }
+        IStateManager stateManager;
 
         public void SetupTransitions(Dictionary<StateTransition<T>, State<T>> transitionsToSetup) {
             transitions = transitionsToSetup;
         }
 
-        public AiStateMashine(State<T> defaultState) {
+        public AiStateMashine(State<T> defaultState, IStateManager stateMng) {
             CurrentState = defaultState;
             CurrentState.EnterState();
+            stateManager = stateMng;
         }
 
         public State<T> GetNext(T command) {
@@ -67,14 +49,15 @@ namespace Poligon.Ai {
             if (!transitions.TryGetValue(transition, out nextState))
                 throw new Exception("Invalid transition: " + CurrentState.state + " -> " + command);
 
-            Debug.Log("Tansition from: " + CurrentState + " to: " + nextState);
+            //Debug.Log("Tansition from: " + CurrentState + " to: " + nextState);
             return nextState;
         }
 
         public T MoveNext(T nextState) {
+            CurrentState.ExitState();
             CurrentState = GetNext(nextState);
             CurrentState.EnterState();
-
+            stateManager.SetUpdateStateCallback(CurrentState.UpdateState);
             return CurrentState.state;
         }
         public T GetState() {

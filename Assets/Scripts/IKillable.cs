@@ -5,7 +5,7 @@ using UnityEngine;
 
 public interface IKillable
 {
-    public void ApplyDamage(float damage);
+    public void ApplyDamage(BulletData bulletData);
     public event EventHandler OnDeath;
-    public event EventHandler OnHealthLoss;
+    public event EventHandler<BulletDataEventArgs> OnHealthLoss;
 }

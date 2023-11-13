@@ -13,7 +13,7 @@ using static Cinemachine.CinemachineOrbitalTransposer;
 using static UnityEngine.UI.GridLayoutGroup;
 using System.Reflection;
 
-public class EnemyController : MonoBehaviour, ICharacterController {
+public class EnemyController : MonoBehaviour, ICharacterController, IStateManager {
     public event EventHandler OnRunStart;
     public event EventHandler OnRunCancel;
 
@@ -65,9 +65,10 @@ public class EnemyController : MonoBehaviour, ICharacterController {
         } }
     private bool aiming = false;
     private AiStateMashine<AiState> stateMashine;
+    private Action stateMashineCallback;
 
     public HidingLogic hidingLogic { get; private set; }
-    [SerializeField] private AttackingLogic attackingLogic;
+    public AttackingLogic attackingLogic { get; private set; }
 
     void Awake() {
         navAgent = gameObject.transform.parent.GetComponent<NavMeshAgent>();
@@ -77,15 +78,15 @@ public class EnemyController : MonoBehaviour, ICharacterController {
         enemy = transform.GetComponentInParent<Enemy>();
 
         
-        NoneState none = new();
-        PatrollingState patrolling = new();
-        HidingState hiding = new();
-        BehindCoverState behindCover = new();
-        AttackingState attacking = new();
-        ChasingState chasing = new();
+        NoneState none = new(this);
+        PatrollingState patrolling = new(this);
+        HidingState hiding = new(this);
+        BehindCoverState behindCover = new(this);
+        AttackingState attacking = new(this);
+        ChasingState chasing = new(this);
 
 
-        stateMashine = new AiStateMashine<AiState>(none);
+        stateMashine = new AiStateMashine<AiState>(none, this);
 
         Dictionary<StateTransition<AiState>, State<AiState>> transitions = new Dictionary<StateTransition<AiState>, State<AiState>>
         {
@@ -99,7 +100,7 @@ public class EnemyController : MonoBehaviour, ICharacterController {
             { new StateTransition<AiState>(AiState.Hiding, AiState.BehindCover), behindCover },
 
             { new StateTransition<AiState>(AiState.BehindCover, AiState.Attacking), attacking },
-            { new StateTransition<AiState>(AiState.BehindCover, AiState.Chasing), attacking },
+            { new StateTransition<AiState>(AiState.BehindCover, AiState.Chasing), chasing },
 
             { new StateTransition<AiState>(AiState.Attacking, AiState.Chasing), chasing },
             { new StateTransition<AiState>(AiState.Attacking, AiState.BehindCover), behindCover },
@@ -117,40 +118,29 @@ public class EnemyController : MonoBehaviour, ICharacterController {
     private void Start() {
         if(aiEnabled) {
             SetPatrollingPath();
-            enemy.GetAimPosition().OnLineOfSight += SetAiState;
+            enemy.GetAimPosition().OnLineOfSight += EnemySpotted;
             enemy.OnHealthLoss += HealthLoss;
             aiState = AiState.Patrolling;
         }
     }
+    private void EnemySpotted(object sender = null, System.EventArgs e = null) {
+        enemy.GetAimPosition().OnLineOfSight -= EnemySpotted;
+        attackingLogic.EnemySpotted();
+    }
+    public void SetUpdateStateCallback(Action callback) {
+        stateMashineCallback = callback;
+    }
 
     private void Update() {
+        if (stateMashineCallback != null) stateMashineCallback();
         if (!aiEnabled) return;
 
         Debug.Log(aiState);
     }
     
-    public void HealthLoss(object sender = null, System.EventArgs e = null) {
+    public void HealthLoss(object sender, BulletDataEventArgs eventArgs) {
         if (!enemy.GetAimPosition().aimingAtCharacter) {
-            Player player = FindFirstObjectByType<Player>(); // TEMP
-            enemy.GetAimPosition().LockOnTarget(player);
-        }
-    }
-
-    public void SetAiState(object sender = null, System.EventArgs e = null) {
-        //enemy.getAimPosition().OnLineOfSightLost += StopAttacking;
-        switch (aiState) {
-            case AiState.Patrolling:
-            case AiState.None:
-                attackingLogic.EnemySpotted();
-                enemy.GetAimPosition().OnLineOfSight -= SetAiState;
-                break;
-            case AiState.Chasing:
-                attackingLogic.EnemySpotted();
-                break;
-            case AiState.Hiding:
-                attackingLogic.SetBehindCoverPosition();
-                aiState = AiState.BehindCover;
-                break;
+            enemy.GetAimPosition().LockOnTarget(eventArgs.BulletData.source);
         }
     }
 
@@ -160,6 +150,10 @@ public class EnemyController : MonoBehaviour, ICharacterController {
         OnFinalPositionEvent = null;
         navAgent.CalculatePath(spot, destination);
     }
+    public Vector3 GetOpponentLastKnownPosition() {
+        return attackingLogic.lastKnownPosition;
+    }
+
 
     public void FinalPosition() {
         if (OnFinalPositionEvent != null) OnFinalPositionEvent(this, EventArgs.Empty);
@@ -215,7 +209,6 @@ public class EnemyController : MonoBehaviour, ICharacterController {
     public void SetPatrollingPath(object sender = null, System.EventArgs e = null) {
         if (patrolPositions.Length == 0) {
             onFinalPosition = true;
-            //aiState = AiState.None;
 
             return;
         };
