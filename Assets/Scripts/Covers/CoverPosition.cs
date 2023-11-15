@@ -13,6 +13,7 @@ public class CoverPosition : Cover
 
     [SerializeField] List<CoverPose> avaliablePoses =  new List<CoverPose>();
     private bool posesChecked = false;
+    public bool occuped = false;
 
     public void Setup(CoverParams coverParams) {
         isEdgeCover = coverParams.coverPoint.GetValueOrDefault().isEdgeCover;

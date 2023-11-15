@@ -30,7 +30,7 @@ public class EnemyAimPosition : AimPosition {
         player = FindFirstObjectByType<Player>().GetComponent<Player>();
         checkCoroutine = DoCheck(true);
         StartCoroutine(checkCoroutine);
-        transform.SetParent(null);
+        transform.SetParent(enemy.transform.parent);
     }
 
     // Update is called once per frame

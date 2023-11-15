@@ -16,7 +16,8 @@ public class HidingCollisionSphere : MonoBehaviour
     }
 
     void OnCollisionEnter(Collision collision) {
-        covers.Add(collision.GetContact(0).otherCollider.gameObject, collision.GetContact(0).otherCollider.gameObject);
+        bool isCover = collision.GetContact(0).otherCollider.gameObject.TryGetComponent<Cover>(out Cover cover);
+        if(isCover) covers.Add(cover.gameObject, cover.gameObject);
     }
 
     private void OnCollisionExit(Collision collision) {

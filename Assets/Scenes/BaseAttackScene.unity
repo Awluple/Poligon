@@ -44592,6 +44592,38 @@ Mesh:
     offset: 0
     size: 0
     path: 
+--- !u!1 &1278774729
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1278774730}
+  m_Layer: 0
+  m_Name: Enemies
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1278774730
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1278774729}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -45.189514, y: 15.74452, z: -13.697419}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 8903581965020454416}
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!43 &1287357752
 Mesh:
   m_ObjectHideFlags: 0
@@ -81124,7 +81156,6 @@ MonoBehaviour:
   groundSpot: {fileID: 3076249970038054422}
   eyes: {fileID: 3326206275487339568}
   currentPatrolPosition: -1
-  attackingLogic: {fileID: 0}
 --- !u!1 &911515840316220539
 GameObject:
   m_ObjectHideFlags: 0
@@ -83562,7 +83593,6 @@ MonoBehaviour:
   groundSpot: {fileID: 7116084685793240402}
   eyes: {fileID: 7375047503306567540}
   currentPatrolPosition: -1
-  attackingLogic: {fileID: 0}
 --- !u!1 &5005955353308448581
 GameObject:
   m_ObjectHideFlags: 0
@@ -85915,7 +85945,7 @@ Transform:
   m_GameObject: {fileID: 4657535447426923988}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -1, z: -0, w: 0.0000028461216}
-  m_LocalPosition: {x: -46.94, y: 0, z: 8.23}
+  m_LocalPosition: {x: -1.7504845, y: -15.74452, z: 21.927418}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -85924,7 +85954,7 @@ Transform:
   - {fileID: 2973689224240147574}
   - {fileID: 7773743141883994396}
   - {fileID: 3597182821632199120}
-  m_Father: {fileID: 0}
+  m_Father: {fileID: 1278774730}
   m_LocalEulerAnglesHint: {x: 0, y: -180, z: 0}
 --- !u!23 &8921535332706767629
 MeshRenderer:
@@ -86123,7 +86153,7 @@ SceneRoots:
   - {fileID: 6801193557338423814}
   - {fileID: 1325871183}
   - {fileID: 3746854988354118996}
-  - {fileID: 8903581965020454416}
+  - {fileID: 1278774730}
   - {fileID: 2120496583}
   - {fileID: 554170667}
   - {fileID: 1749647200}

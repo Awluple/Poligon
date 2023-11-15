@@ -17,12 +17,10 @@ public class AttackingLogic : MonoBehaviour
     private IEnumerator keepTrackOnEnemyCoroutine;
 
 
-
+    public Character opponent;
 
     private float lastSeen;
     public Vector3 lastKnownPosition { get; private set; } = Vector3.zero;
-
-    public CoverPosition coverPosition;
 
     private void Awake() {
         enemyController = transform.GetComponentInParent<EnemyController>();
@@ -31,14 +29,17 @@ public class AttackingLogic : MonoBehaviour
     public void SetBehindCoverPosition() {
 
         if(!Methods.HasVisionOnOpponent(out Character chara, enemyController)) {
-            enemyController.enemy.RotateSelf(-coverPosition.transform.forward);
-            List<CoverPose> poses = coverPosition.GetCoverPoses();
+            enemyController.enemy.RotateSelf(-enemyController.hidingLogic.currentCoverPosition.transform.position);
+            List<CoverPose> poses = enemyController.hidingLogic.currentCoverPosition.GetCoverPoses();
             if (poses.Count == 1) {
 
                 if (poses[0] == CoverPose.Standing) {
                     enemyController.CrouchStart();
                 }
             }
+            enemyController.aiState = AiState.BehindCover;
+        } else {
+            enemyController.aiState = AiState.Attacking;
         }
 
         coveredAttackCoroutine = ContinueAttackingWhileCovered();
@@ -62,8 +63,6 @@ public class AttackingLogic : MonoBehaviour
         Player player = FindFirstObjectByType<Player>();
 
         enemyController.hidingLogic.GetHidingPosition(player.transform.position);
-
-        coverPosition = enemyController.hidingLogic.currentCoverPosition;
 
         keepTrackOnEnemyCoroutine = KeepTrackOnEnemy();
         StartCoroutine(keepTrackOnEnemyCoroutine);
@@ -118,7 +117,6 @@ public class AttackingLogic : MonoBehaviour
             lastSeenIteration++;
             if (lastSeenIteration == 5) {
                 enemyController.hidingLogic.GetHidingPosition(enemyController.enemy.GetAimPosition().transform.position, enemyController.enemy.GetAimPosition().transform.position, true, true, 3f, 30f, 11f);
-                coverPosition = enemyController.hidingLogic.currentCoverPosition;
                 enemyController.aiState = AiState.Chasing;
                 StopCoroutine(coveredAttackCoroutine);
 

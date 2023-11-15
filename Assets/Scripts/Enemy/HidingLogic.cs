@@ -65,7 +65,6 @@ public class HidingLogic : MonoBehaviour {
         if (originPosition == null) originPos = transform.position;
         else { originPos = originPosition.GetValueOrDefault(); }
 
-        //if (Vector3.Distance(originPos, hidingSourcePosition) < maxSearchDistance) {
         GameObject[] values = hidingSphere.GetCovers().Values.ToArray();
         if (closestCover) {
             Array.Sort(values, (a, b) => Vector3.Distance(a.transform.position, originPos).CompareTo(Vector3.Distance(b.transform.position, originPos)));
@@ -74,6 +73,9 @@ public class HidingLogic : MonoBehaviour {
         }
         foreach (GameObject cover in values) {
             if (Vector3.Distance(originPos, cover.transform.position) > maxSearchDistance) { continue; };
+
+            CoverPosition coverPosition = cover.GetComponent<CoverPosition>();
+            if (coverPosition.occuped) continue;
 
             Vector3 direction = Vector3.Normalize(hidingSourcePosition - cover.transform.position);
             float dotToPlayer = Vector3.Dot(cover.transform.forward, direction);
@@ -103,10 +105,11 @@ public class HidingLogic : MonoBehaviour {
                 for (int i = 1; i < path.corners.Length; i++) {
                     pathLine.SetPosition(i, path.corners[i]);
                 }
-                currentCoverPosition = cover.GetComponent<CoverPosition>();
+                if(currentCoverPosition != null ) currentCoverPosition.occuped = false;
+                currentCoverPosition = coverPosition;
+                currentCoverPosition.occuped = true;
                 return cover.transform.position;
             }
-            //}
         }
 
         return Vector3.zero;

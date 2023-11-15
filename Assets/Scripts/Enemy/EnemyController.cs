@@ -125,6 +125,8 @@ public class EnemyController : MonoBehaviour, ICharacterController, IStateManage
     }
     private void EnemySpotted(object sender = null, System.EventArgs e = null) {
         enemy.GetAimPosition().OnLineOfSight -= EnemySpotted;
+        Player player = FindFirstObjectByType<Player>();
+        attackingLogic.opponent = player;
         attackingLogic.EnemySpotted();
     }
     public void SetUpdateStateCallback(Action callback) {

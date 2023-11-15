@@ -5,6 +5,8 @@ using Poligon.Ai.EnemyStates.Utils;
 namespace Poligon.Ai.EnemyStates {
     public class HidingState : EnemyBaseState {
         private IEnumerator movingAttackCoroutine;
+        private IEnumerator attemptHideCoroutine;
+
 
 
         public HidingState(EnemyController controller) : base(controller) {
@@ -13,30 +15,53 @@ namespace Poligon.Ai.EnemyStates {
         public override AiState state { get; protected set; } = AiState.Hiding;
 
         public override void EnterState() {
+            CoverPosition hidingSpot = enemyController.hidingLogic.currentCoverPosition;
 
-            Vector3 hidingSpot = enemyController.hidingLogic.currentCoverPosition.transform.position;
-
-
-            if (hidingSpot != Vector3.zero) {
-                enemyController.SetNewDestinaction(hidingSpot);
+            if (hidingSpot != null && hidingSpot.transform.position != Vector3.zero) {
+                enemyController.SetNewDestinaction(hidingSpot.transform.position);
                 enemyController.OnFinalPositionEvent += OnPosition;
                 enemyController.OnFinalPositionEvent += (object sender, System.EventArgs e) => { enemyController.RunCancel(); };
 
             } else {
                 enemyController.SetNewDestinaction(enemyController.transform.position);
                 enemyController.CrouchStart();
+                attemptHideCoroutine = AttemptHideCoroutine();
+                enemyController.StartCoroutine(attemptHideCoroutine);
             }
 
             movingAttackCoroutine = Coroutines.ContinueAttackingWhileMoving(enemyController);
             enemyController.StartCoroutine(movingAttackCoroutine);
         }
 
+        private IEnumerator AttemptHideCoroutine() {
+            for (; ; ) {
+                if(Methods.HasVisionOnOpponent(out Character character, enemyController)) {
+                    enemyController.hidingLogic.GetHidingPosition(enemyController.attackingLogic.opponent.transform.position);
+                } else {
+                    enemyController.hidingLogic.GetHidingPosition(enemyController.enemy.GetAimPosition().transform.position);
+                }
+
+                CoverPosition hidingSpot = enemyController.hidingLogic.currentCoverPosition;
+                if (hidingSpot != null && hidingSpot.transform.position != Vector3.zero) {
+                    enemyController.CrouchCancel();
+
+                    enemyController.SetNewDestinaction(hidingSpot.transform.position);
+                    enemyController.OnFinalPositionEvent += OnPosition;
+                    enemyController.OnFinalPositionEvent += (object sender, System.EventArgs e) => { enemyController.RunCancel(); };
+
+                    enemyController.StopCoroutine(attemptHideCoroutine);
+                }
+
+
+                yield return new WaitForSeconds(3f);
+            }
+        }
+
         private void OnPosition(object sender = null, System.EventArgs e = null) {
-            enemyController.aiState = AiState.BehindCover;
             enemyController.attackingLogic.SetBehindCoverPosition();
         }
         public override void ExitState() {
-            enemyController.StopCoroutine(movingAttackCoroutine);
+            if(movingAttackCoroutine != null) enemyController.StopCoroutine(movingAttackCoroutine);
         }
     }
 }
