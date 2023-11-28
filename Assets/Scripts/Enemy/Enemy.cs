@@ -15,14 +15,8 @@ public class Enemy : Character {
 
     [SerializeField] private EnemyController enemyController;
 
-
-    void Awake() {
-        isRunning = true;
-        characterController = GetComponent<CharacterController>();
-    }
-
     // Start is called before the first frame update
-    void Start() {
+    void Awake() {
         enemyController.OnRunStart += StartRun;
         enemyController.OnRunCancel += CancelRun;
 
@@ -34,7 +28,6 @@ public class Enemy : Character {
 
         enemyController.OnCrouchStart += StartCrouch;
         enemyController.OnCrouchCancel += CancelCrouch;
-
 
         characterController = GetComponent<CharacterController>();
 

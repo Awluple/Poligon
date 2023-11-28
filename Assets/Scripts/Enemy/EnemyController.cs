@@ -35,6 +35,8 @@ public class EnemyController : MonoBehaviour, ICharacterController, IStateManage
 
     public event EventHandler OnFinalPositionEvent;
 
+    public event EventHandler OnNextCornerEvent;
+
 
     public Enemy enemy { get; private set; }
 
@@ -54,7 +56,7 @@ public class EnemyController : MonoBehaviour, ICharacterController, IStateManage
 
     public int currentPatrolPosition = -1;
     public bool onFinalPosition { get; private set; } = false;
-    private int currentCorner = 1;
+    public int currentCorner { get; private set; } = 1;
 
     private Vector3 moveDir;
     private IEnumerator pathRecalc;
@@ -84,6 +86,8 @@ public class EnemyController : MonoBehaviour, ICharacterController, IStateManage
         BehindCoverState behindCover = new(this);
         AttackingState attacking = new(this);
         ChasingState chasing = new(this);
+        SearchingState searching = new(this);
+
 
 
         stateMashine = new AiStateMashine<AiState>(none, this);
@@ -91,6 +95,8 @@ public class EnemyController : MonoBehaviour, ICharacterController, IStateManage
         Dictionary<StateTransition<AiState>, State<AiState>> transitions = new Dictionary<StateTransition<AiState>, State<AiState>>
         {
             { new StateTransition<AiState>(AiState.None, AiState.Patrolling), patrolling },
+            { new StateTransition<AiState>(AiState.None, AiState.Searching), searching },
+
 
             { new StateTransition<AiState>(AiState.Patrolling, AiState.None), none },
             { new StateTransition<AiState>(AiState.Patrolling, AiState.Hiding), hiding },
@@ -108,6 +114,10 @@ public class EnemyController : MonoBehaviour, ICharacterController, IStateManage
             { new StateTransition<AiState>(AiState.Chasing, AiState.Hiding), hiding },
             { new StateTransition<AiState>(AiState.Chasing, AiState.Attacking), attacking },
             { new StateTransition<AiState>(AiState.Chasing, AiState.Patrolling), patrolling },
+            { new StateTransition<AiState>(AiState.Chasing, AiState.Searching), searching },
+
+            { new StateTransition<AiState>(AiState.Searching, AiState.Hiding), hiding },
+
 
 
         };
@@ -120,7 +130,9 @@ public class EnemyController : MonoBehaviour, ICharacterController, IStateManage
             SetPatrollingPath();
             enemy.GetAimPosition().OnLineOfSight += EnemySpotted;
             enemy.OnHealthLoss += HealthLoss;
-            aiState = AiState.Patrolling;
+            //aiState = AiState.Patrolling;
+            aiState = AiState.Searching;
+
         }
     }
     private void EnemySpotted(object sender = null, System.EventArgs e = null) {
@@ -136,6 +148,7 @@ public class EnemyController : MonoBehaviour, ICharacterController, IStateManage
     private void Update() {
         if (stateMashineCallback != null) stateMashineCallback();
         if (!aiEnabled) return;
+        stateMashine.UpdateState();
 
         Debug.Log(aiState);
     }
@@ -146,11 +159,13 @@ public class EnemyController : MonoBehaviour, ICharacterController, IStateManage
         }
     }
 
-    public void SetNewDestinaction(Vector3 spot) {
+    public Vector3[] SetNewDestinaction(Vector3 spot) {
         currentCorner = 1;
         onFinalPosition = false;
         OnFinalPositionEvent = null;
+        OnNextCornerEvent = null;
         navAgent.CalculatePath(spot, destination);
+        return destination.corners;
     }
     public Vector3 GetOpponentLastKnownPosition() {
         return attackingLogic.lastKnownPosition;
@@ -159,6 +174,9 @@ public class EnemyController : MonoBehaviour, ICharacterController, IStateManage
 
     public void FinalPosition() {
         if (OnFinalPositionEvent != null) OnFinalPositionEvent(this, EventArgs.Empty);
+    }
+    public void NextCorner() {
+        if (OnNextCornerEvent != null) OnNextCornerEvent(this, EventArgs.Empty);
     }
     public void RunStart() {
         if (OnRunStart != null) OnRunStart(this, EventArgs.Empty);
@@ -256,10 +274,10 @@ public class EnemyController : MonoBehaviour, ICharacterController, IStateManage
 
         if(destination == null || destination.corners.Length == 0) return Vector2.zero;
 
-        if (Vector3.Distance(groundSpot.position, destination.corners[destination.corners.Length - 1]) < 0.2f) {
+        if (Vector3.Distance(groundSpot.position, destination.corners[destination.corners.Length - 1]) < 0.2f && onFinalPosition == false) {
             onFinalPosition = true;
             FinalPosition();
-            OnFinalPositionEvent = null;
+            //OnFinalPositionEvent = null;
             return new Vector2(0, 0);
         }
         moveDir = destination.corners[currentCorner] - groundSpot.position;
@@ -268,9 +286,23 @@ public class EnemyController : MonoBehaviour, ICharacterController, IStateManage
             if(destination.corners.Length > 2) {
                 moveDir = destination.corners[currentCorner] - groundSpot.position;
                 currentCorner++;
+                NextCorner();
             }
         }
 
         return new Vector2(moveDir.x, moveDir.z).normalized;
+    }
+
+    private void OnDrawGizmos() {
+        foreach (var area in SearchingState.areas) {
+            if (area.AreaChecked) {
+                Gizmos.color = Color.yellow;
+            } else {
+                Gizmos.color = Color.red;
+            }
+            Gizmos.DrawCube(area.Position, Vector3.one);
+        }
+
+
     }
 }

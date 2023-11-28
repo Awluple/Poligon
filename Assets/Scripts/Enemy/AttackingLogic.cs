@@ -104,33 +104,30 @@ public class AttackingLogic : MonoBehaviour
     }
 
     IEnumerator ContinueAttackingWhileCovered() {
-        bool covered = true;
-        int lastSeenIteration = 0;
 
         for (; ; ) {
             yield return new WaitForSeconds(Random.Range(4f, 8f));
 
             if(Methods.HasVisionOnOpponent(out Character character, enemyController) ) {
-                lastSeenIteration = 0;
+                if(enemyController.aiState != AiState.Attacking) {
+                    enemyController.aiState = AiState.Attacking;
+                }
                 goto End;
             }
-            lastSeenIteration++;
-            if (lastSeenIteration == 5) {
+
+            if (enemyController.aiState == AiState.BehindCover && (Time.time - lastSeen > 30f)) {
                 enemyController.hidingLogic.GetHidingPosition(enemyController.enemy.GetAimPosition().transform.position, enemyController.enemy.GetAimPosition().transform.position, true, true, 3f, 30f, 11f);
                 enemyController.aiState = AiState.Chasing;
                 StopCoroutine(coveredAttackCoroutine);
 
-                lastSeen = 30f;
                 goto End;
             }
 
 
-            if (covered) {
+            if (enemyController.aiState == AiState.BehindCover) {
                 enemyController.aiState = AiState.Attacking;
-                covered = false;
             } else {
                 enemyController.aiState = AiState.BehindCover;
-                covered = true;
             }
             End:;
 

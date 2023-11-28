@@ -29,11 +29,11 @@ namespace Poligon.Ai.EnemyStates.Utils {
         }
     }
     public static class Methods {
-        public static bool HasVisionOnOpponent(out Character character, EnemyController enemyController) {
+        public static bool HasVisionOnOpponent(out Character character, EnemyController enemyController, float maxDistance = 40f) {
              
             Vector3 eyesPosition = enemyController.eyes.transform.position;
             Ray ray = new Ray(eyesPosition, enemyController.enemy.GetAimPosition().transform.position - eyesPosition);
-            if (Physics.Raycast(ray, out RaycastHit hit, 40f)) {
+            if (Physics.Raycast(ray, out RaycastHit hit, maxDistance)) {
                 if (hit.collider.gameObject.TryGetComponent<Character>(out Character hitCharacter)) {
                     character = hitCharacter;
                     return true;

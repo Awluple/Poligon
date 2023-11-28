@@ -53,6 +53,10 @@ namespace Poligon.Ai {
             return nextState;
         }
 
+        public void UpdateState() {
+            CurrentState.UpdateState();
+        }
+
         public T MoveNext(T nextState) {
             CurrentState.ExitState();
             CurrentState = GetNext(nextState);

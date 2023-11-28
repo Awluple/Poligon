@@ -7,6 +7,10 @@ using UnityEngine.Animations.Rigging;
 using Poligon.Extensions;
 using TMPro;
 using Poligon.EvetArgs;
+using UnityEngine.AI;
+using UnityEngine.UIElements;
+using System.IO;
+using Poligon.Ai.EnemyStates;
 
 public class Player : Character {
 
@@ -141,4 +145,71 @@ public class Player : Character {
         movement.z = inputVector.y * speed;
 
     }
+
+
+
+    NavMeshTriangulation navMeshData;
+    bool navmeshReady = false;
+
+    //void OnDrawGizmos() {
+    //    List<Vector3> positions = new List<Vector3>();
+
+    //    //if (positions.Count == 0) {
+    //    //    for (int radius = 4; radius < 60; radius = radius + 4) {
+    //    //        float addition = (60 / radius * (radius < 30 ? 3f : 6f));
+
+    //    //        for (float angle = 1; angle < 360; angle = angle + addition) {
+    //    //            float radians = (Mathf.PI / 180) * angle;
+    //    //            float x = radius * Mathf.Sin(radians);
+    //    //            float y = radius * Mathf.Cos(radians);
+
+    //    //            positions.Add(new Vector3(transform.position.x + x, transform.position.y + 0.5f, transform.position.z + y));
+    //    //        }
+    //    //    }
+    //    //}
+
+    //    List<Vector3> points = new List<Vector3>();
+    //    if(!navmeshReady) {
+    //        navMeshData = NavMesh.CalculateTriangulation();
+    //        navmeshReady = true;
+    //    }
+
+    //    for (int i = 0; i < navMeshData.indices.Length; i += 3) {
+    //        Vector3 p1 = navMeshData.vertices[navMeshData.indices[i]];
+    //        Vector3 p2 = navMeshData.vertices[navMeshData.indices[i + 1]];
+    //        Vector3 p3 = navMeshData.vertices[navMeshData.indices[i + 2]];
+
+    //        Vector3 triangleCenter =  (p1 + p2 + p3) / 3f;
+
+    //        float a = Vector3.Distance(p1, p2);
+    //        float b = Vector3.Distance(p1, p3);
+    //        float c = Vector3.Distance(p2, p3);
+
+    //        float circ =  (a + b + c) / 2;
+
+    //        float triangleAreaSize = Mathf.Sqrt(circ * (circ - a) * (circ - b) * (circ - c));
+
+    //        if(Vector3.Distance(transform.position, triangleCenter) > 50f) {
+    //            continue;
+    //        }
+
+    //        if (Physics.Raycast(triangleCenter, Vector3.down, out RaycastHit hit, Mathf.Infinity, NavMesh.AllAreas)) {
+    //            points.Add(hit.point);
+    //        }
+
+    //        if(triangleAreaSize < 10) {
+    //            continue;
+    //        }
+
+    //        if (triangleAreaSize > 100) {
+    //            Gizmos.color = new Color(1, 0, 0, 0.5f);
+    //        } else {
+    //            Gizmos.color = new Color(0, 1, 0, 0.5f);
+    //        }
+
+    //        Gizmos.DrawCube(hit.point, new Vector3(1, 1, 1));
+
+    //    }
+
+    //}
 }

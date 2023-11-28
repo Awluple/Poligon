@@ -9,6 +9,7 @@ public class EnemyAimPosition : AimPosition {
     Player player;
     Enemy enemy;
     public bool aimingAtCharacter = false;
+    public bool alerted = false;
 
     public event EventHandler OnLineOfSight;
     public event EventHandler OnLineOfSightLost;
@@ -81,6 +82,7 @@ public class EnemyAimPosition : AimPosition {
         for (; ; ) {
             if (ProximityCheck()) {
                 MoveToCharacter(player, ref moveAimCalled);
+                alerted = true;
                 yield return new WaitForSeconds(0f);
             } else {
                 if (repositionOnFailed) {
@@ -108,7 +110,7 @@ public class EnemyAimPosition : AimPosition {
         StartCoroutine(checkCoroutine);
     }
 
-    public void MoveAim(Vector3 targetPosition, float speed, OnMoveCompleteCallback onCompleteCallback) {
+    public void MoveAim(Vector3 targetPosition, float speed, OnMoveCompleteCallback onCompleteCallback = null) {
         onMoveCompleteCallback = onCompleteCallback;
         movePosition = targetPosition;
         moveSpeed = speed;
@@ -147,14 +149,14 @@ public class EnemyAimPosition : AimPosition {
                 sightEventsCalled = true;
             };
             return true;
-        } else if (Vector3.Distance(enemy.transform.position, player.transform.position) < 20f &&
+        } else if (Vector3.Distance(enemy.transform.position, player.transform.position) < (alerted ? 35f : 20f) &&
             Vector3.Angle(player.transform.position - enemy.transform.position, enemy.transform.forward) < 75) { // Detect within 20f if visable
             Vector3 startPoint = enemy.GetController().eyes.transform.position;
-            startPoint.y += 1f;
+            //startPoint.y += 1f;
             Vector3 target = player.transform.position;
             target.y += 1.6f;
             Ray ray = new Ray(startPoint, target - startPoint);
-            if (Physics.Raycast(ray, out RaycastHit hit, 25f)) {
+            if (Physics.Raycast(ray, out RaycastHit hit, (alerted ? 40f : 25f))) {
                 if (!hit.collider.gameObject.TryGetComponent<Player>(out Player player)) {
                     return false;
                 }
