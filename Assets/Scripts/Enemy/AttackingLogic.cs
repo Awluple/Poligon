@@ -79,7 +79,9 @@ public class AttackingLogic : MonoBehaviour
                 enemyController.RunCancel();
                 enemyController.enemy.GetAimPosition().Reset();
             } else if (Time.time - lastSeen > 60f) {
-                StopAttacking();
+                //StopAttacking();
+                enemyController.aiState = AiState.Searching;
+                StopCoroutine(checkLastSeen);
             }
             yield return new WaitForSeconds(1f);
         }
@@ -99,7 +101,7 @@ public class AttackingLogic : MonoBehaviour
                 needsReposition = false;
             }
 
-            yield return new WaitForSeconds(0.2f);
+            yield return new WaitForEndOfFrame();
         }
     }
 

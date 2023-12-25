@@ -58,6 +58,7 @@ public class Player : Character {
     // Update is called once per frame
     protected override void Update() {
         base.Update();
+
         if(!stunned) {
             Move();
         } else {

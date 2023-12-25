@@ -11,6 +11,7 @@ namespace Poligon.Ai.EnemyStates.Utils {
                     if (character == enemyController.enemy) { yield return new WaitForSeconds(0.3f); } // don't shoot yourself...
                     enemyController.ShootPerformed();
                 } else {
+                   
                     if (runWhenNoVision) {
                         enemyController.AimCancel();
                         enemyController.RunStart();
@@ -32,8 +33,10 @@ namespace Poligon.Ai.EnemyStates.Utils {
         public static bool HasVisionOnOpponent(out Character character, EnemyController enemyController, float maxDistance = 40f) {
              
             Vector3 eyesPosition = enemyController.eyes.transform.position;
-            Ray ray = new Ray(eyesPosition, enemyController.enemy.GetAimPosition().transform.position - eyesPosition);
-            if (Physics.Raycast(ray, out RaycastHit hit, maxDistance)) {
+            Ray ray = new Ray(eyesPosition, enemyController.enemy.GetAimPosition().GetPosition() - eyesPosition);
+            int layerMask = ~LayerMask.GetMask("Enemy");
+
+            if (Physics.Raycast(ray, out RaycastHit hit, maxDistance, layerMask)) {
                 if (hit.collider.gameObject.TryGetComponent<Character>(out Character hitCharacter)) {
                     character = hitCharacter;
                     return true;

@@ -57,7 +57,6 @@ namespace Poligon.Ai.EnemyStates {
         }
 
         public void NextCorner(object sender = null, EventArgs args = null) {
-            Debug.Log("Called!");
             Vector3 pos = corners[enemyController.currentCorner];
             Vector3 direction = (enemyController.transform.position - pos).normalized * -2.5f;
             pos.y += 1.6f;
@@ -66,11 +65,29 @@ namespace Poligon.Ai.EnemyStates {
 
             enemyController.enemy.GetAimPosition().MoveAim(pos, 10f);
 
+            for (int i = 0; i < areas.Count; i++) {
+                var area = areas[i];
+                if (Physics.Raycast(enemyController.eyes.transform.position, (area.Position - enemyController.eyes.transform.position), out RaycastHit hit, 15f)) {
+
+                    if (Vector3.Distance(hit.point, enemyController.eyes.transform.position) + 5f > Vector3.Distance(enemyController.eyes.transform.position, area.Position)) {
+                        area.AreaChecked = true;
+                        areas[i] = area;
+                    }
+                }
+            }
+
         }
 
         private (SearchingArea area, int index) GetNextArea() {
-            (SearchingArea area, int index) area = areas.Select((area, index) => (area, index)).Where(a => a.area.AreaChecked == false).OrderBy(a => Vector3.Distance(enemyController.transform.position, a.area.Position)).First();
-            return area;
+            (SearchingArea area, int index) area = areas.Select((area, index) => (area, index)).Where(a => a.area.AreaChecked == false).OrderBy(a => Vector3.Distance(enemyController.GetOpponentLastKnownPosition(), a.area.Position)).First();
+            NavMeshPath navMeshPath = new NavMeshPath();
+            if (enemyController.navAgent.CalculatePath(area.area.Position, navMeshPath) && navMeshPath.status == NavMeshPathStatus.PathComplete) {
+                return area;
+            } else {
+                area.area.AreaChecked = true;
+                areas[area.index] = area.area;
+                return GetNextArea();
+            }
         }
 
         private void AreaReached(object sender = null, EventArgs args = null) {
@@ -133,7 +150,7 @@ namespace Poligon.Ai.EnemyStates {
 
                 float triangleAreaSize = Mathf.Sqrt(circ * (circ - a) * (circ - b) * (circ - c));
 
-                if (triangleAreaSize < 10 || Vector3.Distance(enemyController.transform.position, triangleCenter) > 500f) {
+                if (triangleAreaSize < 10 || Vector3.Distance(enemyController.transform.position, triangleCenter) > 175f) {
                     continue;
                 }
 

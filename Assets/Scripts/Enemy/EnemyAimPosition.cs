@@ -46,6 +46,14 @@ public class EnemyAimPosition : AimPosition {
         }
     }
 
+    public override Vector3 GetPosition() {
+        if(movePosition == Vector3.zero) {
+            return transform.position;
+        } else {
+            return movePosition;
+        }
+    }
+
     void RemoveTarget(object sender, EventArgs args) {
         Destroy(gameObject);
     }
@@ -82,6 +90,10 @@ public class EnemyAimPosition : AimPosition {
         for (; ; ) {
             if (ProximityCheck()) {
                 MoveToCharacter(player, ref moveAimCalled);
+                if (OnLineOfSight != null && sightEventsCalled == false) {
+                    OnLineOfSight(this, EventArgs.Empty);
+                    sightEventsCalled = true;
+                };
                 alerted = true;
                 yield return new WaitForSeconds(0f);
             } else {
@@ -103,6 +115,7 @@ public class EnemyAimPosition : AimPosition {
 
     public override void Reposition(Vector3 newPosition) {
         base.Reposition(newPosition);
+        StopMoveAim();
         StopCoroutine(checkCoroutine);
         aimingAtCharacter = false;
         sightEventsCalled = false;
@@ -152,21 +165,21 @@ public class EnemyAimPosition : AimPosition {
         } else if (Vector3.Distance(enemy.transform.position, player.transform.position) < (alerted ? 35f : 20f) &&
             Vector3.Angle(player.transform.position - enemy.transform.position, enemy.transform.forward) < 75) { // Detect within 20f if visable
             Vector3 startPoint = enemy.GetController().eyes.transform.position;
-            //startPoint.y += 1f;
-            Vector3 target = player.transform.position;
-            target.y += 1.6f;
+            Vector3 target = player.GetComponentInChildren<DetectionPoint>().transform.position;
+            int layerMask = ~LayerMask.GetMask("Enemy");
+
             Ray ray = new Ray(startPoint, target - startPoint);
-            if (Physics.Raycast(ray, out RaycastHit hit, (alerted ? 40f : 25f))) {
+            if (Physics.Raycast(ray, out RaycastHit hit, (alerted ? 40f : 25f), layerMask)) {
                 if (!hit.collider.gameObject.TryGetComponent<Player>(out Player player)) {
                     return false;
                 }
 
             }
 
-            if (OnLineOfSight != null && sightEventsCalled == false) {
-                OnLineOfSight(this, EventArgs.Empty);
-                sightEventsCalled = true;
-            };
+            //if (OnLineOfSight != null && sightEventsCalled == false) {
+            //    OnLineOfSight(this, EventArgs.Empty);
+            //    sightEventsCalled = true;
+            //};
             return true;
         }
         if (aimingAtCharacter) {

@@ -4,7 +4,7 @@ using UnityEngine;
 
 public abstract class AimPosition : MonoBehaviour
 {
-    public Vector3 GetPosition() {
+    public virtual Vector3 GetPosition() {
         return transform.position;
     }
     public Transform GetTransform() {

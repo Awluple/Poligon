@@ -12,6 +12,7 @@ using Poligon.Ai.EnemyStates;
 using static Cinemachine.CinemachineOrbitalTransposer;
 using static UnityEngine.UI.GridLayoutGroup;
 using System.Reflection;
+using UnityEngine.InputSystem.XR;
 
 public class EnemyController : MonoBehaviour, ICharacterController, IStateManager {
     public event EventHandler OnRunStart;
@@ -51,7 +52,7 @@ public class EnemyController : MonoBehaviour, ICharacterController, IStateManage
     private LineRenderer pathLine;
 
     // Movement
-    private NavMeshAgent navAgent;
+    public NavMeshAgent navAgent { get; private set; }
     private NavMeshPath destination;
 
     public int currentPatrolPosition = -1;
@@ -78,7 +79,6 @@ public class EnemyController : MonoBehaviour, ICharacterController, IStateManage
         hidingLogic = transform.GetComponent<HidingLogic>();
         attackingLogic = transform.AddComponent<AttackingLogic>();
         enemy = transform.GetComponentInParent<Enemy>();
-
         
         NoneState none = new(this);
         PatrollingState patrolling = new(this);
@@ -130,8 +130,8 @@ public class EnemyController : MonoBehaviour, ICharacterController, IStateManage
             SetPatrollingPath();
             enemy.GetAimPosition().OnLineOfSight += EnemySpotted;
             enemy.OnHealthLoss += HealthLoss;
-            //aiState = AiState.Patrolling;
-            aiState = AiState.Searching;
+            aiState = AiState.Patrolling;
+            //aiState = AiState.Searching;
 
         }
     }
@@ -272,7 +272,7 @@ public class EnemyController : MonoBehaviour, ICharacterController, IStateManage
 
         if (aiState == AiState.Patrolling) SetPatrollingPath();
 
-        if(destination == null || destination.corners.Length == 0) return Vector2.zero;
+        if(destination == null || destination.corners.Length == 0 || onFinalPosition) return Vector2.zero;
 
         if (Vector3.Distance(groundSpot.position, destination.corners[destination.corners.Length - 1]) < 0.2f && onFinalPosition == false) {
             onFinalPosition = true;
