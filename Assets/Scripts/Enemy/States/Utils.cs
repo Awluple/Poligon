@@ -46,5 +46,24 @@ namespace Poligon.Ai.EnemyStates.Utils {
             character = null;
             return false;
         }
+        public static bool HasVisionOnCharacter(out Character character, EnemyController enemyController, Character target, float maxDistance = 40f) {
+
+            Vector3 eyesPosition = enemyController.eyes.transform.position;
+            Vector3 targetPos = target.transform.position;
+            targetPos.y += 1f;
+            Ray ray = new Ray(eyesPosition, targetPos - eyesPosition);
+            int layerMask = ~LayerMask.GetMask("Enemy");
+            Debug.DrawRay(eyesPosition, targetPos - eyesPosition, Color.red, 30f);
+
+            if (Physics.Raycast(ray, out RaycastHit hit, maxDistance, layerMask)) {
+                if (hit.collider.gameObject.TryGetComponent<Character>(out Character hitCharacter)) {
+                    character = hitCharacter;
+                    return true;
+                }
+
+            }
+            character = null;
+            return false;
+        }
     }
 }

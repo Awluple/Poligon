@@ -17,13 +17,18 @@ namespace Poligon.Ai.EnemyStates {
 
             shootingCoroutine = Coroutines.ShootingCoroutine(enemyController);
             enemyController.StartCoroutine(shootingCoroutine);
+            if(enemyController.enemy.IsCrouching()) {
+                enemyController.CrouchCancel();
+            }
+            if(!enemyController.enemy.IsAiming()) {
+                enemyController.AimStart();
+            }
+            if(coverPosition!= null) {
+                Vector3 pos = coverPosition.transform.forward * 4 + enemyController.eyes.transform.position;
 
-            enemyController.CrouchCancel();
-            enemyController.AimStart();
-            Vector3 pos = coverPosition.transform.forward * 4 + enemyController.eyes.transform.position;
-
-            enemyController.enemy.GetAimPosition().Reposition(enemyController.GetOpponentLastKnownPosition() == Vector3.zero ? pos : enemyController.GetOpponentLastKnownPosition());
-            enemyController.enemy.RotateSelf(coverPosition.transform.forward);
+                enemyController.enemy.GetAimPosition().Reposition(enemyController.enemy.squad.lastKnownPosition == Vector3.zero ? pos : enemyController.enemy.squad.lastKnownPosition);
+                enemyController.enemy.RotateSelf(coverPosition.transform.forward);
+            }
         }
 
         public override void ExitState() {

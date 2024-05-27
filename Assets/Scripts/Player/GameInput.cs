@@ -31,6 +31,7 @@ public class GameInput : MonoBehaviour, ICharacterController {
     public event EventHandler<InputValueEventArgs> OnLeaningCancel;
 
     CameraControl camera;
+    public Transform eyes;
 
     private void Awake() {
         playerInputActions = new PlayerInputActions();
@@ -116,7 +117,6 @@ public class GameInput : MonoBehaviour, ICharacterController {
     private void LeaningCancel(UnityEngine.InputSystem.InputAction.CallbackContext obj) {
         if (OnLeaningCancel != null) OnLeaningCancel(this, new InputValueEventArgs(obj.ReadValue<float>()));
     }
-
     public Vector2 GetMovementVectorNormalized() {
         Vector2 inputVector = playerInputActions.Player.Move.ReadValue<Vector2>();
 

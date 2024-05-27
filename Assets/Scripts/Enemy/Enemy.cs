@@ -9,11 +9,16 @@ using TMPro;
 using Poligon.EvetArgs;
 using UnityEngine.UIElements;
 using UnityEngine.EventSystems;
+using System.Linq;
 
-public class Enemy : Character {
+public class Enemy : Character, ISquadMember {
 
 
     [SerializeField] private EnemyController enemyController;
+
+    public static List<Enemy> enemyList;
+
+    public Squad squad { get; set; }
 
     // Start is called before the first frame update
     void Awake() {
@@ -30,6 +35,10 @@ public class Enemy : Character {
         enemyController.OnCrouchCancel += CancelCrouch;
 
         characterController = GetComponent<CharacterController>();
+
+        if(enemyList == null ) {
+            enemyList = GetComponentsInParent<Enemy>().ToList();
+        }
 
     }
 

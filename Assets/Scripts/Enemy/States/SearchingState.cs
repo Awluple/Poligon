@@ -54,6 +54,16 @@ namespace Poligon.Ai.EnemyStates {
             pos += direction;
             enemyController.enemy.GetAimPosition().Reposition(pos);
 
+            enemyController.enemy.GetAimPosition().OnLineOfSight += Hide;
+
+        }
+
+        public override void ExitState() {
+            enemyController.enemy.GetAimPosition().OnLineOfSight -= Hide;
+        }
+
+        private void Hide(object sender, EventArgs args) {
+            enemyController.aiState = AiState.Hiding;
         }
 
         public void NextCorner(object sender = null, EventArgs args = null) {
@@ -79,7 +89,7 @@ namespace Poligon.Ai.EnemyStates {
         }
 
         private (SearchingArea area, int index) GetNextArea() {
-            (SearchingArea area, int index) area = areas.Select((area, index) => (area, index)).Where(a => a.area.AreaChecked == false).OrderBy(a => Vector3.Distance(enemyController.GetOpponentLastKnownPosition(), a.area.Position)).First();
+            (SearchingArea area, int index) area = areas.Select((area, index) => (area, index)).Where(a => a.area.AreaChecked == false).OrderBy(a => Vector3.Distance(enemyController.enemy.squad.lastKnownPosition, a.area.Position)).First();
             NavMeshPath navMeshPath = new NavMeshPath();
             if (enemyController.navAgent.CalculatePath(area.area.Position, navMeshPath) && navMeshPath.status == NavMeshPathStatus.PathComplete) {
                 return area;

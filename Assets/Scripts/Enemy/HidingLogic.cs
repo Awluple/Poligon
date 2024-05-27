@@ -60,7 +60,9 @@ public class HidingLogic : MonoBehaviour {
         return distance < maxCoverDistance;
     }
 
-    public Vector3 GetHidingPosition(Vector3 hidingSourcePosition, Vector3? originPosition = null, bool closestCover = true, bool ignoreDot = false, float minDistanceFromSource = 8f, float maxCoverPathDistance = 20f, float maxSearchDistance = 21f) {
+    public Vector3 GetHidingPosition(Vector3 hidingSourcePosition, Vector3? originPosition = null,
+        bool closestCover = true, bool ignoreDot = false, float minDistanceFromSource = 8f, float maxCoverPathDistance = 20f, float maxSearchDistance = 21f) {
+
         Vector3 originPos = Vector3.zero;
         if (originPosition == null) originPos = transform.position;
         else { originPos = originPosition.GetValueOrDefault(); }

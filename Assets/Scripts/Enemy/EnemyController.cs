@@ -13,8 +13,9 @@ using static Cinemachine.CinemachineOrbitalTransposer;
 using static UnityEngine.UI.GridLayoutGroup;
 using System.Reflection;
 using UnityEngine.InputSystem.XR;
+using Poligon.Ai.Commands;
 
-public class EnemyController : MonoBehaviour, ICharacterController, IStateManager {
+public class EnemyController : MonoBehaviour, IAICharacterController, IStateManager {
     public event EventHandler OnRunStart;
     public event EventHandler OnRunCancel;
 
@@ -44,7 +45,7 @@ public class EnemyController : MonoBehaviour, ICharacterController, IStateManage
     [SerializeField] private bool aiEnabled = true;
 
 
-    [SerializeField] private GameObject[] patrolPositions;
+    public GameObject[] patrolPositions;
     [SerializeField] private Transform groundSpot;
     public Transform eyes;
 
@@ -53,11 +54,11 @@ public class EnemyController : MonoBehaviour, ICharacterController, IStateManage
 
     // Movement
     public NavMeshAgent navAgent { get; private set; }
-    private NavMeshPath destination;
+    public NavMeshPath destination;
 
     public int currentPatrolPosition = -1;
-    public bool onFinalPosition { get; private set; } = false;
-    public int currentCorner { get; private set; } = 1;
+    public bool onFinalPosition { get; set; } = false;
+    public int currentCorner { get; set; } = 1;
 
     private Vector3 moveDir;
     private IEnumerator pathRecalc;
@@ -66,7 +67,6 @@ public class EnemyController : MonoBehaviour, ICharacterController, IStateManage
     public AiState aiState { get => stateMashine.GetState(); set {
             stateMashine.MoveNext(value);
         } }
-    private bool aiming = false;
     private AiStateMashine<AiState> stateMashine;
     private Action stateMashineCallback;
 
@@ -79,7 +79,7 @@ public class EnemyController : MonoBehaviour, ICharacterController, IStateManage
         hidingLogic = transform.GetComponent<HidingLogic>();
         attackingLogic = transform.AddComponent<AttackingLogic>();
         enemy = transform.GetComponentInParent<Enemy>();
-        
+
         NoneState none = new(this);
         PatrollingState patrolling = new(this);
         HidingState hiding = new(this);
@@ -101,6 +101,8 @@ public class EnemyController : MonoBehaviour, ICharacterController, IStateManage
             { new StateTransition<AiState>(AiState.Patrolling, AiState.None), none },
             { new StateTransition<AiState>(AiState.Patrolling, AiState.Hiding), hiding },
             { new StateTransition<AiState>(AiState.Patrolling, AiState.Attacking), attacking },
+            { new StateTransition<AiState>(AiState.Patrolling, AiState.Chasing), chasing },
+
 
             { new StateTransition<AiState>(AiState.Hiding, AiState.Attacking), attacking },
             { new StateTransition<AiState>(AiState.Hiding, AiState.BehindCover), behindCover },
@@ -124,10 +126,12 @@ public class EnemyController : MonoBehaviour, ICharacterController, IStateManage
         stateMashine.SetupTransitions(transitions);
 
     }
-
+    public Transform GetEyes() {
+        return eyes;
+    }
     private void Start() {
-        if(aiEnabled) {
-            SetPatrollingPath();
+        if (aiEnabled) {
+            //SetPatrollingPath();
             enemy.GetAimPosition().OnLineOfSight += EnemySpotted;
             enemy.OnHealthLoss += HealthLoss;
             aiState = AiState.Patrolling;
@@ -135,11 +139,24 @@ public class EnemyController : MonoBehaviour, ICharacterController, IStateManage
 
         }
     }
+
+    public void setSquad(Squad squad) {
+        enemy.squad = squad;
+    }
+
     private void EnemySpotted(object sender = null, System.EventArgs e = null) {
         enemy.GetAimPosition().OnLineOfSight -= EnemySpotted;
         Player player = FindFirstObjectByType<Player>();
-        attackingLogic.opponent = player;
-        attackingLogic.EnemySpotted();
+        //attackingLogic.opponent = player;
+        //attackingLogic.EnemySpotted();
+
+        ICommand command = new EnemySpottedCommand(enemy.squad, player);
+        command.execute();
+    }
+    public void EnemySpotted(Character character) {
+        enemy.GetAimPosition().OnLineOfSight -= EnemySpotted;
+        attackingLogic.opponent = character;
+        attackingLogic.EnemySpotted(character);
     }
     public void SetUpdateStateCallback(Action callback) {
         stateMashineCallback = callback;
@@ -167,9 +184,9 @@ public class EnemyController : MonoBehaviour, ICharacterController, IStateManage
         navAgent.CalculatePath(spot, destination);
         return destination.corners;
     }
-    public Vector3 GetOpponentLastKnownPosition() {
-        return attackingLogic.lastKnownPosition;
-    }
+    //public Vector3 GetOpponentLastKnownPosition() {
+    //    return AttackingLogic.lastKnownPosition;
+    //}
 
 
     public void FinalPosition() {
@@ -195,15 +212,12 @@ public class EnemyController : MonoBehaviour, ICharacterController, IStateManage
         if (OnJumpCancel != null) OnJumpCancel(this, EventArgs.Empty);
     }
     public void AimStart() {
-        aiming = true;
         if (OnAimStart != null) OnAimStart(this, EventArgs.Empty);
     }
     public void AimPerformed() {
-        aiming = true;
         if (OnAimPerformed != null) OnAimPerformed(this, EventArgs.Empty);
     }
     public void AimCancel() {
-        aiming = false;
         if (OnAimCancel != null) OnAimCancel(this, EventArgs.Empty);
     }
 
@@ -226,35 +240,34 @@ public class EnemyController : MonoBehaviour, ICharacterController, IStateManage
         if (OnShootCancel != null) OnShootCancel(this, EventArgs.Empty);
     }
 
-    public void SetPatrollingPath(object sender = null, System.EventArgs e = null) {
-        if (patrolPositions.Length == 0) {
-            onFinalPosition = true;
+    //public void SetPatrollingPath(object sender = null, System.EventArgs e = null) {
+    //    if (patrolPositions.Length == 0) {
+    //        onFinalPosition = true;
 
-            return;
-        };
-        if ((currentPatrolPosition == -1 || onFinalPosition) && aiState == AiState.Patrolling) {
-            patrolPointSelection();
-            if(pathRecalc != null) StopCoroutine(pathRecalc);
-            pathRecalc = RecalculatePath();
-            StartCoroutine(pathRecalc);
-        }
-    }
+    //        return;
+    //    };
+    //    if ((currentPatrolPosition == -1 || onFinalPosition) && aiState == AiState.Patrolling) {
+    //        patrolPointSelection();
+    //        if(pathRecalc != null) StopCoroutine(pathRecalc);
+    //        pathRecalc = RecalculatePath();
+    //        StartCoroutine(pathRecalc);
+    //    }
+    //}
 
-    private void patrolPointSelection() {
-        System.Random random = new System.Random();
-        currentPatrolPosition = random.Next(0, 3);
-        SetNewDestinaction(patrolPositions[currentPatrolPosition].transform.position);
-        OnFinalPositionEvent += SetPatrollingPath;
-    }
+    //private void patrolPointSelection() {
+    //    System.Random random = new System.Random();
+    //    currentPatrolPosition = random.Next(0, 3);
+    //    SetNewDestinaction(patrolPositions[currentPatrolPosition].transform.position);
+    //    OnFinalPositionEvent += SetPatrollingPath;
+    //}
 
-    private IEnumerator RecalculatePath() {
-        while(!onFinalPosition) {
-            currentCorner = 1;
-            navAgent.CalculatePath(destination.corners[destination.corners.Length - 1], destination);
-            //DrawLine();
-            yield return new WaitForSeconds(.5f);
-        }
-    }
+    //private IEnumerator RecalculatePath() {
+    //    while(!onFinalPosition) {
+    //        currentCorner = 1;
+    //        navAgent.CalculatePath(destination.corners[destination.corners.Length - 1], destination);
+    //        yield return new WaitForSeconds(.5f);
+    //    }
+    //}
 
     private void DrawLine() {
         pathLine.positionCount = destination.corners.Length;
@@ -270,7 +283,7 @@ public class EnemyController : MonoBehaviour, ICharacterController, IStateManage
 
     public Vector2 GetMovementVectorNormalized() {
 
-        if (aiState == AiState.Patrolling) SetPatrollingPath();
+        //if (aiState == AiState.Patrolling) SetPatrollingPath();
 
         if(destination == null || destination.corners.Length == 0 || onFinalPosition) return Vector2.zero;
 

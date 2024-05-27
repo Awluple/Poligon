@@ -21,15 +21,17 @@ namespace Poligon.Ai.EnemyStates {
                 enemyController.SetNewDestinaction(hidingSpot.transform.position);
                 enemyController.OnFinalPositionEvent += OnPosition;
                 enemyController.OnFinalPositionEvent += (object sender, System.EventArgs e) => { enemyController.RunCancel(); };
+                movingAttackCoroutine = Coroutines.ContinueAttackingWhileMoving(enemyController);
 
             } else {
                 enemyController.SetNewDestinaction(enemyController.transform.position);
                 enemyController.CrouchStart();
                 attemptHideCoroutine = AttemptHideCoroutine();
                 enemyController.StartCoroutine(attemptHideCoroutine);
+                movingAttackCoroutine = Coroutines.ContinueAttackingWhileMoving(enemyController, false);
             }
 
-            movingAttackCoroutine = Coroutines.ContinueAttackingWhileMoving(enemyController);
+            
             enemyController.StartCoroutine(movingAttackCoroutine);
         }
 
