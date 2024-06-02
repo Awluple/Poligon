@@ -111,7 +111,7 @@ AnimatorState:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Armature|Crouch
+  m_Name: Animation|Crouch
   m_Speed: 1
   m_CycleOffset: 0
   m_Transitions:
@@ -125,7 +125,7 @@ AnimatorState:
   m_MirrorParameterActive: 0
   m_CycleOffsetParameterActive: 0
   m_TimeParameterActive: 0
-  m_Motion: {fileID: 6589755540219670814, guid: b98fb4c716596ec4dbfaf2a70e7b0341, type: 3}
+  m_Motion: {fileID: 7400000, guid: 719dd1139eb1d5643ac6e7edd70e858a, type: 2}
   m_Tag: 
   m_SpeedParameter: 
   m_MirrorParameter: 
@@ -138,7 +138,7 @@ AnimatorState:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Armature|Running
+  m_Name: Animation|Running
   m_Speed: 1.5
   m_CycleOffset: 0
   m_Transitions:
@@ -155,7 +155,7 @@ AnimatorState:
   m_MirrorParameterActive: 0
   m_CycleOffsetParameterActive: 0
   m_TimeParameterActive: 0
-  m_Motion: {fileID: -3828583913261678786, guid: 8fa49fb5768693447bfda77ffa57c0d3, type: 3}
+  m_Motion: {fileID: 7400000, guid: d31ead78a3b136a449feb7ae65694d7f, type: 2}
   m_Tag: 
   m_SpeedParameter: 
   m_MirrorParameter: 
@@ -168,7 +168,7 @@ AnimatorState:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Armature|Standing Lean Reverse
+  m_Name: Animation|Standing Lean Reverse
   m_Speed: 1
   m_CycleOffset: 0
   m_Transitions:
@@ -184,7 +184,7 @@ AnimatorState:
   m_MirrorParameterActive: 0
   m_CycleOffsetParameterActive: 0
   m_TimeParameterActive: 0
-  m_Motion: {fileID: -4977074802279681084, guid: b98fb4c716596ec4dbfaf2a70e7b0341, type: 3}
+  m_Motion: {fileID: 7400000, guid: 342ad57cce54618438da0aa04b50a69b, type: 2}
   m_Tag: 
   m_SpeedParameter: 
   m_MirrorParameter: 
@@ -382,7 +382,7 @@ AnimatorState:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Armature|None
+  m_Name: Animation|None
   m_Speed: 1
   m_CycleOffset: 0
   m_Transitions:
@@ -398,7 +398,7 @@ AnimatorState:
   m_MirrorParameterActive: 0
   m_CycleOffsetParameterActive: 0
   m_TimeParameterActive: 0
-  m_Motion: {fileID: 2116532724941763908, guid: b98fb4c716596ec4dbfaf2a70e7b0341, type: 3}
+  m_Motion: {fileID: 7400000, guid: 7c39de5758eebde4a8da5ff0754ad09b, type: 2}
   m_Tag: 
   m_SpeedParameter: 
   m_MirrorParameter: 
@@ -436,7 +436,7 @@ AnimatorState:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Armature|PositionChange
+  m_Name: Animation|PositionChange
   m_Speed: 4
   m_CycleOffset: 0
   m_Transitions:
@@ -451,7 +451,7 @@ AnimatorState:
   m_MirrorParameterActive: 0
   m_CycleOffsetParameterActive: 0
   m_TimeParameterActive: 0
-  m_Motion: {fileID: 4880152766571575312, guid: b98fb4c716596ec4dbfaf2a70e7b0341, type: 3}
+  m_Motion: {fileID: 7400000, guid: 6c20356d037f7504f9f9368a6bc8e239, type: 2}
   m_Tag: 
   m_SpeedParameter: 
   m_MirrorParameter: 
@@ -464,7 +464,7 @@ AnimatorState:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Armature|Jump Fall Heavy
+  m_Name: Animation|Jump Fall Heavy
   m_Speed: 2
   m_CycleOffset: 0
   m_Transitions:
@@ -478,7 +478,7 @@ AnimatorState:
   m_MirrorParameterActive: 0
   m_CycleOffsetParameterActive: 0
   m_TimeParameterActive: 0
-  m_Motion: {fileID: 6847946976908915573, guid: 8fa49fb5768693447bfda77ffa57c0d3, type: 3}
+  m_Motion: {fileID: 7400000, guid: c472a5c9a93ecc94dbe37f3b56751bf3, type: 2}
   m_Tag: 
   m_SpeedParameter: 
   m_MirrorParameter: 
@@ -538,7 +538,7 @@ AnimatorState:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Armature|Crouch Walk
+  m_Name: Animation|Crouch Walk
   m_Speed: 1
   m_CycleOffset: 0
   m_Transitions:
@@ -552,7 +552,7 @@ AnimatorState:
   m_MirrorParameterActive: 0
   m_CycleOffsetParameterActive: 0
   m_TimeParameterActive: 0
-  m_Motion: {fileID: -4064174542843464024, guid: b98fb4c716596ec4dbfaf2a70e7b0341, type: 3}
+  m_Motion: {fileID: 7400000, guid: df2053f25ebeb90419b8fbf8bd7383eb, type: 2}
   m_Tag: 
   m_SpeedParameter: 
   m_MirrorParameter: 
@@ -565,7 +565,7 @@ AnimatorState:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Armature|Jump Midair
+  m_Name: Animation|Jump Midair
   m_Speed: 1
   m_CycleOffset: 0
   m_Transitions:
@@ -579,7 +579,7 @@ AnimatorState:
   m_MirrorParameterActive: 0
   m_CycleOffsetParameterActive: 0
   m_TimeParameterActive: 0
-  m_Motion: {fileID: 8177639437257629768, guid: 8fa49fb5768693447bfda77ffa57c0d3, type: 3}
+  m_Motion: {fileID: 7400000, guid: 58b1b1de01f8fdf45a5c33a6056c9edc, type: 2}
   m_Tag: 
   m_SpeedParameter: 
   m_MirrorParameter: 
@@ -592,7 +592,7 @@ AnimatorState:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Armature|Pistol Shoot
+  m_Name: Animation|Pistol Shoot
   m_Speed: 3
   m_CycleOffset: 0
   m_Transitions:
@@ -606,7 +606,7 @@ AnimatorState:
   m_MirrorParameterActive: 0
   m_CycleOffsetParameterActive: 0
   m_TimeParameterActive: 0
-  m_Motion: {fileID: -8157261382703142229, guid: 8fa49fb5768693447bfda77ffa57c0d3, type: 3}
+  m_Motion: {fileID: 7400000, guid: 92428e3c86ef25141bb62c09a054965a, type: 2}
   m_Tag: 
   m_SpeedParameter: 
   m_MirrorParameter: 
@@ -619,7 +619,7 @@ AnimatorState:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Armature|Crouch Lean
+  m_Name: Animation|Crouch Lean
   m_Speed: 1
   m_CycleOffset: 0
   m_Transitions:
@@ -635,7 +635,7 @@ AnimatorState:
   m_MirrorParameterActive: 0
   m_CycleOffsetParameterActive: 0
   m_TimeParameterActive: 0
-  m_Motion: {fileID: -6755964299707868435, guid: b98fb4c716596ec4dbfaf2a70e7b0341, type: 3}
+  m_Motion: {fileID: 7400000, guid: b7188213bba0b3843be8516c4ba7092c, type: 2}
   m_Tag: 
   m_SpeedParameter: 
   m_MirrorParameter: 
@@ -932,7 +932,7 @@ BlendTree:
   m_Name: Blend Tree
   m_Childs:
   - serializedVersion: 2
-    m_Motion: {fileID: 6589755540219670814, guid: b98fb4c716596ec4dbfaf2a70e7b0341, type: 3}
+    m_Motion: {fileID: 7400000, guid: 719dd1139eb1d5643ac6e7edd70e858a, type: 2}
     m_Threshold: 0
     m_Position: {x: 0, y: 0}
     m_TimeScale: 1
@@ -940,7 +940,7 @@ BlendTree:
     m_DirectBlendParameter: Blend
     m_Mirror: 0
   - serializedVersion: 2
-    m_Motion: {fileID: -1122806199550229587, guid: b98fb4c716596ec4dbfaf2a70e7b0341, type: 3}
+    m_Motion: {fileID: 7400000, guid: bc47d1de780c4f34c8dd1c017bc9edd1, type: 2}
     m_Threshold: 0.25
     m_Position: {x: 1, y: 0}
     m_TimeScale: 1
@@ -948,7 +948,7 @@ BlendTree:
     m_DirectBlendParameter: Blend
     m_Mirror: 0
   - serializedVersion: 2
-    m_Motion: {fileID: -1122806199550229587, guid: b98fb4c716596ec4dbfaf2a70e7b0341, type: 3}
+    m_Motion: {fileID: 7400000, guid: bc47d1de780c4f34c8dd1c017bc9edd1, type: 2}
     m_Threshold: 0.5
     m_Position: {x: -1, y: 0}
     m_TimeScale: 1
@@ -956,7 +956,7 @@ BlendTree:
     m_DirectBlendParameter: Blend
     m_Mirror: 1
   - serializedVersion: 2
-    m_Motion: {fileID: -4064174542843464024, guid: b98fb4c716596ec4dbfaf2a70e7b0341, type: 3}
+    m_Motion: {fileID: 7400000, guid: df2053f25ebeb90419b8fbf8bd7383eb, type: 2}
     m_Threshold: 0.75
     m_Position: {x: 0, y: 1}
     m_TimeScale: 0.6
@@ -964,7 +964,7 @@ BlendTree:
     m_DirectBlendParameter: Blend
     m_Mirror: 0
   - serializedVersion: 2
-    m_Motion: {fileID: 153876933975015118, guid: b98fb4c716596ec4dbfaf2a70e7b0341, type: 3}
+    m_Motion: {fileID: 7400000, guid: 7db4cb18e6d171a4e80a41abd1bb9c4c, type: 2}
     m_Threshold: 1
     m_Position: {x: 0, y: -1}
     m_TimeScale: 0.6
@@ -1138,7 +1138,7 @@ AnimatorState:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Armature|Pistol Aim
+  m_Name: Animation|Pistol Aim
   m_Speed: 1
   m_CycleOffset: 0
   m_Transitions:
@@ -1152,7 +1152,7 @@ AnimatorState:
   m_MirrorParameterActive: 0
   m_CycleOffsetParameterActive: 0
   m_TimeParameterActive: 0
-  m_Motion: {fileID: 6085600697005787804, guid: 8fa49fb5768693447bfda77ffa57c0d3, type: 3}
+  m_Motion: {fileID: 7400000, guid: db66ddbe7b356e94c8653919ddcef500, type: 2}
   m_Tag: 
   m_SpeedParameter: 
   m_MirrorParameter: 
@@ -1165,7 +1165,7 @@ AnimatorState:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Armature|Crouch Lean Reverse
+  m_Name: Animation|Crouch Lean Reverse
   m_Speed: 1
   m_CycleOffset: 0
   m_Transitions:
@@ -1181,7 +1181,7 @@ AnimatorState:
   m_MirrorParameterActive: 0
   m_CycleOffsetParameterActive: 0
   m_TimeParameterActive: 0
-  m_Motion: {fileID: -6755964299707868435, guid: b98fb4c716596ec4dbfaf2a70e7b0341, type: 3}
+  m_Motion: {fileID: 7400000, guid: b7188213bba0b3843be8516c4ba7092c, type: 2}
   m_Tag: 
   m_SpeedParameter: 
   m_MirrorParameter: 
@@ -1257,7 +1257,7 @@ AnimatorState:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Armature|Jump Fall Heavy Recover
+  m_Name: Animation|Jump Fall Heavy Recover
   m_Speed: 0.6
   m_CycleOffset: 0
   m_Transitions:
@@ -1271,7 +1271,7 @@ AnimatorState:
   m_MirrorParameterActive: 0
   m_CycleOffsetParameterActive: 0
   m_TimeParameterActive: 0
-  m_Motion: {fileID: 578235928886147626, guid: 8fa49fb5768693447bfda77ffa57c0d3, type: 3}
+  m_Motion: {fileID: 7400000, guid: fa5afaf1d94473342bdce5d93e081712, type: 2}
   m_Tag: 
   m_SpeedParameter: 
   m_MirrorParameter: 
@@ -1521,7 +1521,7 @@ AnimatorState:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Armature|Standing Lean
+  m_Name: Animation|Standing Lean
   m_Speed: 1
   m_CycleOffset: 0
   m_Transitions:
@@ -1537,7 +1537,7 @@ AnimatorState:
   m_MirrorParameterActive: 0
   m_CycleOffsetParameterActive: 0
   m_TimeParameterActive: 0
-  m_Motion: {fileID: -4977074802279681084, guid: b98fb4c716596ec4dbfaf2a70e7b0341, type: 3}
+  m_Motion: {fileID: 7400000, guid: 342ad57cce54618438da0aa04b50a69b, type: 2}
   m_Tag: 
   m_SpeedParameter: 
   m_MirrorParameter: 
@@ -1632,7 +1632,7 @@ AnimatorState:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Armature|Idle 0
+  m_Name: Animation|Idle 0
   m_Speed: 1
   m_CycleOffset: 0
   m_Transitions:
@@ -1646,7 +1646,7 @@ AnimatorState:
   m_MirrorParameterActive: 0
   m_CycleOffsetParameterActive: 0
   m_TimeParameterActive: 0
-  m_Motion: {fileID: -8945691123924629249, guid: 8fa49fb5768693447bfda77ffa57c0d3, type: 3}
+  m_Motion: {fileID: 7400000, guid: 25a1c05d11295b549bf4e6e337faf9e3, type: 2}
   m_Tag: 
   m_SpeedParameter: 
   m_MirrorParameter: 
@@ -1787,79 +1787,79 @@ AnimatorController:
     m_DefaultFloat: 0
     m_DefaultInt: 0
     m_DefaultBool: 0
-    m_Controller: {fileID: 0}
+    m_Controller: {fileID: 9100000}
   - m_Name: isRunning
     m_Type: 4
     m_DefaultFloat: 0
     m_DefaultInt: 0
     m_DefaultBool: 0
-    m_Controller: {fileID: 0}
+    m_Controller: {fileID: 9100000}
   - m_Name: jumped
     m_Type: 4
     m_DefaultFloat: 0
     m_DefaultInt: 0
     m_DefaultBool: 0
-    m_Controller: {fileID: 0}
+    m_Controller: {fileID: 9100000}
   - m_Name: falling
     m_Type: 4
     m_DefaultFloat: 0
     m_DefaultInt: 0
     m_DefaultBool: 0
-    m_Controller: {fileID: 0}
+    m_Controller: {fileID: 9100000}
   - m_Name: heavyLanding
     m_Type: 4
     m_DefaultFloat: 0
     m_DefaultInt: 0
     m_DefaultBool: 0
-    m_Controller: {fileID: 0}
+    m_Controller: {fileID: 9100000}
   - m_Name: aiming
     m_Type: 4
     m_DefaultFloat: 0
     m_DefaultInt: 0
     m_DefaultBool: 0
-    m_Controller: {fileID: 0}
+    m_Controller: {fileID: 9100000}
   - m_Name: crouching
     m_Type: 4
     m_DefaultFloat: 0
     m_DefaultInt: 0
     m_DefaultBool: 0
-    m_Controller: {fileID: 0}
+    m_Controller: {fileID: 9100000}
   - m_Name: shoot
     m_Type: 9
     m_DefaultFloat: 0
     m_DefaultInt: 0
     m_DefaultBool: 0
-    m_Controller: {fileID: 0}
+    m_Controller: {fileID: 9100000}
   - m_Name: Blend
     m_Type: 1
     m_DefaultFloat: 0
     m_DefaultInt: 0
     m_DefaultBool: 0
-    m_Controller: {fileID: 0}
+    m_Controller: {fileID: 9100000}
   - m_Name: xMovement
     m_Type: 1
     m_DefaultFloat: 0
     m_DefaultInt: 0
     m_DefaultBool: 0
-    m_Controller: {fileID: 0}
+    m_Controller: {fileID: 9100000}
   - m_Name: yMovement
     m_Type: 1
     m_DefaultFloat: 0
     m_DefaultInt: 0
     m_DefaultBool: 0
-    m_Controller: {fileID: 0}
+    m_Controller: {fileID: 9100000}
   - m_Name: leanState
     m_Type: 3
     m_DefaultFloat: 0
     m_DefaultInt: 0
     m_DefaultBool: 0
-    m_Controller: {fileID: 0}
+    m_Controller: {fileID: 9100000}
   - m_Name: positionChange
     m_Type: 9
     m_DefaultFloat: 0
     m_DefaultInt: 0
     m_DefaultBool: 0
-    m_Controller: {fileID: 0}
+    m_Controller: {fileID: 9100000}
   m_AnimatorLayers:
   - serializedVersion: 5
     m_Name: Base Layer
@@ -1964,7 +1964,7 @@ AnimatorState:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Armature|PositionChange 0
+  m_Name: Animation|PositionChange 0
   m_Speed: -4
   m_CycleOffset: 0
   m_Transitions:
@@ -1978,7 +1978,7 @@ AnimatorState:
   m_MirrorParameterActive: 0
   m_CycleOffsetParameterActive: 0
   m_TimeParameterActive: 0
-  m_Motion: {fileID: 4880152766571575312, guid: b98fb4c716596ec4dbfaf2a70e7b0341, type: 3}
+  m_Motion: {fileID: 7400000, guid: 6c20356d037f7504f9f9368a6bc8e239, type: 2}
   m_Tag: 
   m_SpeedParameter: 
   m_MirrorParameter: 
@@ -2013,7 +2013,7 @@ AnimatorState:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Armature|Weapon Up
+  m_Name: Animation|Weapon Up
   m_Speed: 10
   m_CycleOffset: 0
   m_Transitions:
@@ -2027,7 +2027,7 @@ AnimatorState:
   m_MirrorParameterActive: 0
   m_CycleOffsetParameterActive: 0
   m_TimeParameterActive: 0
-  m_Motion: {fileID: 6811010156348694470, guid: 8fa49fb5768693447bfda77ffa57c0d3, type: 3}
+  m_Motion: {fileID: 7400000, guid: cf50fe5c1d7ba2c419078a6caa50b213, type: 2}
   m_Tag: 
   m_SpeedParameter: 
   m_MirrorParameter: 
@@ -2380,7 +2380,7 @@ AnimatorState:
   m_MirrorParameterActive: 0
   m_CycleOffsetParameterActive: 0
   m_TimeParameterActive: 0
-  m_Motion: {fileID: 6085600697005787804, guid: 8fa49fb5768693447bfda77ffa57c0d3, type: 3}
+  m_Motion: {fileID: 7400000, guid: db66ddbe7b356e94c8653919ddcef500, type: 2}
   m_Tag: 
   m_SpeedParameter: 
   m_MirrorParameter: 
@@ -2474,7 +2474,7 @@ AnimatorState:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Armature|Crouch
+  m_Name: AnimationCrouch
   m_Speed: 1
   m_CycleOffset: 0
   m_Transitions:
@@ -2490,7 +2490,7 @@ AnimatorState:
   m_MirrorParameterActive: 0
   m_CycleOffsetParameterActive: 0
   m_TimeParameterActive: 0
-  m_Motion: {fileID: 6589755540219670814, guid: b98fb4c716596ec4dbfaf2a70e7b0341, type: 3}
+  m_Motion: {fileID: 7400000, guid: 719dd1139eb1d5643ac6e7edd70e858a, type: 2}
   m_Tag: 
   m_SpeedParameter: 
   m_MirrorParameter: 
@@ -2503,7 +2503,7 @@ AnimatorState:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Armature|Jump Midair
+  m_Name: Animation|Jump Midair
   m_Speed: 1
   m_CycleOffset: 0
   m_Transitions:
@@ -2520,7 +2520,7 @@ AnimatorState:
   m_MirrorParameterActive: 0
   m_CycleOffsetParameterActive: 0
   m_TimeParameterActive: 0
-  m_Motion: {fileID: 8177639437257629768, guid: 8fa49fb5768693447bfda77ffa57c0d3, type: 3}
+  m_Motion: {fileID: 7400000, guid: 58b1b1de01f8fdf45a5c33a6056c9edc, type: 2}
   m_Tag: 
   m_SpeedParameter: 
   m_MirrorParameter: 
@@ -2683,7 +2683,7 @@ AnimatorState:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Armature|PositionChange 0
+  m_Name: Animation|PositionChange 0
   m_Speed: -4
   m_CycleOffset: 0
   m_Transitions:
@@ -2697,7 +2697,7 @@ AnimatorState:
   m_MirrorParameterActive: 0
   m_CycleOffsetParameterActive: 0
   m_TimeParameterActive: 0
-  m_Motion: {fileID: 4880152766571575312, guid: b98fb4c716596ec4dbfaf2a70e7b0341, type: 3}
+  m_Motion: {fileID: 7400000, guid: 6c20356d037f7504f9f9368a6bc8e239, type: 2}
   m_Tag: 
   m_SpeedParameter: 
   m_MirrorParameter: 
@@ -2807,7 +2807,7 @@ AnimatorState:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Armature|Walking
+  m_Name: Animation|Walking
   m_Speed: 1.2
   m_CycleOffset: 0
   m_Transitions:
@@ -2824,7 +2824,7 @@ AnimatorState:
   m_MirrorParameterActive: 0
   m_CycleOffsetParameterActive: 0
   m_TimeParameterActive: 0
-  m_Motion: {fileID: -4274770991410265338, guid: 8fa49fb5768693447bfda77ffa57c0d3, type: 3}
+  m_Motion: {fileID: 7400000, guid: 383578b3c0bff9941af552beb78bab59, type: 2}
   m_Tag: 
   m_SpeedParameter: 
   m_MirrorParameter: 
@@ -3006,7 +3006,7 @@ AnimatorState:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Armature|Jump Start
+  m_Name: Animation|Jump Start
   m_Speed: 2
   m_CycleOffset: 0
   m_Transitions:
@@ -3020,7 +3020,7 @@ AnimatorState:
   m_MirrorParameterActive: 0
   m_CycleOffsetParameterActive: 0
   m_TimeParameterActive: 0
-  m_Motion: {fileID: -1988327863596754629, guid: 8fa49fb5768693447bfda77ffa57c0d3, type: 3}
+  m_Motion: {fileID: 7400000, guid: 1e4c345b21f94b74c8d9b2ab562fc95e, type: 2}
   m_Tag: 
   m_SpeedParameter: 
   m_MirrorParameter: 
@@ -3143,7 +3143,7 @@ AnimatorStateMachine:
   m_ChildStates:
   - serializedVersion: 1
     m_State: {fileID: -7925752350283792532}
-    m_Position: {x: 170, y: -110, z: 0}
+    m_Position: {x: 180, y: -110, z: 0}
   - serializedVersion: 1
     m_State: {fileID: -3062689671837623208}
     m_Position: {x: 470, y: -100, z: 0}
@@ -3270,7 +3270,7 @@ AnimatorState:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Armature|Idle
+  m_Name: Animation|Idle
   m_Speed: 1
   m_CycleOffset: 0
   m_Transitions:
@@ -3286,7 +3286,7 @@ AnimatorState:
   m_MirrorParameterActive: 0
   m_CycleOffsetParameterActive: 0
   m_TimeParameterActive: 0
-  m_Motion: {fileID: -8945691123924629249, guid: 8fa49fb5768693447bfda77ffa57c0d3, type: 3}
+  m_Motion: {fileID: 7400000, guid: 25a1c05d11295b549bf4e6e337faf9e3, type: 2}
   m_Tag: 
   m_SpeedParameter: 
   m_MirrorParameter: 
@@ -3404,7 +3404,7 @@ BlendTree:
   m_Name: Blend Tree
   m_Childs:
   - serializedVersion: 2
-    m_Motion: {fileID: -4274770991410265338, guid: 8fa49fb5768693447bfda77ffa57c0d3, type: 3}
+    m_Motion: {fileID: 7400000, guid: 383578b3c0bff9941af552beb78bab59, type: 2}
     m_Threshold: 0
     m_Position: {x: 0, y: 1}
     m_TimeScale: 1
@@ -3412,7 +3412,7 @@ BlendTree:
     m_DirectBlendParameter: Blend
     m_Mirror: 0
   - serializedVersion: 2
-    m_Motion: {fileID: 1882895500144890335, guid: 8fa49fb5768693447bfda77ffa57c0d3, type: 3}
+    m_Motion: {fileID: 7400000, guid: 0622e99dcae8b0640a3396d187aa68cf, type: 2}
     m_Threshold: 0.2
     m_Position: {x: 0, y: -1}
     m_TimeScale: 1.1
@@ -3420,7 +3420,7 @@ BlendTree:
     m_DirectBlendParameter: Blend
     m_Mirror: 0
   - serializedVersion: 2
-    m_Motion: {fileID: 6637450910500248463, guid: 8fa49fb5768693447bfda77ffa57c0d3, type: 3}
+    m_Motion: {fileID: 7400000, guid: ba4ba8cd3c155e34cacf305d06c40466, type: 2}
     m_Threshold: 0.4
     m_Position: {x: 1, y: 0}
     m_TimeScale: 1.3
@@ -3428,7 +3428,7 @@ BlendTree:
     m_DirectBlendParameter: Blend
     m_Mirror: 0
   - serializedVersion: 2
-    m_Motion: {fileID: -3748903445591918725, guid: 8fa49fb5768693447bfda77ffa57c0d3, type: 3}
+    m_Motion: {fileID: 7400000, guid: 4c71dbc7d6698474fb7aa7f2430fddd7, type: 2}
     m_Threshold: 0.6
     m_Position: {x: -1, y: 0}
     m_TimeScale: 1.3
@@ -3436,7 +3436,7 @@ BlendTree:
     m_DirectBlendParameter: Blend
     m_Mirror: 0
   - serializedVersion: 2
-    m_Motion: {fileID: -8945691123924629249, guid: 8fa49fb5768693447bfda77ffa57c0d3, type: 3}
+    m_Motion: {fileID: 7400000, guid: 25a1c05d11295b549bf4e6e337faf9e3, type: 2}
     m_Threshold: 0.8
     m_Position: {x: 0, y: 0}
     m_TimeScale: 1
@@ -3563,7 +3563,7 @@ AnimatorState:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Armature|PositionChange
+  m_Name: Animation|PositionChange
   m_Speed: 4
   m_CycleOffset: 0
   m_Transitions:
@@ -3577,7 +3577,7 @@ AnimatorState:
   m_MirrorParameterActive: 0
   m_CycleOffsetParameterActive: 0
   m_TimeParameterActive: 0
-  m_Motion: {fileID: 4880152766571575312, guid: b98fb4c716596ec4dbfaf2a70e7b0341, type: 3}
+  m_Motion: {fileID: 7400000, guid: 6c20356d037f7504f9f9368a6bc8e239, type: 2}
   m_Tag: 
   m_SpeedParameter: 
   m_MirrorParameter: 
