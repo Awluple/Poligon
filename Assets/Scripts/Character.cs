@@ -1,3 +1,4 @@
+using Poligon.Enums;
 using Poligon.EvetArgs;
 using System;
 using System.Collections;
@@ -21,21 +22,25 @@ public abstract class Character : MonoBehaviour, IKillable {
 
 
     [SerializeField] protected Rig rig;
-    [SerializeField] protected Gun gun;
+    [SerializeField] protected Gun gun = null;
+    public WeaponTypes currentWeapon = WeaponTypes.None;
     [SerializeField] protected AimPosition aimingTarget;
 
     protected Vector3 movement = Vector3.zero;
 
     protected CharacterController characterController;
-    protected bool isWalking;
-    protected bool isRunning;
-    protected bool isAiming;
-    protected bool isCrouching;
-    protected bool stunned = false;
+    [SerializeField] protected bool isWalking;
+    [SerializeField] protected bool isReloading;
+    [SerializeField] protected bool isRunning;
+    [SerializeField] protected bool isAiming;
+    [SerializeField] protected bool isCrouching;
+    [SerializeField] protected bool stunned = false;
 
     private bool lastFrameMoving = false;
 
     [SerializeField] protected float health = 100;
+
+    private IEnumerator shootingCoroutine = null;
 
 
     //public event EventHandler OnFalling;
@@ -56,8 +61,11 @@ public abstract class Character : MonoBehaviour, IKillable {
     public event EventHandler OnCrouchingEnd;
     public event EventHandler OnShoot;
     public event EventHandler OnShootEnd;
+    public event EventHandler OnReload;
+
     public event EventHandler<InputValueEventArgs> OnLeaning;
     public event EventHandler<InputValueEventArgs> OnLeaningEnd;
+    public event EventHandler<InputValueEventArgs> OnWeaponChange;
 
     public event EventHandler OnDeath;
     public event EventHandler<BulletDataEventArgs> OnHealthLoss;
@@ -79,6 +87,20 @@ public abstract class Character : MonoBehaviour, IKillable {
     }
 
     //public event Vector2EventHandler OnAimingWalk;
+
+    private IEnumerator ShootingCoroutine() {
+        while (gun.currentAmmo > 0) {
+            if (OnShoot != null) OnShoot(this, EventArgs.Empty);
+            gun.Shoot();
+            gun.currentAmmo -= 1;
+            yield return new WaitForSeconds(gun.fireRate);
+        }
+    }
+    private IEnumerator ExecuteAfterTime(float time, Action task) {
+        yield return new WaitForSeconds(time);
+
+        task();
+    }
 
     public delegate void Vector2EventHandler(object sender, Vector2EventArgs args);
 
@@ -106,12 +128,25 @@ public abstract class Character : MonoBehaviour, IKillable {
     }
 
     protected void AimStart(object sender, System.EventArgs e) {
+        if(currentWeapon == WeaponTypes.None) {
+            return;
+        }
         if (isGrounded() && !stunned) {
 
             if (OnAiming != null) OnAiming(this, EventArgs.Empty);
             isAiming = true;
             isRunning = false;
             rig.weight = 1;
+        }
+        switch (currentWeapon) {
+            case (WeaponTypes.Pistol):
+                
+                break;
+            case (WeaponTypes.AssultRifle):
+                gun.transform.position = gun.equippedPositions[1].transform.position;
+                gun.transform.rotation = gun.equippedPositions[1].transform.rotation;
+                gun.transform.parent = gun.equippedPositions[1].transform.parent;
+                break;
         }
     }
 
@@ -120,18 +155,41 @@ public abstract class Character : MonoBehaviour, IKillable {
         rig.weight = 0;
         if (OnAimingEnd != null) OnAimingEnd(this, EventArgs.Empty);
         isAiming = false;
+
+        switch (currentWeapon) {
+            case (WeaponTypes.Pistol):
+
+                break;
+            case (WeaponTypes.AssultRifle):
+                gun.transform.position = gun.equippedPositions[0].transform.position;
+                gun.transform.rotation = gun.equippedPositions[0].transform.rotation;
+                gun.transform.parent = gun.equippedPositions[0].transform.parent;
+                break;
+        }
     }
 
     protected void ShootPerformed(object sender, System.EventArgs e) {
         if (!isAiming) return;
+        if (gun.currentAmmo == 0) return;
 
-        if (OnShoot != null && gun.CanShoot()) OnShoot(this, EventArgs.Empty);
-        gun.Shoot();
+        if(!gun.automatic) {
+            if (OnShoot != null && gun.CanShoot()) {
+                OnShoot(this, EventArgs.Empty);
+                gun.Shoot();
+                gun.currentAmmo -= 1;
+            }
+        } else {
+            shootingCoroutine = ShootingCoroutine();
+            StartCoroutine(shootingCoroutine);
+        }
     }
 
     protected void ShootCancel(object sender, System.EventArgs e) {
         if (!isAiming) return;
         if (OnShootEnd != null) OnShootEnd(this, EventArgs.Empty);
+        if(shootingCoroutine != null) {
+            StopCoroutine(shootingCoroutine);
+        }
     }
 
     protected void LeaningStart(object sender, InputValueEventArgs args) {
@@ -140,7 +198,83 @@ public abstract class Character : MonoBehaviour, IKillable {
 
     protected void LeaningCancel(object sender, InputValueEventArgs args) {
         if (OnLeaningEnd != null) OnLeaningEnd(this, args);
+    }
+    protected void Reload(object sender, EventArgs e) {
+        Ammo ammo = gun.GetComponentInChildren<Ammo>();
+        if(ammo == null || isReloading) return;
+        if (OnReload != null) OnReload(this, EventArgs.Empty);
+        isReloading = true;
+        Vector3 originalPosition = ammo.transform.localPosition;
+        Quaternion originalRotation = ammo.transform.localRotation;
 
+        GameObject newAmmo = null;
+
+        StartCoroutine(ExecuteAfterTime(0.3f, () => {
+            ammo.transform.parent = gun.ammoPosition.parent;
+            ammo.transform.position = gun.ammoPosition.position;
+            ammo.transform.rotation = gun.ammoPosition.rotation;
+        }));
+        StartCoroutine(ExecuteAfterTime(0.7f, () => {
+            ammo.transform.parent = null;
+            Vector3 throwDirection = new Vector3(1, -1, 0);
+            float throwForce = 1.5f;
+
+            Rigidbody rb = ammo.GetComponent<Rigidbody>();
+            rb.useGravity = true;
+            rb.isKinematic = false;
+            rb.AddForce(throwDirection.normalized * throwForce, ForceMode.Impulse);
+            ammo.GetComponent<BoxCollider>().enabled = true;
+            //ammo.GetComponent<Rigidbody>().isKinematic = true;
+        }));
+        StartCoroutine(ExecuteAfterTime(0.8f, () => {
+            newAmmo = Instantiate(gun.ammoPrefab, gun.ammoPosition.transform.position, gun.ammoPosition.rotation);
+            newAmmo.transform.parent = gun.ammoPosition.parent;
+            newAmmo.transform.position = gun.ammoPosition.position;
+            newAmmo.transform.rotation = gun.ammoPosition.rotation;
+        }));
+        StartCoroutine(ExecuteAfterTime(1.7f, () => {
+            newAmmo.transform.parent = gun.transform;
+            newAmmo.transform.localPosition = originalPosition;
+            newAmmo.transform.localRotation = originalRotation;
+            gun.currentAmmo = gun.maxAmmo;
+            isReloading = false;
+        }));
+    }
+
+    protected void ChangeWeapon(object sender, InputValueEventArgs args) {
+        WeaponTypes weapon = (WeaponTypes)args.Value;
+
+        if(gun != null) {
+            gun.transform.position = gun.positionOnBody.position;
+            gun.transform.rotation = gun.positionOnBody.rotation;
+            gun.transform.parent = gun.positionOnBody.parent;
+        }
+
+        currentWeapon = weapon;
+        MultiAimConstraint rigConstraints = GetComponentInChildren<MultiAimConstraint>();
+
+        switch (weapon) {
+            case (WeaponTypes.Pistol):
+                gun = GetComponentInChildren<Pistol>();
+                gun.transform.position = gun.equippedPositions[0].transform.position;
+                gun.transform.rotation = gun.equippedPositions[0].transform.rotation;
+                gun.transform.parent = gun.equippedPositions[0].transform.parent;
+                rigConstraints.data.offset = new Vector3(20, 17, 13);
+
+
+                break;
+            case (WeaponTypes.AssultRifle):
+                gun = GetComponentInChildren<AssultRifle>();
+                int index = 0;
+                if (isAiming) index = 1;
+                gun.transform.position = gun.equippedPositions[index].transform.position;
+                gun.transform.rotation = gun.equippedPositions[index].transform.rotation;
+                gun.transform.parent = gun.equippedPositions[index].transform.parent;
+                rigConstraints.data.offset = new Vector3(15, 25, 0);
+                break;
+        }
+
+        if (OnWeaponChange != null) OnWeaponChange(this, args);
     }
 
     protected IEnumerator HeavyFallStun() {

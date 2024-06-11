@@ -26,11 +26,19 @@ public class BulletDataEventArgs : EventArgs {
 public abstract class Gun : MonoBehaviour
 {
 
-    [SerializeField] private GameObject bullet;
-    [SerializeField] private Transform spawnBulletPosition;
-    [SerializeField] private AimPosition aimingTarget;
-    [SerializeField] private float fireRate;
-    [SerializeField] private AudioClip shotSound;
+    [SerializeField] protected GameObject bullet;
+    [SerializeField] protected Transform spawnBulletPosition;
+    [SerializeField] protected AimPosition aimingTarget;
+    public GameObject ammoPrefab;
+    public float fireRate;
+    public int maxAmmo;
+    public int currentAmmo;
+    [SerializeField] protected AudioClip shotSound;
+    public bool automatic;
+    public Transform positionOnBody;
+    public Transform[] equippedPositions;
+    public Transform ammoPosition;
+
 
 
     private float nextShootTime;

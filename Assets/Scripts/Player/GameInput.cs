@@ -2,8 +2,10 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
+using UnityEngine.InputSystem;
 using UnityEngine;
 using Poligon.EvetArgs;
+using static UnityEditor.Timeline.TimelinePlaybackControls;
 
 public class GameInput : MonoBehaviour, ICharacterController {
     private PlayerInputActions playerInputActions;
@@ -26,9 +28,15 @@ public class GameInput : MonoBehaviour, ICharacterController {
     public event EventHandler OnShootPerformed;
     public event EventHandler OnShootCancel;
 
+    public event EventHandler OnReloadPerformed;
+
+
     public event EventHandler<InputValueEventArgs> OnLeaningStart;
     public event EventHandler<InputValueEventArgs> OnLeaningPerformed;
     public event EventHandler<InputValueEventArgs> OnLeaningCancel;
+
+
+    public event EventHandler<InputValueEventArgs> OnWeaponChangePerformed;
 
     CameraControl camera;
     public Transform eyes;
@@ -59,6 +67,11 @@ public class GameInput : MonoBehaviour, ICharacterController {
         playerInputActions.Player.Leaning.started += LeaningStart;
         playerInputActions.Player.Leaning.performed += LeaningPerformed;
         playerInputActions.Player.Leaning.canceled += LeaningCancel;
+
+        playerInputActions.Player.Reload.performed += ReloadPerformed;
+
+
+        playerInputActions.Player.WeaponChange.performed += WeaponChangePerformed;
 
 
         camera = FindObjectOfType<CameraControl>();
@@ -116,6 +129,14 @@ public class GameInput : MonoBehaviour, ICharacterController {
     }
     private void LeaningCancel(UnityEngine.InputSystem.InputAction.CallbackContext obj) {
         if (OnLeaningCancel != null) OnLeaningCancel(this, new InputValueEventArgs(obj.ReadValue<float>()));
+    }
+
+    private void ReloadPerformed(UnityEngine.InputSystem.InputAction.CallbackContext obj) {
+        if (OnReloadPerformed != null) OnReloadPerformed(this, EventArgs.Empty);
+    }
+
+    private void WeaponChangePerformed(UnityEngine.InputSystem.InputAction.CallbackContext obj) {
+        if (OnWeaponChangePerformed != null) OnWeaponChangePerformed(this, new InputValueEventArgs(obj.action.GetBindingIndexForControl(obj.control)));
     }
     public Vector2 GetMovementVectorNormalized() {
         Vector2 inputVector = playerInputActions.Player.Move.ReadValue<Vector2>();

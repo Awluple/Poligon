@@ -8,4 +8,110 @@ AvatarMask:
   m_PrefabAsset: {fileID: 0}
   m_Name: legsOnly
   m_Mask: 01000000000000000000000001000000010000000000000000000000000000000000000001000000010000000000000000000000
-  m_Elements: []
+  m_Elements:
+  - m_Path: 
+    m_Weight: 1
+  - m_Path: Armature
+    m_Weight: 1
+  - m_Path: Armature/Body.001
+    m_Weight: 1
+  - m_Path: Armature/Body.001/Body.002
+    m_Weight: 1
+  - m_Path: Armature/Body.001/Body.002/Body.003
+    m_Weight: 1
+  - m_Path: Armature/Body.001/Body.002/Body.003/Head.001
+    m_Weight: 1
+  - m_Path: Armature/Body.001/Body.002/Shoulder.001.L
+    m_Weight: 1
+  - m_Path: Armature/Body.001/Body.002/Shoulder.001.L/Arm.001.L
+    m_Weight: 1
+  - m_Path: Armature/Body.001/Body.002/Shoulder.001.L/Arm.001.L/Arm.002.L
+    m_Weight: 1
+  - m_Path: Armature/Body.001/Body.002/Shoulder.001.L/Arm.001.L/Arm.002.L/Hand.001.L
+    m_Weight: 1
+  - m_Path: Armature/Body.001/Body.002/Shoulder.001.L/Arm.001.L/Arm.002.L/Hand.001.L/Index.001.L
+    m_Weight: 1
+  - m_Path: Armature/Body.001/Body.002/Shoulder.001.L/Arm.001.L/Arm.002.L/Hand.001.L/Index.001.L/Index.002.L
+    m_Weight: 1
+  - m_Path: Armature/Body.001/Body.002/Shoulder.001.L/Arm.001.L/Arm.002.L/Hand.001.L/Index.001.L/Index.002.L/Index.003.L
+    m_Weight: 1
+  - m_Path: Armature/Body.001/Body.002/Shoulder.001.L/Arm.001.L/Arm.002.L/Hand.001.L/Middle.001.L
+    m_Weight: 1
+  - m_Path: Armature/Body.001/Body.002/Shoulder.001.L/Arm.001.L/Arm.002.L/Hand.001.L/Middle.001.L/Middle.002.L
+    m_Weight: 1
+  - m_Path: Armature/Body.001/Body.002/Shoulder.001.L/Arm.001.L/Arm.002.L/Hand.001.L/Middle.001.L/Middle.002.L/Middle.003.L
+    m_Weight: 1
+  - m_Path: Armature/Body.001/Body.002/Shoulder.001.L/Arm.001.L/Arm.002.L/Hand.001.L/Pinky.001.L
+    m_Weight: 1
+  - m_Path: Armature/Body.001/Body.002/Shoulder.001.L/Arm.001.L/Arm.002.L/Hand.001.L/Pinky.001.L/Pinky.002.L
+    m_Weight: 1
+  - m_Path: Armature/Body.001/Body.002/Shoulder.001.L/Arm.001.L/Arm.002.L/Hand.001.L/Pinky.001.L/Pinky.002.L/Pinky.003.L
+    m_Weight: 1
+  - m_Path: Armature/Body.001/Body.002/Shoulder.001.L/Arm.001.L/Arm.002.L/Hand.001.L/Ring.001.L
+    m_Weight: 1
+  - m_Path: Armature/Body.001/Body.002/Shoulder.001.L/Arm.001.L/Arm.002.L/Hand.001.L/Ring.001.L/Ring.002.L
+    m_Weight: 1
+  - m_Path: Armature/Body.001/Body.002/Shoulder.001.L/Arm.001.L/Arm.002.L/Hand.001.L/Ring.001.L/Ring.002.L/Ring.003.L
+    m_Weight: 1
+  - m_Path: Armature/Body.001/Body.002/Shoulder.001.L/Arm.001.L/Arm.002.L/Hand.001.L/Thumb.001.L
+    m_Weight: 1
+  - m_Path: Armature/Body.001/Body.002/Shoulder.001.L/Arm.001.L/Arm.002.L/Hand.001.L/Thumb.001.L/Thumb.002.L
+    m_Weight: 1
+  - m_Path: Armature/Body.001/Body.002/Shoulder.001.L/Arm.001.L/Arm.002.L/Hand.001.L/Thumb.001.L/Thumb.002.L/Thumb.003.L
+    m_Weight: 1
+  - m_Path: Armature/Body.001/Body.002/Shoulder.001.R
+    m_Weight: 1
+  - m_Path: Armature/Body.001/Body.002/Shoulder.001.R/Arm.001.R
+    m_Weight: 1
+  - m_Path: Armature/Body.001/Body.002/Shoulder.001.R/Arm.001.R/Arm.002.R
+    m_Weight: 1
+  - m_Path: Armature/Body.001/Body.002/Shoulder.001.R/Arm.001.R/Arm.002.R/Hand.001.R
+    m_Weight: 1
+  - m_Path: Armature/Body.001/Body.002/Shoulder.001.R/Arm.001.R/Arm.002.R/Hand.001.R/Index.001.R
+    m_Weight: 1
+  - m_Path: Armature/Body.001/Body.002/Shoulder.001.R/Arm.001.R/Arm.002.R/Hand.001.R/Index.001.R/Index.002.R
+    m_Weight: 1
+  - m_Path: Armature/Body.001/Body.002/Shoulder.001.R/Arm.001.R/Arm.002.R/Hand.001.R/Index.001.R/Index.002.R/Index.003.R
+    m_Weight: 1
+  - m_Path: Armature/Body.001/Body.002/Shoulder.001.R/Arm.001.R/Arm.002.R/Hand.001.R/Middle.001.R
+    m_Weight: 1
+  - m_Path: Armature/Body.001/Body.002/Shoulder.001.R/Arm.001.R/Arm.002.R/Hand.001.R/Middle.001.R/Middle.002.R
+    m_Weight: 1
+  - m_Path: Armature/Body.001/Body.002/Shoulder.001.R/Arm.001.R/Arm.002.R/Hand.001.R/Middle.001.R/Middle.002.R/Middle.003.R
+    m_Weight: 1
+  - m_Path: Armature/Body.001/Body.002/Shoulder.001.R/Arm.001.R/Arm.002.R/Hand.001.R/Pinky.001.R
+    m_Weight: 1
+  - m_Path: Armature/Body.001/Body.002/Shoulder.001.R/Arm.001.R/Arm.002.R/Hand.001.R/Pinky.001.R/Pinky.002.R
+    m_Weight: 1
+  - m_Path: Armature/Body.001/Body.002/Shoulder.001.R/Arm.001.R/Arm.002.R/Hand.001.R/Pinky.001.R/Pinky.002.R/Pinky.003.R
+    m_Weight: 1
+  - m_Path: Armature/Body.001/Body.002/Shoulder.001.R/Arm.001.R/Arm.002.R/Hand.001.R/Ring.001.R
+    m_Weight: 1
+  - m_Path: Armature/Body.001/Body.002/Shoulder.001.R/Arm.001.R/Arm.002.R/Hand.001.R/Ring.001.R/Ring.002.R
+    m_Weight: 1
+  - m_Path: Armature/Body.001/Body.002/Shoulder.001.R/Arm.001.R/Arm.002.R/Hand.001.R/Ring.001.R/Ring.002.R/Ring.003.R
+    m_Weight: 1
+  - m_Path: Armature/Body.001/Body.002/Shoulder.001.R/Arm.001.R/Arm.002.R/Hand.001.R/Thumb.001.R
+    m_Weight: 1
+  - m_Path: Armature/Body.001/Body.002/Shoulder.001.R/Arm.001.R/Arm.002.R/Hand.001.R/Thumb.001.R/Thumb.002.R
+    m_Weight: 1
+  - m_Path: Armature/Body.001/Body.002/Shoulder.001.R/Arm.001.R/Arm.002.R/Hand.001.R/Thumb.001.R/Thumb.002.R/Thumb.003.R
+    m_Weight: 1
+  - m_Path: Armature/Body.001/Pelvis.001.L
+    m_Weight: 1
+  - m_Path: Armature/Body.001/Pelvis.001.L/Leg.001.L
+    m_Weight: 1
+  - m_Path: Armature/Body.001/Pelvis.001.L/Leg.001.L/Leg.002.L
+    m_Weight: 1
+  - m_Path: Armature/Body.001/Pelvis.001.L/Leg.001.L/Leg.002.L/Feet.001.L
+    m_Weight: 1
+  - m_Path: Armature/Body.001/Pelvis.001.R
+    m_Weight: 1
+  - m_Path: Armature/Body.001/Pelvis.001.R/Leg.001.R
+    m_Weight: 1
+  - m_Path: Armature/Body.001/Pelvis.001.R/Leg.001.R/Leg.002.R
+    m_Weight: 1
+  - m_Path: Armature/Body.001/Pelvis.001.R/Leg.001.R/Leg.002.R/Feet.001.R
+    m_Weight: 1
+  - m_Path: Body Full
+    m_Weight: 1

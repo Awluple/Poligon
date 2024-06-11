@@ -47,6 +47,10 @@ public class Player : Character {
         gameInput.OnLeaningStart += LeaningStart;
         gameInput.OnLeaningCancel += LeaningCancel;
 
+        gameInput.OnWeaponChangePerformed += ChangeWeapon;
+
+        gameInput.OnReloadPerformed += Reload;
+
 
         characterController = GetComponent<CharacterController>();
         originalStepOffset = characterController.stepOffset;

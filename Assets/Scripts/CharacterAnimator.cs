@@ -9,6 +9,7 @@ public class CharacterAnimator : MonoBehaviour
 {
     [SerializeField] protected Animator animator;
     [SerializeField] protected Character character;
+    [SerializeField] protected AvatarMask avatarMask;
 
     private int leaningPosition = 0;
 
@@ -31,7 +32,9 @@ public class CharacterAnimator : MonoBehaviour
         character.OnMoving += StopLeaningOnMove;
         character.OnMovingEnd += ResumeLeaning;
 
+        character.OnWeaponChange += ChangeWeapon;
 
+        character.OnReload += Reload;
     }
 
     float yVelocity = 0.0f;
@@ -47,21 +50,21 @@ public class CharacterAnimator : MonoBehaviour
         }
 
         if(!character.IsAiming() && animator.GetLayerWeight(2) > 0) {
-            if(animator.GetLayerWeight((int)CharacterAnimatorLayers.Aiming) < 0.05) {
-                animator.SetLayerWeight((int)CharacterAnimatorLayers.Aiming, 0);
+            if(animator.GetLayerWeight((int)CharacterAnimatorLayers.AimingPistol) < 0.01) {
+                animator.SetLayerWeight((int)CharacterAnimatorLayers.AimingPistol, 0);
             } else {
-                var m_currentLayerWeight = animator.GetLayerWeight((int)CharacterAnimatorLayers.Aiming);
+                var m_currentLayerWeight = animator.GetLayerWeight((int)CharacterAnimatorLayers.AimingPistol);
                 m_currentLayerWeight = Mathf.SmoothDamp(m_currentLayerWeight, character.IsAiming() ? 1 : 0, ref yVelocity, aimTransitionTime);
-                animator.SetLayerWeight((int)CharacterAnimatorLayers.Aiming, m_currentLayerWeight);
+                animator.SetLayerWeight((int)CharacterAnimatorLayers.AimingPistol, m_currentLayerWeight);
             }
             
-        } else if (character.IsAiming() && animator.GetLayerWeight((int)CharacterAnimatorLayers.Aiming) < 1) {
-            if (animator.GetLayerWeight((int)CharacterAnimatorLayers.Aiming) > 0.95) {
-                animator.SetLayerWeight((int)CharacterAnimatorLayers.Aiming, 1);
+        } else if (character.IsAiming() && animator.GetLayerWeight((int)CharacterAnimatorLayers.AimingPistol) < 1) {
+            if (animator.GetLayerWeight((int)CharacterAnimatorLayers.AimingPistol) > 0.99) {
+                animator.SetLayerWeight((int)CharacterAnimatorLayers.AimingPistol, 1);
             } else {
-                var m_currentLayerWeight = animator.GetLayerWeight((int)CharacterAnimatorLayers.Aiming);
+                var m_currentLayerWeight = animator.GetLayerWeight((int)CharacterAnimatorLayers.AimingPistol);
                 m_currentLayerWeight = Mathf.SmoothDamp(m_currentLayerWeight, character.IsAiming() ? 1 : 0, ref yVelocity, aimTransitionTime);
-                animator.SetLayerWeight((int)CharacterAnimatorLayers.Aiming, m_currentLayerWeight);
+                animator.SetLayerWeight((int)CharacterAnimatorLayers.AimingPistol, m_currentLayerWeight);
             }
         }
 
@@ -92,6 +95,11 @@ public class CharacterAnimator : MonoBehaviour
             animator.SetLayerWeight((int)CharacterAnimatorLayers.CrouchingBlend, 1);
             animator.SetBool("crouching", true);
             animator.SetLayerWeight((int)CharacterAnimatorLayers.Crouching, 0);
+
+            if (character.currentWeapon == WeaponTypes.AssultRifle) {
+                avatarMask.SetHumanoidBodyPartActive(AvatarMaskBodyPart.Body, true);
+            }
+
         } else {
             animator.SetLayerWeight((int)CharacterAnimatorLayers.WalkingBlend, 1);
         }
@@ -105,6 +113,7 @@ public class CharacterAnimator : MonoBehaviour
         } else {
             animator.SetLayerWeight((int)CharacterAnimatorLayers.WalkingBlend, 0);
         }
+        avatarMask.SetHumanoidBodyPartActive(AvatarMaskBodyPart.Body, false);
         animator.SetLayerWeight((int)CharacterAnimatorLayers.Leaning, 0);
         animator.SetBool("aiming", false);
     }
@@ -155,6 +164,10 @@ public class CharacterAnimator : MonoBehaviour
         } else {
             animator.SetLayerWeight((int)CharacterAnimatorLayers.Crouching, 1);
         }
+        if(character.currentWeapon == WeaponTypes.AssultRifle) {
+            avatarMask.SetHumanoidBodyPartActive(AvatarMaskBodyPart.LeftArm, false);
+            avatarMask.SetHumanoidBodyPartActive(AvatarMaskBodyPart.RightArm, false);
+        }
         animator.SetBool("crouching", true);
         animator.SetTrigger("positionChange");
     }
@@ -167,6 +180,28 @@ public class CharacterAnimator : MonoBehaviour
             animator.SetLayerWeight((int)CharacterAnimatorLayers.WalkingBlend, 1);
             animator.SetLayerWeight((int)CharacterAnimatorLayers.CrouchingBlend, 0);
         }
+        avatarMask.SetHumanoidBodyPartActive(AvatarMaskBodyPart.LeftArm, true);
+        avatarMask.SetHumanoidBodyPartActive(AvatarMaskBodyPart.RightArm, true);
         animator.SetBool("crouching", false);
+    }
+
+    protected void ChangeWeapon(object sender, InputValueEventArgs e) {
+        animator.SetLayerWeight((int)CharacterAnimatorLayers.PistolUp, 0);
+        animator.SetLayerWeight((int)CharacterAnimatorLayers.Rifle, 0);
+
+        switch((WeaponTypes)e.Value) {
+            case (WeaponTypes.Pistol):
+                animator.SetLayerWeight((int)CharacterAnimatorLayers.PistolUp, 1);
+                break;
+            case (WeaponTypes.AssultRifle):
+                animator.SetLayerWeight((int)CharacterAnimatorLayers.Rifle, 1);
+                break;
+            default:
+                Debug.LogWarning($"Animations for {(WeaponTypes)e.Value} are not present");
+                break;
+        }
+    }
+    protected void Reload(object sender, System.EventArgs e) {
+        animator.SetTrigger("reloadWeapon");
     }
 }
