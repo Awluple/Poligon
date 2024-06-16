@@ -143,9 +143,7 @@ public abstract class Character : MonoBehaviour, IKillable {
                 
                 break;
             case (WeaponTypes.AssultRifle):
-                gun.transform.position = gun.equippedPositions[1].transform.position;
-                gun.transform.rotation = gun.equippedPositions[1].transform.rotation;
-                gun.transform.parent = gun.equippedPositions[1].transform.parent;
+                gun.SwitchPosition(1);
                 break;
         }
     }
@@ -161,9 +159,7 @@ public abstract class Character : MonoBehaviour, IKillable {
 
                 break;
             case (WeaponTypes.AssultRifle):
-                gun.transform.position = gun.equippedPositions[0].transform.position;
-                gun.transform.rotation = gun.equippedPositions[0].transform.rotation;
-                gun.transform.parent = gun.equippedPositions[0].transform.parent;
+                gun.SwitchPosition(0);
                 break;
         }
     }
@@ -199,11 +195,29 @@ public abstract class Character : MonoBehaviour, IKillable {
     protected void LeaningCancel(object sender, InputValueEventArgs args) {
         if (OnLeaningEnd != null) OnLeaningEnd(this, args);
     }
+    /// <summary>
+    /// Reload a weapon. Move ammo object to the hand, drop it, and spawn a new one.
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
     protected void Reload(object sender, EventArgs e) {
         Ammo ammo = gun.GetComponentInChildren<Ammo>();
-        if(ammo == null || isReloading) return;
+        if (ammo == null || isReloading || gun.ammoStock <= 0) return;
         if (OnReload != null) OnReload(this, EventArgs.Empty);
         isReloading = true;
+        switch (currentWeapon) {
+            case (WeaponTypes.Pistol):
+                ReloadPistol(ammo);
+                break;
+            case (WeaponTypes.AssultRifle):
+                ReloadRifle(ammo);
+                break;
+        }
+
+    }
+
+    
+    protected void ReloadRifle(Ammo ammo) {
         Vector3 originalPosition = ammo.transform.localPosition;
         Quaternion originalRotation = ammo.transform.localRotation;
 
@@ -213,18 +227,18 @@ public abstract class Character : MonoBehaviour, IKillable {
             ammo.transform.parent = gun.ammoPosition.parent;
             ammo.transform.position = gun.ammoPosition.position;
             ammo.transform.rotation = gun.ammoPosition.rotation;
+            gun.PlayReloadSound();
         }));
         StartCoroutine(ExecuteAfterTime(0.7f, () => {
             ammo.transform.parent = null;
-            Vector3 throwDirection = new Vector3(1, -1, 0);
+            Vector3 throwDirection = new Vector3(-1, 1, 0);
             float throwForce = 1.5f;
 
             Rigidbody rb = ammo.GetComponent<Rigidbody>();
             rb.useGravity = true;
             rb.isKinematic = false;
-            rb.AddForce(throwDirection.normalized * throwForce, ForceMode.Impulse);
+            rb.AddForce(transform.rotation * throwDirection.normalized * throwForce, ForceMode.Impulse);
             ammo.GetComponent<BoxCollider>().enabled = true;
-            //ammo.GetComponent<Rigidbody>().isKinematic = true;
         }));
         StartCoroutine(ExecuteAfterTime(0.8f, () => {
             newAmmo = Instantiate(gun.ammoPrefab, gun.ammoPosition.transform.position, gun.ammoPosition.rotation);
@@ -236,7 +250,29 @@ public abstract class Character : MonoBehaviour, IKillable {
             newAmmo.transform.parent = gun.transform;
             newAmmo.transform.localPosition = originalPosition;
             newAmmo.transform.localRotation = originalRotation;
-            gun.currentAmmo = gun.maxAmmo;
+            
+            if(gun.ammoStock >= gun.maxAmmo) {
+                gun.currentAmmo = gun.maxAmmo;
+                gun.ammoStock -= gun.maxAmmo;
+            } else {
+                gun.currentAmmo = gun.ammoStock;
+                gun.ammoStock = 0;
+            }
+            isReloading = false;
+        }));
+    }
+    protected void ReloadPistol(Ammo ammo) {
+        
+        Vector3 originalPosition = ammo.transform.localPosition;
+        Quaternion originalRotation = ammo.transform.localRotation;
+        StartCoroutine(ExecuteAfterTime(1.7f, () => {
+            if (gun.ammoStock >= gun.maxAmmo) {
+                gun.currentAmmo = gun.maxAmmo;
+                gun.ammoStock -= gun.maxAmmo;
+            } else {
+                gun.currentAmmo = gun.ammoStock;
+                gun.ammoStock = 0;
+            }
             isReloading = false;
         }));
     }
@@ -245,9 +281,7 @@ public abstract class Character : MonoBehaviour, IKillable {
         WeaponTypes weapon = (WeaponTypes)args.Value;
 
         if(gun != null) {
-            gun.transform.position = gun.positionOnBody.position;
-            gun.transform.rotation = gun.positionOnBody.rotation;
-            gun.transform.parent = gun.positionOnBody.parent;
+            gun.UnequipWeapon();
         }
 
         currentWeapon = weapon;
@@ -256,9 +290,7 @@ public abstract class Character : MonoBehaviour, IKillable {
         switch (weapon) {
             case (WeaponTypes.Pistol):
                 gun = GetComponentInChildren<Pistol>();
-                gun.transform.position = gun.equippedPositions[0].transform.position;
-                gun.transform.rotation = gun.equippedPositions[0].transform.rotation;
-                gun.transform.parent = gun.equippedPositions[0].transform.parent;
+                gun.SwitchPosition(0);
                 rigConstraints.data.offset = new Vector3(20, 17, 13);
 
 
@@ -267,9 +299,7 @@ public abstract class Character : MonoBehaviour, IKillable {
                 gun = GetComponentInChildren<AssultRifle>();
                 int index = 0;
                 if (isAiming) index = 1;
-                gun.transform.position = gun.equippedPositions[index].transform.position;
-                gun.transform.rotation = gun.equippedPositions[index].transform.rotation;
-                gun.transform.parent = gun.equippedPositions[index].transform.parent;
+                gun.SwitchPosition(index);
                 rigConstraints.data.offset = new Vector3(15, 25, 0);
                 break;
         }
