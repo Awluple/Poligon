@@ -5,11 +5,18 @@ namespace Poligon.Ai.EnemyStates.Utils {
 
     public static class Coroutines {
         public static IEnumerator ContinueAttackingWhileMoving(EnemyController enemyController, bool runWhenNoVision = true) {
+            bool shootCalled = false;
             for (; ; ) {
                 if (Methods.HasVisionOnOpponent(out Character character, enemyController)) {
                     if (!enemyController.enemy.IsAiming()) enemyController.AimStart();
                     if (character == enemyController.enemy) { yield return new WaitForSeconds(0.3f); } // don't shoot yourself...
-                    enemyController.ShootPerformed();
+                    if(!enemyController.getWeapon().automatic) {
+                        enemyController.ShootPerformed();
+                    } else if(enemyController.getWeapon().automatic && ! shootCalled) {
+                        enemyController.ShootPerformed();
+                        shootCalled = true;
+                    }
+                    
                 } else {
                    
                     if (runWhenNoVision) {
@@ -21,9 +28,19 @@ namespace Poligon.Ai.EnemyStates.Utils {
             }
         }
         public static IEnumerator ShootingCoroutine(EnemyController enemyController) {
+            bool shootCalled = false;
             for (; ; ) {
                 if (Methods.HasVisionOnOpponent(out Character character, enemyController)) {
-                    if (character != enemyController.enemy) enemyController.ShootPerformed();
+                    if (character != enemyController.enemy && !enemyController.getWeapon().automatic) {
+                        enemyController.ShootPerformed();
+                    } else if (character != enemyController.enemy && enemyController.getWeapon().automatic && !shootCalled) {
+                        enemyController.ShootPerformed();
+                        shootCalled = true;
+                    }
+                }
+                if(enemyController.getWeapon().currentAmmo == 0) {
+                    shootCalled = false;
+                    enemyController.Reload();
                 }
                 yield return new WaitForSeconds(Random.Range(0.5f, 1f));
             }

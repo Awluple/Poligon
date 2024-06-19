@@ -10,6 +10,7 @@ using Poligon.EvetArgs;
 using UnityEngine.UIElements;
 using UnityEngine.EventSystems;
 using System.Linq;
+using Poligon.Enums;
 
 public class Enemy : Character, ISquadMember {
 
@@ -34,10 +35,16 @@ public class Enemy : Character, ISquadMember {
         enemyController.OnCrouchStart += StartCrouch;
         enemyController.OnCrouchCancel += CancelCrouch;
 
+        enemyController.OnReloadStart += Reload;
+
         characterController = GetComponent<CharacterController>();
 
         if(enemyList == null ) {
             enemyList = GetComponentsInParent<Enemy>().ToList();
+        }
+
+        if(currentWeapon == WeaponTypes.None) {
+            ChangeWeapon(null,new InputValueEventArgs((int)WeaponTypes.AssultRifle));
         }
 
     }

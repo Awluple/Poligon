@@ -35,6 +35,9 @@ public class EnemyController : MonoBehaviour, IAICharacterController, IStateMana
     public event EventHandler OnShootPerformed;
     public event EventHandler OnShootCancel;
 
+    public event EventHandler OnReloadStart;
+    public event EventHandler OnReloadCancel;
+
     public event EventHandler OnFinalPositionEvent;
 
     public event EventHandler OnNextCornerEvent;
@@ -140,6 +143,10 @@ public class EnemyController : MonoBehaviour, IAICharacterController, IStateMana
         }
     }
 
+    public Gun getWeapon() {
+        return enemy.gun;
+    }
+
     public void setSquad(Squad squad) {
         enemy.squad = squad;
     }
@@ -239,6 +246,13 @@ public class EnemyController : MonoBehaviour, IAICharacterController, IStateMana
     public void ShootCancel() {
         if (OnShootCancel != null) OnShootCancel(this, EventArgs.Empty);
     }
+    public void Reload() {
+        if (OnReloadStart != null) OnReloadStart(this, EventArgs.Empty);
+    }
+    public void ReloadCancel() {
+        if (OnReloadCancel != null) OnReloadCancel(this, EventArgs.Empty);
+    }
+
 
     //public void SetPatrollingPath(object sender = null, System.EventArgs e = null) {
     //    if (patrolPositions.Length == 0) {

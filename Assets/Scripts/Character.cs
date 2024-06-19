@@ -22,7 +22,7 @@ public abstract class Character : MonoBehaviour, IKillable {
 
 
     [SerializeField] protected Rig rig;
-    [SerializeField] protected Gun gun = null;
+    public Gun gun = null;
     public WeaponTypes currentWeapon = WeaponTypes.None;
     [SerializeField] protected AimPosition aimingTarget;
 

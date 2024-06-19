@@ -6,8 +6,8 @@ using UnityEngine;
 using UnityEngine.UIElements;
 
 public class EnemyAimPosition : AimPosition {
-    Player player;
-    Enemy enemy;
+    [SerializeField] Player player;
+    [SerializeField] Enemy enemy;
     public bool aimingAtCharacter = false;
     public bool alerted = false;
 
@@ -90,6 +90,7 @@ public class EnemyAimPosition : AimPosition {
         for (; ; ) {
             if (ProximityCheck()) {
                 MoveToCharacter(player, ref moveAimCalled);
+                Debug.Log(OnLineOfSight == null);
                 if (OnLineOfSight != null && sightEventsCalled == false) {
                     OnLineOfSight(this, EventArgs.Empty);
                     sightEventsCalled = true;
@@ -138,7 +139,9 @@ public class EnemyAimPosition : AimPosition {
 
     public void LockOnTarget(Character character) {
         bool moveAimCalled = false;
-        StopCoroutine(checkCoroutine);
+        if(checkCoroutine!= null) {
+            StopCoroutine(checkCoroutine);
+        }
         MoveToCharacter(character, ref moveAimCalled);
         if (OnLineOfSight != null) {
             OnLineOfSight(this, EventArgs.Empty);
