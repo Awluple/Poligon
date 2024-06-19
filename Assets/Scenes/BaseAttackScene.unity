@@ -18863,6 +18863,8 @@ MonoBehaviour:
   positionOnBody: {fileID: 0}
   equippedPositions: []
   ammoPosition: {fileID: 0}
+  isReloading: 0
+  ammoSlideOutPosition: {fileID: 0}
 --- !u!4 &463161150
 Transform:
   m_ObjectHideFlags: 0
@@ -20173,7 +20175,6 @@ MonoBehaviour:
   currentWeapon: 0
   aimingTarget: {fileID: 537529771}
   isWalking: 0
-  isReloading: 0
   isRunning: 0
   isAiming: 0
   isCrouching: 0
@@ -23927,6 +23928,8 @@ MonoBehaviour:
   positionOnBody: {fileID: 0}
   equippedPositions: []
   ammoPosition: {fileID: 0}
+  isReloading: 0
+  ammoSlideOutPosition: {fileID: 0}
 --- !u!1 &652054877
 GameObject:
   m_ObjectHideFlags: 0
@@ -26911,18 +26914,6 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 8970256709149944031, guid: f519fb8cc2376c141baca2ead5f0a624, type: 3}
   m_PrefabInstance: {fileID: 2014486083}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &796699026
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 796699022}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7a237704a094abb458690d427171bdf1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!54 &796699027
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -46446,7 +46437,6 @@ MonoBehaviour:
   currentWeapon: 0
   aimingTarget: {fileID: 948497449}
   isWalking: 0
-  isReloading: 0
   isRunning: 0
   isAiming: 0
   isCrouching: 0
@@ -54089,6 +54079,37 @@ Transform:
   - {fileID: 2014043923}
   m_Father: {fileID: 494393436}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1480359458
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1480359459}
+  m_Layer: 0
+  m_Name: PistolAmmoPosition
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1480359459
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1480359458}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0.4362659, y: -0.51843524, z: -0.6221216, w: -0.39225215}
+  m_LocalPosition: {x: 0.00091, y: 0.00336, z: 0.00128}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1067712377}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1498653799
 GameObject:
   m_ObjectHideFlags: 0
@@ -54423,6 +54444,11 @@ Mesh:
     offset: 0
     size: 0
     path: 
+--- !u!4 &1511062647 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 1080186462961609105, guid: cedf5a8ea0bbcd44882ed6b10468336c, type: 3}
+  m_PrefabInstance: {fileID: 6801193557338423814}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1511939773
 GameObject:
   m_ObjectHideFlags: 0
@@ -68390,6 +68416,7 @@ MonoBehaviour:
   - {fileID: 1681701182}
   - {fileID: 1850832185}
   ammoPosition: {fileID: 184756437}
+  isReloading: 0
 --- !u!1 &1837073048
 GameObject:
   m_ObjectHideFlags: 0
@@ -82048,16 +82075,14 @@ PrefabInstance:
       propertyPath: m_Layer
       value: 0
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 1403756385288609292, guid: f519fb8cc2376c141baca2ead5f0a624, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 7049378010696739475, guid: f519fb8cc2376c141baca2ead5f0a624, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1828973961}
-    - targetCorrespondingSourceObject: {fileID: 8970256709149944031, guid: f519fb8cc2376c141baca2ead5f0a624, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 796699026}
     - targetCorrespondingSourceObject: {fileID: 8970256709149944031, guid: f519fb8cc2376c141baca2ead5f0a624, type: 3}
       insertIndex: -1
       addedObject: {fileID: 796699027}
@@ -83846,6 +83871,37 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1713201547}
   m_LocalEulerAnglesHint: {x: -0.001, y: 89.798, z: -0.367}
+--- !u!1 &2088689436
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2088689437}
+  m_Layer: 0
+  m_Name: PistolAmmoSlideOutPosition
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2088689437
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2088689436}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0.6059923, y: -0.42302197, z: -0.59217304, w: 0.32118037}
+  m_LocalPosition: {x: -0.00713, y: -0.00466, z: 0.00096}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1511062647}
+  m_LocalEulerAnglesHint: {x: 1.783, y: 0.174, z: -0.063}
 --- !u!1 &2092332373
 GameObject:
   m_ObjectHideFlags: 0
@@ -87252,13 +87308,29 @@ PrefabInstance:
       value: 100
       objectReference: {fileID: 0}
     - target: {fileID: 2559488853928618976, guid: cedf5a8ea0bbcd44882ed6b10468336c, type: 3}
+      propertyPath: ammoPrefab
+      value: 
+      objectReference: {fileID: 6067302740154983676, guid: 532558ddeb52ead44886d5ee1c8c97ad, type: 3}
+    - target: {fileID: 2559488853928618976, guid: cedf5a8ea0bbcd44882ed6b10468336c, type: 3}
       propertyPath: currentAmmo
       value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 2559488853928618976, guid: cedf5a8ea0bbcd44882ed6b10468336c, type: 3}
+      propertyPath: reloadSound
+      value: 
+      objectReference: {fileID: 8300000, guid: 2c4afb162d83971438cc2d666688fb24, type: 3}
+    - target: {fileID: 2559488853928618976, guid: cedf5a8ea0bbcd44882ed6b10468336c, type: 3}
+      propertyPath: ammoPosition
+      value: 
+      objectReference: {fileID: 1480359459}
+    - target: {fileID: 2559488853928618976, guid: cedf5a8ea0bbcd44882ed6b10468336c, type: 3}
       propertyPath: positionOnBody
       value: 
       objectReference: {fileID: 1804061611}
+    - target: {fileID: 2559488853928618976, guid: cedf5a8ea0bbcd44882ed6b10468336c, type: 3}
+      propertyPath: ammoSlideOutPosition
+      value: 
+      objectReference: {fileID: 2088689437}
     - target: {fileID: 2559488853928618976, guid: cedf5a8ea0bbcd44882ed6b10468336c, type: 3}
       propertyPath: equippedPositions.Array.size
       value: 1
@@ -87420,7 +87492,8 @@ PrefabInstance:
       value: 0.112
       objectReference: {fileID: 0}
     m_RemovedComponents: []
-    m_RemovedGameObjects: []
+    m_RemovedGameObjects:
+    - {fileID: 2573706231537876686, guid: cedf5a8ea0bbcd44882ed6b10468336c, type: 3}
     m_AddedGameObjects:
     - targetCorrespondingSourceObject: {fileID: 3593114763632661773, guid: cedf5a8ea0bbcd44882ed6b10468336c, type: 3}
       insertIndex: 2
@@ -87437,6 +87510,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 244899159388904504, guid: cedf5a8ea0bbcd44882ed6b10468336c, type: 3}
       insertIndex: -1
       addedObject: {fileID: 184756437}
+    - targetCorrespondingSourceObject: {fileID: 244899159388904504, guid: cedf5a8ea0bbcd44882ed6b10468336c, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1480359459}
     - targetCorrespondingSourceObject: {fileID: 4071454004535217110, guid: cedf5a8ea0bbcd44882ed6b10468336c, type: 3}
       insertIndex: -1
       addedObject: {fileID: 38243189}
@@ -87452,6 +87528,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 7357002305036942171, guid: cedf5a8ea0bbcd44882ed6b10468336c, type: 3}
       insertIndex: -1
       addedObject: {fileID: 489120734}
+    - targetCorrespondingSourceObject: {fileID: 1080186462961609105, guid: cedf5a8ea0bbcd44882ed6b10468336c, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2088689437}
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 1319007247175903699, guid: cedf5a8ea0bbcd44882ed6b10468336c, type: 3}
       insertIndex: -1

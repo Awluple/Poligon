@@ -34,7 +34,8 @@ public class CharacterAnimator : MonoBehaviour
 
         character.OnWeaponChange += ChangeWeapon;
 
-        character.OnReload += Reload;
+        character.OnReload += StartReload;
+        character.OnReloadEnd += EndReload;
     }
 
     float yVelocity = 0.0f;
@@ -201,7 +202,10 @@ public class CharacterAnimator : MonoBehaviour
                 break;
         }
     }
-    protected void Reload(object sender, System.EventArgs e) {
-        animator.SetTrigger("reloadWeapon");
+    protected void StartReload(object sender, System.EventArgs e) {
+        animator.SetBool("isReloading", true);
+    }
+    protected void EndReload(object sender, System.EventArgs e) {
+        animator.SetBool("isReloading", false);
     }
 }

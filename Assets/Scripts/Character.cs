@@ -30,7 +30,6 @@ public abstract class Character : MonoBehaviour, IKillable {
 
     protected CharacterController characterController;
     [SerializeField] protected bool isWalking;
-    [SerializeField] protected bool isReloading;
     [SerializeField] protected bool isRunning;
     [SerializeField] protected bool isAiming;
     [SerializeField] protected bool isCrouching;
@@ -62,6 +61,7 @@ public abstract class Character : MonoBehaviour, IKillable {
     public event EventHandler OnShoot;
     public event EventHandler OnShootEnd;
     public event EventHandler OnReload;
+    public event EventHandler OnReloadEnd;
 
     public event EventHandler<InputValueEventArgs> OnLeaning;
     public event EventHandler<InputValueEventArgs> OnLeaningEnd;
@@ -156,7 +156,6 @@ public abstract class Character : MonoBehaviour, IKillable {
 
         switch (currentWeapon) {
             case (WeaponTypes.Pistol):
-
                 break;
             case (WeaponTypes.AssultRifle):
                 gun.SwitchPosition(0);
@@ -165,7 +164,7 @@ public abstract class Character : MonoBehaviour, IKillable {
     }
 
     protected void ShootPerformed(object sender, System.EventArgs e) {
-        if (!isAiming) return;
+        if (!isAiming || gun.isReloading) return;
         if (gun.currentAmmo == 0) return;
 
         if(!gun.automatic) {
@@ -202,79 +201,19 @@ public abstract class Character : MonoBehaviour, IKillable {
     /// <param name="e"></param>
     protected void Reload(object sender, EventArgs e) {
         Ammo ammo = gun.GetComponentInChildren<Ammo>();
-        if (ammo == null || isReloading || gun.ammoStock <= 0) return;
-        if (OnReload != null) OnReload(this, EventArgs.Empty);
-        isReloading = true;
-        switch (currentWeapon) {
-            case (WeaponTypes.Pistol):
-                ReloadPistol(ammo);
-                break;
-            case (WeaponTypes.AssultRifle):
-                ReloadRifle(ammo);
-                break;
+        if (ammo == null || gun.isReloading || gun.ammoStock <= 0) return;
+        if (OnShootEnd != null) OnShootEnd(this, EventArgs.Empty);
+        if (shootingCoroutine != null) {
+            StopCoroutine(shootingCoroutine);
         }
-
+        if (OnReload != null) OnReload(this, EventArgs.Empty);
+        gun.Reload(null, () => {
+            ReloadEnd();
+        });
     }
 
-    
-    protected void ReloadRifle(Ammo ammo) {
-        Vector3 originalPosition = ammo.transform.localPosition;
-        Quaternion originalRotation = ammo.transform.localRotation;
-
-        GameObject newAmmo = null;
-
-        StartCoroutine(ExecuteAfterTime(0.3f, () => {
-            ammo.transform.parent = gun.ammoPosition.parent;
-            ammo.transform.position = gun.ammoPosition.position;
-            ammo.transform.rotation = gun.ammoPosition.rotation;
-            gun.PlayReloadSound();
-        }));
-        StartCoroutine(ExecuteAfterTime(0.7f, () => {
-            ammo.transform.parent = null;
-            Vector3 throwDirection = new Vector3(-1, 1, 0);
-            float throwForce = 1.5f;
-
-            Rigidbody rb = ammo.GetComponent<Rigidbody>();
-            rb.useGravity = true;
-            rb.isKinematic = false;
-            rb.AddForce(transform.rotation * throwDirection.normalized * throwForce, ForceMode.Impulse);
-            ammo.GetComponent<BoxCollider>().enabled = true;
-        }));
-        StartCoroutine(ExecuteAfterTime(0.8f, () => {
-            newAmmo = Instantiate(gun.ammoPrefab, gun.ammoPosition.transform.position, gun.ammoPosition.rotation);
-            newAmmo.transform.parent = gun.ammoPosition.parent;
-            newAmmo.transform.position = gun.ammoPosition.position;
-            newAmmo.transform.rotation = gun.ammoPosition.rotation;
-        }));
-        StartCoroutine(ExecuteAfterTime(1.7f, () => {
-            newAmmo.transform.parent = gun.transform;
-            newAmmo.transform.localPosition = originalPosition;
-            newAmmo.transform.localRotation = originalRotation;
-            
-            if(gun.ammoStock >= gun.maxAmmo) {
-                gun.currentAmmo = gun.maxAmmo;
-                gun.ammoStock -= gun.maxAmmo;
-            } else {
-                gun.currentAmmo = gun.ammoStock;
-                gun.ammoStock = 0;
-            }
-            isReloading = false;
-        }));
-    }
-    protected void ReloadPistol(Ammo ammo) {
-        
-        Vector3 originalPosition = ammo.transform.localPosition;
-        Quaternion originalRotation = ammo.transform.localRotation;
-        StartCoroutine(ExecuteAfterTime(1.7f, () => {
-            if (gun.ammoStock >= gun.maxAmmo) {
-                gun.currentAmmo = gun.maxAmmo;
-                gun.ammoStock -= gun.maxAmmo;
-            } else {
-                gun.currentAmmo = gun.ammoStock;
-                gun.ammoStock = 0;
-            }
-            isReloading = false;
-        }));
+    protected void ReloadEnd() {
+        if (OnReloadEnd != null) OnReloadEnd(this, EventArgs.Empty);
     }
 
     protected void ChangeWeapon(object sender, InputValueEventArgs args) {

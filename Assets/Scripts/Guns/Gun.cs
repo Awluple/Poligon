@@ -64,6 +64,7 @@ public abstract class Gun : MonoBehaviour
     public Transform ammoPosition;
 
     private float nextShootTime; // When a gun can shoot again; for non-automatic
+    public bool isReloading = false;
     private AudioSource audioSource;
 
 
@@ -72,6 +73,13 @@ public abstract class Gun : MonoBehaviour
         GameObject shotSoundObject = new GameObject("ShotSoundObject");
         audioSource = shotSoundObject.AddComponent<AudioSource>();
         currentInaccuracy = baseInaccuracy;
+    }
+    abstract public void Reload(Ammo ammo = null, Action callback = null);
+
+    protected IEnumerator ExecuteAfterTime(float time, Action task) {
+        yield return new WaitForSeconds(time);
+
+        task();
     }
 
     protected void Update()
@@ -84,6 +92,7 @@ public abstract class Gun : MonoBehaviour
         } else if(timeToResetAccurancyTimeout > 0) {
             timeToResetAccurancyTimeout -= Time.deltaTime;
         }
+        Debug.Log(isReloading);
     }
     /// <summary>
     /// Fire a bullet, checks if a gun is able to shoot
