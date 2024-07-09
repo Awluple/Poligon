@@ -4448,7 +4448,7 @@ GameObject:
   - component: {fileID: 156746703}
   - component: {fileID: 156746702}
   - component: {fileID: 156746701}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Cover 4
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -11307,7 +11307,7 @@ GameObject:
   - component: {fileID: 309183264}
   - component: {fileID: 309183263}
   - component: {fileID: 309183262}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Cover 4
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -17657,7 +17657,7 @@ GameObject:
   - component: {fileID: 436906196}
   - component: {fileID: 436906195}
   - component: {fileID: 436906194}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Cover 4
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -42222,7 +42222,7 @@ Transform:
   m_GameObject: {fileID: 1070240603}
   serializedVersion: 2
   m_LocalRotation: {x: -0.31524903, y: -0.13785163, z: 0.04633997, w: 0.93779933}
-  m_LocalPosition: {x: -30.21, y: 5.45, z: -19.61}
+  m_LocalPosition: {x: -30.21, y: 13.8, z: -19.61}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -45238,7 +45238,7 @@ GameObject:
   - component: {fileID: 1311506397}
   - component: {fileID: 1311506396}
   - component: {fileID: 1311506395}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Cover 4
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -63499,6 +63499,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Enemy ver 3
       objectReference: {fileID: 0}
+    - target: {fileID: 8550997773179030341, guid: 157642c4f9788ba4db30101b3671ae2a, type: 3}
+      propertyPath: avatarMask
+      value: 
+      objectReference: {fileID: 31900000, guid: 1319e3927cae2a043832f768e7bdfce1, type: 2}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -81346,6 +81350,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 1631946341161693831, guid: 7e990383e4ddef749af49b0092c24b56, type: 3}
+      propertyPath: avatarMask
+      value: 
+      objectReference: {fileID: 31900000, guid: 6ac37ace561d36d428eed5eaa44f9d93, type: 2}
     - target: {fileID: 4597011208909376599, guid: 7e990383e4ddef749af49b0092c24b56, type: 3}
       propertyPath: gameInput
       value: 

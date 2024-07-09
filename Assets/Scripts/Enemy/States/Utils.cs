@@ -4,8 +4,15 @@ using UnityEngine;
 namespace Poligon.Ai.EnemyStates.Utils {
 
     public static class Coroutines {
-        public static IEnumerator ContinueAttackingWhileMoving(EnemyController enemyController, bool runWhenNoVision = true) {
+        /// <summary>
+        /// Continue shooting at target while moving. When no ammo, reload a weapon.
+        /// </summary>
+        /// <param name="enemyController">The bot's controller</param>
+        /// <param name="runWhenNoVision">If there is no vision on an opponent, start running</param>
+        /// <param name="timeout">Timeout for attacking at, useful if some other actions needs to take place before (like aim position change)</param>
+        public static IEnumerator ContinueAttackingWhileMoving(EnemyController enemyController, bool runWhenNoVision = true, float timeout = 0f) {
             bool shootCalled = false;
+            yield return new WaitForSeconds(timeout);
             for (; ; ) {
                 if (Methods.HasVisionOnOpponent(out Character character, enemyController)) {
                     if (!enemyController.enemy.IsAiming()) enemyController.AimStart();
@@ -22,13 +29,24 @@ namespace Poligon.Ai.EnemyStates.Utils {
                     if (runWhenNoVision) {
                         enemyController.AimCancel();
                         enemyController.RunStart();
+                        enemyController.ShootCancel();
+                        shootCalled = false;
                     }
+                }
+                if (enemyController.getWeapon().currentAmmo == 0) {
+                    shootCalled = false;
+                    enemyController.ShootCancel();
+                    enemyController.Reload();
                 }
                 yield return new WaitForSeconds(Random.Range(0.8f, 1.2f));
             }
         }
+        /// <summary>
+        /// Shoot at target. When no ammo, reload a weapon.
+        /// </summary>
+        /// <param name="enemyController">The bot's controller</param>
         public static IEnumerator ShootingCoroutine(EnemyController enemyController) {
-            bool shootCalled = false;
+            bool shootCalled = false; 
             for (; ; ) {
                 if (Methods.HasVisionOnOpponent(out Character character, enemyController)) {
                     if (character != enemyController.enemy && !enemyController.getWeapon().automatic) {
@@ -37,9 +55,13 @@ namespace Poligon.Ai.EnemyStates.Utils {
                         enemyController.ShootPerformed();
                         shootCalled = true;
                     }
+                } else {
+                    shootCalled = false;
+                    enemyController.ShootCancel();
                 }
                 if(enemyController.getWeapon().currentAmmo == 0) {
                     shootCalled = false;
+                    enemyController.ShootCancel();
                     enemyController.Reload();
                 }
                 yield return new WaitForSeconds(Random.Range(0.5f, 1f));
@@ -47,6 +69,13 @@ namespace Poligon.Ai.EnemyStates.Utils {
         }
     }
     public static class Methods {
+        /// <summary>
+        /// Checks if a bot has vision on it's opponent.
+        /// </summary>
+        /// <param name="character">The character that has been hit by the raycast</param>
+        /// <param name="enemyController">The bot's controller</param>
+        /// <param name="maxDistance">Maximum distance to check visibility.</param>
+        /// <returns></returns>
         public static bool HasVisionOnOpponent(out Character character, EnemyController enemyController, float maxDistance = 40f) {
              
             Vector3 eyesPosition = enemyController.eyes.transform.position;
@@ -63,6 +92,13 @@ namespace Poligon.Ai.EnemyStates.Utils {
             character = null;
             return false;
         }
+        /// <summary>
+        /// Checks if a bot has vision on a diffrent character.
+        /// </summary>
+        /// <param name="character">The character that has been hit by the raycast</param>
+        /// <param name="enemyController">The bot's controller</param>
+        /// <param name="target">The targer character</param>
+        /// <param name="maxDistance">Maximum distance to check visibility.</param>
         public static bool HasVisionOnCharacter(out Character character, EnemyController enemyController, Character target, float maxDistance = 40f) {
 
             Vector3 eyesPosition = enemyController.eyes.transform.position;
@@ -70,7 +106,6 @@ namespace Poligon.Ai.EnemyStates.Utils {
             targetPos.y += 1f;
             Ray ray = new Ray(eyesPosition, targetPos - eyesPosition);
             int layerMask = ~LayerMask.GetMask("Enemy");
-            Debug.DrawRay(eyesPosition, targetPos - eyesPosition, Color.red, 30f);
 
             if (Physics.Raycast(ray, out RaycastHit hit, maxDistance, layerMask)) {
                 if (hit.collider.gameObject.TryGetComponent<Character>(out Character hitCharacter)) {

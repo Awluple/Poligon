@@ -36,6 +36,7 @@ namespace Poligon.Ai.EnemyStates {
                 enemyController.StopCoroutine(shootingCoroutine);
                 shootingCoroutine = null;
             }
+            enemyController.ShootCancel();
         }
     }
 

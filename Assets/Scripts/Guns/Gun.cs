@@ -92,7 +92,6 @@ public abstract class Gun : MonoBehaviour
         } else if(timeToResetAccurancyTimeout > 0) {
             timeToResetAccurancyTimeout -= Time.deltaTime;
         }
-        Debug.Log(isReloading);
     }
     /// <summary>
     /// Fire a bullet, checks if a gun is able to shoot

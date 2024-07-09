@@ -21,7 +21,7 @@ namespace Poligon.Ai.EnemyStates {
                 enemyController.SetNewDestinaction(hidingSpot.transform.position);
                 enemyController.OnFinalPositionEvent += OnPosition;
                 enemyController.OnFinalPositionEvent += (object sender, System.EventArgs e) => { enemyController.RunCancel(); };
-                movingAttackCoroutine = Coroutines.ContinueAttackingWhileMoving(enemyController);
+                movingAttackCoroutine = Coroutines.ContinueAttackingWhileMoving(enemyController, true, 0.15f);
 
             } else {
                 enemyController.SetNewDestinaction(enemyController.transform.position);
@@ -64,6 +64,7 @@ namespace Poligon.Ai.EnemyStates {
         }
         public override void ExitState() {
             if(movingAttackCoroutine != null) enemyController.StopCoroutine(movingAttackCoroutine);
+            enemyController.ShootCancel();
         }
     }
 }

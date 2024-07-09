@@ -9,7 +9,7 @@ namespace Poligon.Ai.EnemyStates {
 
         public override void EnterState() {
             CoverPosition coverPosition = enemyController.hidingLogic.currentCoverPosition;
-
+            enemyController.ShootCancel();
             enemyController.CrouchStart();
             enemyController.AimCancel();
             enemyController.enemy.RotateSelf(-coverPosition.transform.forward);

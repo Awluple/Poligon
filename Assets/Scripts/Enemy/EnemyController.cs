@@ -174,12 +174,12 @@ public class EnemyController : MonoBehaviour, IAICharacterController, IStateMana
         if (!aiEnabled) return;
         stateMashine.UpdateState();
 
-        Debug.Log(aiState);
+        //Debug.Log(aiState);
     }
     
     public void HealthLoss(object sender, BulletDataEventArgs eventArgs) {
         if (!enemy.GetAimPosition().aimingAtCharacter) {
-            enemy.GetAimPosition().LockOnTarget(eventArgs.BulletData.source);
+            enemy.GetAimPosition().LockOnTarget(eventArgs.BulletData.source); // Move the aim to the attacker.
         }
     }
 

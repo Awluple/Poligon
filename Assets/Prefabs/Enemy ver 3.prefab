@@ -88,7 +88,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   animator: {fileID: 9015426160781172002}
   character: {fileID: -3422531968060488226}
-  avatarMask: {fileID: 31900000, guid: 6ac37ace561d36d428eed5eaa44f9d93, type: 2}
+  crouchingAvatarMask: {fileID: 31900000, guid: 6ac37ace561d36d428eed5eaa44f9d93, type: 2}
+  weaponsAvatarMask: {fileID: 31900000, guid: 1319e3927cae2a043832f768e7bdfce1, type: 2}
   aimTransitionTime: 0.112
 --- !u!1 &35397117246689431
 GameObject:
@@ -1405,7 +1406,7 @@ MonoBehaviour:
     m_SourceObjects:
       m_Length: 1
       m_Item0:
-        transform: {fileID: 0}
+        transform: {fileID: 8067999225419319646}
         weight: 1
       m_Item1:
         transform: {fileID: 0}

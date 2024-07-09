@@ -166,7 +166,6 @@ public abstract class Character : MonoBehaviour, IKillable {
     protected void ShootPerformed(object sender, System.EventArgs e) {
         if (!isAiming || gun.isReloading) return;
         if (gun.currentAmmo == 0) return;
-
         if(!gun.automatic) {
             if (OnShoot != null && gun.CanShoot()) {
                 OnShoot(this, EventArgs.Empty);
@@ -180,7 +179,6 @@ public abstract class Character : MonoBehaviour, IKillable {
     }
 
     protected void ShootCancel(object sender, System.EventArgs e) {
-        if (!isAiming) return;
         if (OnShootEnd != null) OnShootEnd(this, EventArgs.Empty);
         if(shootingCoroutine != null) {
             StopCoroutine(shootingCoroutine);
