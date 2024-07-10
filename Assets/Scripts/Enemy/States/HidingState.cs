@@ -37,7 +37,7 @@ namespace Poligon.Ai.EnemyStates {
 
         private IEnumerator AttemptHideCoroutine() {
             for (; ; ) {
-                if(Methods.HasVisionOnOpponent(out Character character, enemyController)) {
+                if(Methods.HasAimOnOpponent(out Character character, enemyController)) {
                     enemyController.hidingLogic.GetHidingPosition(enemyController.attackingLogic.opponent.transform.position);
                 } else {
                     enemyController.hidingLogic.GetHidingPosition(enemyController.enemy.GetAimPosition().transform.position);

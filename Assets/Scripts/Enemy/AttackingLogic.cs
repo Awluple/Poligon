@@ -28,7 +28,7 @@ public class AttackingLogic : MonoBehaviour {
     }
     public void SetBehindCoverPosition() {
 
-        if(!Methods.HasVisionOnOpponent(out Character chara, enemyController)) {
+        if(!Methods.HasAimOnOpponent(out Character chara, enemyController)) {
             enemyController.enemy.RotateSelf(-enemyController.hidingLogic.currentCoverPosition.transform.position);
             List<CoverPose> poses = enemyController.hidingLogic.currentCoverPosition.GetCoverPoses();
             if (poses.Count == 1) {
@@ -46,20 +46,13 @@ public class AttackingLogic : MonoBehaviour {
         StartCoroutine(coveredAttackCoroutine);
     }
 
-    private void StopAttacking(object sender = null, System.EventArgs e = null) {
-        if (checkLastSeen != null) StopCoroutine(checkLastSeen);
-        enemyController.AimCancel();
-        enemyController.aiState = AiState.Patrolling;
-        enemyController.currentPatrolPosition = -1;
-        //enemyController.SetPatrollingPath();
-    }
-
     public void EnemySpotted(Character character) {
         
         if(Methods.HasVisionOnCharacter(out Character hitChar, enemyController, character, 70f)) {
             enemyController.hidingLogic.GetHidingPosition(character.transform.position);
             enemyController.aiState = AiState.Hiding;
             StartTrackCoroutine();
+            Debug.DrawRay(enemyController.eyes.transform.position, character.transform.position - enemyController.eyes.transform.position, Color.magenta, 2f);
         } else {
             enemyController.aiState = AiState.Chasing;
         }
@@ -96,7 +89,7 @@ public class AttackingLogic : MonoBehaviour {
         bool needsReposition = false;
         for (; ; ) {
             Character character = null;
-            bool hasVis = Methods.HasVisionOnOpponent(out character, enemyController);
+            bool hasVis = Methods.HasAimOnOpponent(out character, enemyController);
             if (hasVis) {
                 UpdateLastKnownPosition(character.transform.position);
                 enemySinceLastSeen = Time.time;
@@ -116,7 +109,7 @@ public class AttackingLogic : MonoBehaviour {
         for (; ; ) {
             yield return new WaitForSeconds(Random.Range(4f, 8f));
 
-            if(Methods.HasVisionOnOpponent(out Character character, enemyController) ) {
+            if(Methods.HasAimOnOpponent(out Character character, enemyController) ) {
                 if(enemyController.aiState != AiState.Attacking) {
                     enemyController.aiState = AiState.Attacking;
                 }

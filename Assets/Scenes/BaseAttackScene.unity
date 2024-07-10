@@ -81358,6 +81358,10 @@ PrefabInstance:
       propertyPath: gameInput
       value: 
       objectReference: {fileID: 1236770882}
+    - target: {fileID: 4597011208909376599, guid: 7e990383e4ddef749af49b0092c24b56, type: 3}
+      propertyPath: detectionPoints.Array.size
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 7412248601590603723, guid: 7e990383e4ddef749af49b0092c24b56, type: 3}
       propertyPath: positionOnBody
       value: 

@@ -2601,6 +2601,8 @@ MonoBehaviour:
   isCrouching: 0
   stunned: 0
   health: 100
+  detectionPoints:
+  - {fileID: 8351096138420546127}
   jumpStrength: 14
   jumpGracePeriod: 0.1
   gameInput: {fileID: 0}

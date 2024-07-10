@@ -2753,6 +2753,8 @@ MonoBehaviour:
   isCrouching: 0
   stunned: 0
   health: 200
+  detectionPoints:
+  - {fileID: 8351096138420546127}
   enemyController: {fileID: 1793394347641943726}
 --- !u!143 &5920607441069537772
 CharacterController:

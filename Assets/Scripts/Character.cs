@@ -39,6 +39,8 @@ public abstract class Character : MonoBehaviour, IKillable {
 
     [SerializeField] protected float health = 100;
 
+    public DetectionPoint[] detectionPoints;
+
     private IEnumerator shootingCoroutine = null;
 
 
@@ -166,7 +168,7 @@ public abstract class Character : MonoBehaviour, IKillable {
     protected void ShootPerformed(object sender, System.EventArgs e) {
         if (!isAiming || gun.isReloading) return;
         if (gun.currentAmmo == 0) return;
-        if(!gun.automatic) {
+        if (!gun.automatic) {
             if (OnShoot != null && gun.CanShoot()) {
                 OnShoot(this, EventArgs.Empty);
                 gun.Shoot();

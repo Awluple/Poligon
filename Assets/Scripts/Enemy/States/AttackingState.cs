@@ -14,16 +14,17 @@ namespace Poligon.Ai.EnemyStates {
 
         public override void EnterState() {
             CoverPosition coverPosition = enemyController.hidingLogic.currentCoverPosition;
-
-            shootingCoroutine = Coroutines.ShootingCoroutine(enemyController);
-            enemyController.StartCoroutine(shootingCoroutine);
-            if(enemyController.enemy.IsCrouching()) {
+            bool hasVision = Methods.HasAimOnOpponent(out Character character, enemyController, 40f);
+            
+            if(enemyController.enemy.IsCrouching() && !hasVision) {
                 enemyController.CrouchCancel();
             }
             if(!enemyController.enemy.IsAiming()) {
                 enemyController.AimStart();
             }
-            if(coverPosition!= null) {
+            shootingCoroutine = Coroutines.ShootingCoroutine(enemyController);
+            enemyController.StartCoroutine(shootingCoroutine);
+            if (coverPosition!= null && !hasVision) {
                 Vector3 pos = coverPosition.transform.forward * 4 + enemyController.eyes.transform.position;
 
                 enemyController.enemy.GetAimPosition().Reposition(enemyController.enemy.squad.lastKnownPosition == Vector3.zero ? pos : enemyController.enemy.squad.lastKnownPosition);

@@ -42,6 +42,7 @@ public class EnemyController : MonoBehaviour, IAICharacterController, IStateMana
 
     public event EventHandler OnNextCornerEvent;
 
+    public event EventHandler<BulletDataEventArgs> OnHealthLoss;
 
     public Enemy enemy { get; private set; }
 
@@ -138,8 +139,6 @@ public class EnemyController : MonoBehaviour, IAICharacterController, IStateMana
             enemy.GetAimPosition().OnLineOfSight += EnemySpotted;
             enemy.OnHealthLoss += HealthLoss;
             aiState = AiState.Patrolling;
-            //aiState = AiState.Searching;
-
         }
     }
 
@@ -178,6 +177,7 @@ public class EnemyController : MonoBehaviour, IAICharacterController, IStateMana
     }
     
     public void HealthLoss(object sender, BulletDataEventArgs eventArgs) {
+        if (OnHealthLoss != null) OnHealthLoss(this, eventArgs);
         if (!enemy.GetAimPosition().aimingAtCharacter) {
             enemy.GetAimPosition().LockOnTarget(eventArgs.BulletData.source); // Move the aim to the attacker.
         }
