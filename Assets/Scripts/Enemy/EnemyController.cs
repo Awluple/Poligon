@@ -14,6 +14,8 @@ using static UnityEngine.UI.GridLayoutGroup;
 using System.Reflection;
 using UnityEngine.InputSystem.XR;
 using Poligon.Ai.Commands;
+using Poligon.EvetArgs;
+using Poligon.Enums;
 
 public class EnemyController : MonoBehaviour, IAICharacterController, IStateManager {
     public event EventHandler OnRunStart;
@@ -41,6 +43,8 @@ public class EnemyController : MonoBehaviour, IAICharacterController, IStateMana
     public event EventHandler OnFinalPositionEvent;
 
     public event EventHandler OnNextCornerEvent;
+
+    public event EventHandler<InputValueEventArgs> OnChangeWeapon;
 
     public event EventHandler<BulletDataEventArgs> OnHealthLoss;
 
@@ -251,6 +255,9 @@ public class EnemyController : MonoBehaviour, IAICharacterController, IStateMana
     }
     public void ReloadCancel() {
         if (OnReloadCancel != null) OnReloadCancel(this, EventArgs.Empty);
+    }
+    public void ChangeWeapon(WeaponTypes weapon) {
+        if (OnChangeWeapon != null) OnChangeWeapon(this, new InputValueEventArgs((int)weapon));
     }
 
 

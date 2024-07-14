@@ -1,11 +1,11 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
-public interface ISquadMember
-{
-    Squad squad {
-        get;
-        set;
+namespace Poligon.Ai {
+    public interface ISquadMember {
+        Squad squad {
+            get;
+            set;
+        }
     }
 }

@@ -89,7 +89,7 @@ namespace Poligon.Ai.EnemyStates {
         }
 
         private (SearchingArea area, int index) GetNextArea() {
-            (SearchingArea area, int index) area = areas.Select((area, index) => (area, index)).Where(a => a.area.AreaChecked == false).OrderBy(a => Vector3.Distance(enemyController.enemy.squad.lastKnownPosition, a.area.Position)).First();
+            (SearchingArea area, int index) area = areas.Select((area, index) => (area, index)).Where(a => a.area.AreaChecked == false).OrderBy(a => Vector3.Distance(enemyController.enemy.squad.GetChasingLocation().position, a.area.Position)).First();
             NavMeshPath navMeshPath = new NavMeshPath();
             if (enemyController.navAgent.CalculatePath(area.area.Position, navMeshPath) && navMeshPath.status == NavMeshPathStatus.PathComplete) {
                 return area;

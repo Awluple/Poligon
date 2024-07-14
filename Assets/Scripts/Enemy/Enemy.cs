@@ -11,7 +11,7 @@ using UnityEngine.UIElements;
 using UnityEngine.EventSystems;
 using System.Linq;
 using Poligon.Enums;
-
+using Poligon.Ai;
 public class Enemy : Character, ISquadMember {
 
 
@@ -36,6 +36,7 @@ public class Enemy : Character, ISquadMember {
         enemyController.OnCrouchCancel += CancelCrouch;
 
         enemyController.OnReloadStart += Reload;
+        enemyController.OnChangeWeapon += ChangeWeapon;
 
         characterController = GetComponent<CharacterController>();
 

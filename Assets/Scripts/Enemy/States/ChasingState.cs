@@ -22,7 +22,7 @@ namespace Poligon.Ai.EnemyStates {
             enemyController.StartCoroutine(movingAttackCoroutine);
 
             if (coverPosition != null && coverPosition.transform.position != Vector3.zero) {
-                enemyController.enemy.GetAimPosition().Reposition(enemyController.enemy.squad.lastKnownPosition);
+                enemyController.enemy.GetAimPosition().Reposition(enemyController.enemy.squad.GetChasingLocation().position);
                 enemyController.AimStart();
                 enemyController.CrouchCancel();
                 enemyController.SetNewDestinaction(coverPosition.transform.position);
@@ -47,8 +47,8 @@ namespace Poligon.Ai.EnemyStates {
 
         public IEnumerator ChasingCoroutine() {
             for (; ; ) {
-                if(enemyController.enemy.squad.lastKnownPosition != Vector3.zero) {
-                    enemyController.SetNewDestinaction(enemyController.enemy.squad.lastKnownPosition);
+                if(enemyController.enemy.squad.GetChasingLocation().position != Vector3.zero) {
+                    enemyController.SetNewDestinaction(enemyController.enemy.squad.GetChasingLocation().position);
                     enemyController.RunStart();
                     enemyController.StopCoroutine(chasingCoroutine);
                 }

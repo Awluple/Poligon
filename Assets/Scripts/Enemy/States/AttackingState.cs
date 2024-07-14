@@ -26,8 +26,10 @@ namespace Poligon.Ai.EnemyStates {
             enemyController.StartCoroutine(shootingCoroutine);
             if (coverPosition!= null && !hasVision) {
                 Vector3 pos = coverPosition.transform.forward * 4 + enemyController.eyes.transform.position;
-
-                enemyController.enemy.GetAimPosition().Reposition(enemyController.enemy.squad.lastKnownPosition == Vector3.zero ? pos : enemyController.enemy.squad.lastKnownPosition);
+                Vector3 opponentPosition = enemyController.enemy.squad.GetCharacterLastPosition(enemyController.attackingLogic.opponent).position;
+                Vector3 aimPosition = (opponentPosition == Vector3.zero) ? pos : enemyController.enemy.squad.GetCharacterLastPosition(enemyController.attackingLogic.opponent).position;
+                
+                enemyController.enemy.GetAimPosition().Reposition(aimPosition);
                 enemyController.enemy.RotateSelf(coverPosition.transform.forward);
             }
         }

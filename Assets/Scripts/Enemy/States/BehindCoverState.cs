@@ -5,6 +5,7 @@ using Poligon.Ai.EnemyStates.Utils;
 namespace Poligon.Ai.EnemyStates {
     public class BehindCoverState : EnemyBaseState {
         IEnumerator checkVisionCoroutine;
+        private IEnumerator coveredAttackCoroutine;
         public BehindCoverState(EnemyController controller) : base(controller) {
         }
 
@@ -21,11 +22,14 @@ namespace Poligon.Ai.EnemyStates {
             enemyController.OnHealthLoss += HealthLost;
             checkVisionCoroutine = CheckVision();
             enemyController.StartCoroutine(checkVisionCoroutine);
+            coveredAttackCoroutine = ContinueAttackingWhileCovered();
+            enemyController.StartCoroutine(coveredAttackCoroutine);
             
         }
         public override void ExitState() {
             enemyController.OnHealthLoss -= HealthLost;
             enemyController.StopCoroutine(checkVisionCoroutine);
+            enemyController.StopCoroutine(coveredAttackCoroutine);
         }
 
         private void HealthLost(object sender, BulletDataEventArgs eventArgs) {
@@ -37,6 +41,31 @@ namespace Poligon.Ai.EnemyStates {
                     enemyController.aiState = AiState.Attacking;
                 }
                 yield return new WaitForSeconds(0.2f);
+            }
+        }
+
+        IEnumerator ContinueAttackingWhileCovered() {
+
+            for (; ; ) {
+                yield return new WaitForSeconds(Random.Range(4f, 8f));
+                enemyController.aiState = AiState.Attacking;
+            //    if (Methods.HasAimOnOpponent(out Character character, enemyController)) {
+            //        enemyController.aiState = AiState.Attacking;
+            //        goto End;
+            //    }
+
+            //    if (enemyController.aiState == AiState.BehindCover && (Time.time - enemyController.attackingLogic.enemySinceLastSeen > 30f)) {
+            //        enemyController.hidingLogic.GetHidingPosition(enemyController.enemy.GetAimPosition().transform.position, enemyController.enemy.GetAimPosition().transform.position, true, true, 3f, 30f, 11f);
+            //        enemyController.aiState = AiState.Chasing;
+            //        enemyController.StopCoroutine(coveredAttackCoroutine);
+
+            //        goto End;
+            //    }
+
+
+                
+            //End:;
+
             }
         }
     }

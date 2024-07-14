@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using UnityEngine;
 
@@ -38,7 +39,7 @@ namespace Poligon.Ai.EnemyStates.Utils {
                     enemyController.ShootCancel();
                     enemyController.Reload();
                 }
-                yield return new WaitForSeconds(Random.Range(0.8f, 1.2f));
+                yield return new WaitForSeconds(UnityEngine.Random.Range(0.8f, 1.2f));
             }
         }
         /// <summary>
@@ -46,25 +47,41 @@ namespace Poligon.Ai.EnemyStates.Utils {
         /// </summary>
         /// <param name="enemyController">The bot's controller</param>
         public static IEnumerator ShootingCoroutine(EnemyController enemyController) {
-            bool shootCalled = false; 
+            bool shootCalled = false;
             for (; ; ) {
-                if (Methods.HasAimOnOpponent(out Character character, enemyController)) {
+                bool hasVision = Methods.HasAimOnOpponent(out Character character, enemyController);
+                if (hasVision && !(enemyController.getWeapon().currentAmmo == 0)) {
                     if (character != enemyController.enemy && !enemyController.getWeapon().automatic) {
                         enemyController.ShootPerformed();
                     } else if (character != enemyController.enemy && enemyController.getWeapon().automatic && !shootCalled) {
                         enemyController.ShootPerformed();
                         shootCalled = true;
                     }
-                } else {
+                } else if(!hasVision && !(enemyController.getWeapon().currentAmmo == 0)) {
                     shootCalled = false;
                     enemyController.ShootCancel();
+                    if(enemyController.enemy.IsCrouching()) {
+                        enemyController.CrouchCancel();
+                    }
                 }
-                if(enemyController.getWeapon().currentAmmo == 0) {
+                if(enemyController.getWeapon().currentAmmo == 0 && enemyController.getWeapon().ammoStock != 0) {
                     shootCalled = false;
                     enemyController.ShootCancel();
                     enemyController.Reload();
+                    if(!enemyController.enemy.IsCrouching()) {
+                        enemyController.CrouchStart();
+                        enemyController.OnReloadCancel += Stand;
+                    }
+                } else if(enemyController.getWeapon().currentAmmo == 0 && enemyController.getWeapon().ammoStock == 0) {
+                    enemyController.ShootCancel();
+                    enemyController.ChangeWeapon(Enums.WeaponTypes.Pistol);
+                    yield return new WaitForSeconds(0.3f);
                 }
-                yield return new WaitForSeconds(Random.Range(0.5f, 1f));
+                yield return new WaitForSeconds(UnityEngine.Random.Range(0.5f, 1f));
+            };
+            void Stand(object sender, EventArgs e) {
+                enemyController.OnReloadCancel -= Stand;
+                enemyController.CrouchCancel();
             }
         }
     }
@@ -80,7 +97,8 @@ namespace Poligon.Ai.EnemyStates.Utils {
              
             Vector3 eyesPosition = enemyController.eyes.transform.position;
             Ray ray = new Ray(eyesPosition, enemyController.enemy.GetAimPosition().GetPosition() - eyesPosition);
-            int layerMask = ~LayerMask.GetMask("Enemy");
+            int layerMask = (1 << 8) | (1 << 9); // ingore Enemy and Character masks
+            layerMask = ~layerMask;
 
             if (Physics.Raycast(ray, out RaycastHit hit, maxDistance, layerMask)) {
                 if (hit.collider.gameObject.TryGetComponent<Character>(out Character hitCharacter)) {
@@ -104,7 +122,8 @@ namespace Poligon.Ai.EnemyStates.Utils {
             Vector3 eyesPosition = enemyController.eyes.transform.position;
             foreach(var detectionPoint in target.detectionPoints) {
                 Ray ray = new Ray(eyesPosition, detectionPoint.transform.position - eyesPosition);
-                int layerMask = ~LayerMask.GetMask("Enemy");
+                int layerMask = (1 << 8) | (1 << 9); // ingore Enemy and Character masks
+                layerMask = ~layerMask; ;
 
                 if (Physics.Raycast(ray, out RaycastHit hit, maxDistance, layerMask)) {
                     if (hit.collider.gameObject.TryGetComponent<Character>(out Character hitCharacter)) {

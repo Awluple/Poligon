@@ -1,7 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+using Poligon.Ai;
 public interface IAICharacterController : ICharacterController
 {
     void EnemySpotted(Character character);

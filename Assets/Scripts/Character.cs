@@ -69,7 +69,7 @@ public abstract class Character : MonoBehaviour, IKillable {
     public event EventHandler<InputValueEventArgs> OnLeaningEnd;
     public event EventHandler<InputValueEventArgs> OnWeaponChange;
 
-    public event EventHandler OnDeath;
+    public event EventHandler<DeathEventArgs> OnDeath;
     public event EventHandler<BulletDataEventArgs> OnHealthLoss;
 
     public Vector2EventHandler OnAimingWalk { get; set; }
@@ -265,7 +265,7 @@ public abstract class Character : MonoBehaviour, IKillable {
         if (OnHealthLoss != null) OnHealthLoss(this, new BulletDataEventArgs(bulletData));
 
         if (this.health <= 0) {
-            if (OnDeath != null) OnDeath(this, EventArgs.Empty);
+            if (OnDeath != null) OnDeath(this, new DeathEventArgs(this));
             Destroy(gameObject);
         }
     }

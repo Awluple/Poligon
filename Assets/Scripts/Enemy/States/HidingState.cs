@@ -1,12 +1,12 @@
 using System.Collections;
 using UnityEngine;
 using Poligon.Ai.EnemyStates.Utils;
+using System.Collections.Generic;
 
 namespace Poligon.Ai.EnemyStates {
     public class HidingState : EnemyBaseState {
         private IEnumerator movingAttackCoroutine;
         private IEnumerator attemptHideCoroutine;
-
 
 
         public HidingState(EnemyController controller) : base(controller) {
@@ -31,13 +31,13 @@ namespace Poligon.Ai.EnemyStates {
                 movingAttackCoroutine = Coroutines.ContinueAttackingWhileMoving(enemyController, false);
             }
 
-            
+
             enemyController.StartCoroutine(movingAttackCoroutine);
         }
 
         private IEnumerator AttemptHideCoroutine() {
             for (; ; ) {
-                if(Methods.HasAimOnOpponent(out Character character, enemyController)) {
+                if (Methods.HasAimOnOpponent(out Character character, enemyController)) {
                     enemyController.hidingLogic.GetHidingPosition(enemyController.attackingLogic.opponent.transform.position);
                 } else {
                     enemyController.hidingLogic.GetHidingPosition(enemyController.enemy.GetAimPosition().transform.position);
@@ -60,11 +60,34 @@ namespace Poligon.Ai.EnemyStates {
         }
 
         private void OnPosition(object sender = null, System.EventArgs e = null) {
-            enemyController.attackingLogic.SetBehindCoverPosition();
+            SetBehindCoverPosition();
         }
         public override void ExitState() {
-            if(movingAttackCoroutine != null) enemyController.StopCoroutine(movingAttackCoroutine);
+            if (movingAttackCoroutine != null) enemyController.StopCoroutine(movingAttackCoroutine);
+            if (attemptHideCoroutine != null) enemyController.StopCoroutine(attemptHideCoroutine);
+            
+            enemyController.OnFinalPositionEvent -= OnPosition;
+            enemyController.OnFinalPositionEvent -= (object sender, System.EventArgs e) => { enemyController.RunCancel(); };
+
             enemyController.ShootCancel();
+        }
+        public void SetBehindCoverPosition() {
+
+            if (!Methods.HasAimOnOpponent(out Character chara, enemyController)) {
+                enemyController.enemy.RotateSelf(-enemyController.hidingLogic.currentCoverPosition.transform.position);
+                List<CoverPose> poses = enemyController.hidingLogic.currentCoverPosition.GetCoverPoses();
+                if (poses.Count == 1) {
+
+                    if (poses[0] == CoverPose.Standing) {
+                        enemyController.CrouchStart();
+                    }
+                }
+                enemyController.aiState = AiState.BehindCover;
+                //coveredAttackCoroutine = ContinueAttackingWhileCovered();
+                //enemyController.StartCoroutine(coveredAttackCoroutine);
+            } else {
+                enemyController.aiState = AiState.Attacking;
+            }
         }
     }
 }

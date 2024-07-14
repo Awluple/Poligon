@@ -1,12 +1,14 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using TMPro;
 using UnityEngine;
+using UnityEngine.TextCore.Text;
 using UnityEngine.UIElements;
 
 public class EnemyAimPosition : AimPosition {
-    [SerializeField] Player player;
+    [SerializeField] CharactersSphere charactersSphere;
     [SerializeField] Enemy enemy;
     public bool aimingAtCharacter = false;
     public bool alerted = false;
@@ -18,6 +20,8 @@ public class EnemyAimPosition : AimPosition {
 
     private IEnumerator checkCoroutine;
 
+    Character opponent;
+    DetectionPoint opponentDetectionPoint;
     bool justNoticed = true;
     Vector3 movePosition = Vector3.zero;
     float moveSpeed = 2f;
@@ -28,7 +32,6 @@ public class EnemyAimPosition : AimPosition {
     void Awake() {
         enemy = GetComponentInParent<Enemy>();
         enemy.OnDeath += RemoveTarget;
-        player = FindFirstObjectByType<Player>().GetComponent<Player>();
         checkCoroutine = DoCheck(true);
         StartCoroutine(checkCoroutine);
         transform.SetParent(enemy.transform.parent);
@@ -36,7 +39,7 @@ public class EnemyAimPosition : AimPosition {
 
     // Update is called once per frame
     void Update() {
-        if(movePosition != Vector3.zero) {
+        if (movePosition != Vector3.zero) {
             float step = moveSpeed * Time.deltaTime;
             transform.position = Vector3.MoveTowards(transform.position, movePosition, step);
         }
@@ -50,7 +53,7 @@ public class EnemyAimPosition : AimPosition {
     /// </summary>
     /// <returns>transform.position or move position if during MoveAim</returns>
     public override Vector3 GetPosition() {
-        if(movePosition == Vector3.zero) {
+        if (movePosition == Vector3.zero) {
             return transform.position;
         } else {
             return movePosition;
@@ -65,20 +68,16 @@ public class EnemyAimPosition : AimPosition {
     /// </summary>
     /// <param name="character">The character to move the aim</param>
     /// <param name="moveAimCalled">If true the MoveAim has been called, to prevent unnecessary calls</param>
-    void MoveToCharacter(Character character, ref bool moveAimCalled) {
-        DetectionPoint detectionPoint = character.GetComponentInChildren<DetectionPoint>();
-        if(detectionPoint == null) {
-            Debug.LogError($"The {character} object does not have a DetectionPoint");
-            return;
+    void MoveToCharacter(Character character, ref bool moveAimCalled, DetectionPoint detectionPoint = null) {
+        if (detectionPoint == null) {
+            if (character.detectionPoints.Length == 0) {
+                Debug.LogError($"The {character} object does not have a DetectionPoint");
+                return;
+            }
+            detectionPoint = character.detectionPoints[0];
         }
         Vector3 position = detectionPoint.transform.position;
-        //Vector3 position = character.transform.position;
 
-        //if (character.IsCrouching()) {
-        //    position.y += 1.2f;
-        //} else {
-        //    position.y += 1.8f;
-        //}
         aimingAtCharacter = true;
         if (justNoticed) {
             if (!moveAimCalled) {
@@ -104,21 +103,41 @@ public class EnemyAimPosition : AimPosition {
     IEnumerator DoCheck(bool repositionOnFailed) {
         bool moveAimCalled = false;
         for (; ; ) {
-            if (ProximityCheck()) {
-                MoveToCharacter(player, ref moveAimCalled);
-                if (OnLineOfSight != null && sightEventsCalled == false) {
-                    OnLineOfSight(this, EventArgs.Empty);
-                    sightEventsCalled = true;
-                };
-                alerted = true;
-                yield return new WaitForSeconds(0f);
-            } else {
-                if (repositionOnFailed) {
-                    transform.position = enemy.transform.position;
-                }
-                justNoticed = true;
-                aimingAtCharacter = false;
+            if (charactersSphere.GetCharacters().Count == 0) {
                 yield return new WaitForSeconds(.4f);
+                continue;
+            }
+            if (opponentDetectionPoint != null) {
+                Vector3 rayTarget = opponentDetectionPoint.transform.position;
+                if (ProximityCheck(rayTarget)) {
+                    MoveToCharacter(opponent, ref moveAimCalled, opponentDetectionPoint);
+                    if (OnLineOfSight != null && sightEventsCalled == false) {
+                        OnLineOfSight(this, EventArgs.Empty);
+                        sightEventsCalled = true;
+                    };
+                    alerted = true;
+                    yield return new WaitForSeconds(0f);
+                } else {
+                    opponentDetectionPoint = null;
+                    opponent = null;
+                }
+            } else {
+                foreach (var character in charactersSphere.GetCharacters().Values.ToList()) {
+                    foreach (var detectionPoint in character.detectionPoints) {
+                        Vector3 rayTarget = detectionPoint.transform.position;
+                        if (ProximityCheck(rayTarget)) {
+                            opponentDetectionPoint = detectionPoint;
+                            opponent = character;
+                        } else {
+                            if (repositionOnFailed) {
+                                transform.position = enemy.transform.position;
+                            }
+                            justNoticed = true;
+                            aimingAtCharacter = false;
+                            yield return new WaitForSeconds(.4f);
+                        }
+                    }
+                }
             }
         }
     }
@@ -157,7 +176,7 @@ public class EnemyAimPosition : AimPosition {
     public void StopMoveAim() {
         movePosition = Vector3.zero;
         moveSpeed = 2f;
-        if(onMoveCompleteCallback != null) {
+        if (onMoveCompleteCallback != null) {
             onMoveCompleteCallback();
         }
     }
@@ -170,7 +189,7 @@ public class EnemyAimPosition : AimPosition {
         if (checkCoroutine != null) {
             StopCoroutine(checkCoroutine);
         }
-        MoveToCharacter(character, ref moveAimCalled);
+        MoveToCharacter(character, ref moveAimCalled, null);
         if (OnLineOfSight != null) {
             OnLineOfSight(this, EventArgs.Empty);
             sightEventsCalled = true;
@@ -182,18 +201,16 @@ public class EnemyAimPosition : AimPosition {
     /// Logic for checking if an enemy is within range
     /// </summary>
     /// <returns>True if within range</returns>
-    bool ProximityCheck() {
+    bool ProximityCheck(Vector3 rayTarget) {
         if (aimingAtCharacter) { // keep track of the target if detected
             return true;
         }
-        int layerMask = ~LayerMask.GetMask("Enemy");
+        int layerMask = (1 << 8) | (1 << 9); // ingore Enemy and Character masks
+        layerMask = ~layerMask;
         Vector3 rayStartPoint = enemy.GetController().eyes.transform.position;
-        Vector3 rayTarget = player.GetComponentInChildren<DetectionPoint>().transform.position;
         Ray ray = new Ray(rayStartPoint, rayTarget - rayStartPoint);
-        float distanceToEnemy = Vector3.Distance(enemy.transform.position, player.transform.position);
+        float distanceToEnemy = Vector3.Distance(enemy.transform.position, rayTarget);
 
-
-        Debug.DrawRay(rayStartPoint, rayTarget - rayStartPoint, Color.yellow, 0.3f);
         if (distanceToEnemy < 4f &&
             Physics.Raycast(ray, out RaycastHit hit2, (alerted ? 40f : 25f), layerMask)) { // Always detect within 4f distance
             if (OnLineOfSight != null && sightEventsCalled == false) {
@@ -202,9 +219,9 @@ public class EnemyAimPosition : AimPosition {
             };
             return true;
         } else if (distanceToEnemy < (alerted ? 35f : 20f) && // Detect within 20f if visable or 35f if alerted
-            Vector3.Angle(player.transform.position - enemy.transform.position, enemy.transform.forward) < 75) { // Must be within 75 degerees angle
+            Vector3.Angle(rayTarget - enemy.transform.position, enemy.transform.forward) < 75) { // Must be within 75 degerees angle
             if (Physics.Raycast(ray, out RaycastHit hit, (alerted ? 40f : 25f), layerMask)) {
-                if (!hit.collider.gameObject.TryGetComponent<Player>(out Player player)) {
+                if (!hit.collider.gameObject.TryGetComponent<Character>(out Character player)) {
                     return false;
                 }
 
