@@ -7,6 +7,6 @@ using Poligon.EvetArgs;
 public interface IKillable
 {
     public void ApplyDamage(BulletData bulletData);
-    public event EventHandler<DeathEventArgs> OnDeath;
+    public event EventHandler<CharacterEventArgs> OnDeath;
     public event EventHandler<BulletDataEventArgs> OnHealthLoss;
 }

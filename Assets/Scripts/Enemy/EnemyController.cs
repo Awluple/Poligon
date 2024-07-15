@@ -154,13 +154,9 @@ public class EnemyController : MonoBehaviour, IAICharacterController, IStateMana
         enemy.squad = squad;
     }
 
-    private void EnemySpotted(object sender = null, System.EventArgs e = null) {
+    private void EnemySpotted(object sender = null, CharacterEventArgs e = null) {
         enemy.GetAimPosition().OnLineOfSight -= EnemySpotted;
-        Player player = FindFirstObjectByType<Player>();
-        //attackingLogic.opponent = player;
-        //attackingLogic.EnemySpotted();
-
-        ICommand command = new EnemySpottedCommand(enemy.squad, player);
+        ICommand command = new EnemySpottedCommand(enemy.squad, e.character);
         command.execute();
     }
     public void EnemySpotted(Character character) {
@@ -185,6 +181,8 @@ public class EnemyController : MonoBehaviour, IAICharacterController, IStateMana
         if (!enemy.GetAimPosition().aimingAtCharacter) {
             enemy.GetAimPosition().LockOnTarget(eventArgs.BulletData.source); // Move the aim to the attacker.
         }
+        ICommand command = new CharacterAttacledCommand(enemy,enemy.squad, eventArgs.BulletData.source);
+        command.execute();
     }
 
     public Vector3[] SetNewDestinaction(Vector3 spot) {

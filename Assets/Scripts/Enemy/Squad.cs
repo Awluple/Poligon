@@ -30,7 +30,7 @@ namespace Poligon.Ai {
             }
             lastKnownPosition[lastKnownPos.character] = lastKnownPos;
         }
-        private void RemoveCharacter(object sender, DeathEventArgs e) {
+        private void RemoveCharacter(object sender, CharacterEventArgs e) {
             lastKnownPosition.Remove(e.character);
         }
         public LastKnownPosition GetCharacterLastPosition(Character character) {

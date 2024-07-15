@@ -5,8 +5,7 @@ using UnityEngine;
 using Poligon.Ai.Commands;
 using Poligon.Ai.EnemyStates;
 using Poligon.Ai.EnemyStates.Utils;
-
-
+using Poligon.EvetArgs;
 
 public class AttackingLogic : MonoBehaviour {
 
@@ -16,13 +15,23 @@ public class AttackingLogic : MonoBehaviour {
     private IEnumerator checkLastSeen;
     private IEnumerator keepTrackOnEnemyCoroutine;
 
-
-    public Character opponent;
+    [SerializeField] private Character _opponent;
+    public Character opponent { get { return _opponent; } 
+        set { 
+            if(_opponent != null) {
+                _opponent.OnDeath -= OpponentDeath;
+            }
+            _opponent = value;
+            _opponent.OnDeath += OpponentDeath;
+        } }
 
     public float enemySinceLastSeen { get; private set; }
 
     private void Awake() {
         enemyController = transform.GetComponentInParent<EnemyController>();
+    }
+    private void OpponentDeath(object sender, CharacterEventArgs args) {
+        args.character.OnDeath -= OpponentDeath;
     }
     private void UpdateLastKnownPosition(Character character, Vector3 newPosition) {
         enemyController.enemy.squad.UpdateLastKnownPosition(new LastKnownPosition(character, newPosition));

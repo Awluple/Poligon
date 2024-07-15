@@ -20,6 +20,8 @@ public abstract class Character : MonoBehaviour, IKillable {
 
     [SerializeField] protected float heavyFallStunTime = 3.1f;
 
+    public Team team;
+
 
     [SerializeField] protected Rig rig;
     public Gun gun = null;
@@ -69,7 +71,7 @@ public abstract class Character : MonoBehaviour, IKillable {
     public event EventHandler<InputValueEventArgs> OnLeaningEnd;
     public event EventHandler<InputValueEventArgs> OnWeaponChange;
 
-    public event EventHandler<DeathEventArgs> OnDeath;
+    public event EventHandler<CharacterEventArgs> OnDeath;
     public event EventHandler<BulletDataEventArgs> OnHealthLoss;
 
     public Vector2EventHandler OnAimingWalk { get; set; }
@@ -265,7 +267,7 @@ public abstract class Character : MonoBehaviour, IKillable {
         if (OnHealthLoss != null) OnHealthLoss(this, new BulletDataEventArgs(bulletData));
 
         if (this.health <= 0) {
-            if (OnDeath != null) OnDeath(this, new DeathEventArgs(this));
+            if (OnDeath != null) OnDeath(this, new CharacterEventArgs(this));
             Destroy(gameObject);
         }
     }

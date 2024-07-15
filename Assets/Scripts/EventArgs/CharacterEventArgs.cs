@@ -1,10 +1,10 @@
 namespace Poligon.EvetArgs {
     using System;
 
-    public class DeathEventArgs : EventArgs {
+    public class CharacterEventArgs : EventArgs {
         public Character character { get; }
 
-        public DeathEventArgs(Character value) {
+        public CharacterEventArgs(Character value) {
             character = value;
         }
     }

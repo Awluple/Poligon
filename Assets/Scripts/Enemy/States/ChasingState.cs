@@ -30,9 +30,14 @@ namespace Poligon.Ai.EnemyStates {
             } else {
                 chasingCoroutine = ChasingCoroutine();
                 enemyController.StartCoroutine(chasingCoroutine);
+                enemyController.OnFinalPositionEvent += Search;
             }
 
             enemyController.enemy.GetAimPosition().OnLineOfSight += Hide;
+        }
+        private void Search(object sender, EventArgs e) {
+            enemyController.aiState = AiState.Searching;
+            enemyController.OnFinalPositionEvent -= Search;
         }
         public override void ExitState() {
             enemyController.StopCoroutine(movingAttackCoroutine);

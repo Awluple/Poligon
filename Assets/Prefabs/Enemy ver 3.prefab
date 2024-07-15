@@ -2890,6 +2890,7 @@ MonoBehaviour:
   rotationSpeed: 720
   fallingGravityStrength: 5
   heavyFallStunTime: 2.1
+  team: 2
   rig: {fileID: 9151035154963561539}
   gun: {fileID: 0}
   currentWeapon: 99

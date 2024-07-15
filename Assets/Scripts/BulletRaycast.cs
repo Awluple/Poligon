@@ -5,14 +5,20 @@ using UnityEngine;
 
 public class BulletRaycast : MonoBehaviour
 {
-    private Vector3 targetPosition;
-    private float moveSpeed = 300f;
-
-
+    [SerializeField] private Vector3 targetPosition;
+    [SerializeField] private float moveSpeed = 300f;
+    [SerializeField] private float lifetime = 0f;
 
     public void Setup(BulletData bulletData) {
-        Physics.Raycast(transform.position, bulletData.targetPosition, out RaycastHit hitInfo, 999f);
-        this.targetPosition = hitInfo.point;
+        Ray ray = new Ray(transform.position, bulletData.targetPosition);
+        Physics.Raycast(ray, out RaycastHit hitInfo, 999f);
+        
+        if(hitInfo.collider != null) {
+            targetPosition = hitInfo.point;
+        } else {
+            targetPosition = ray.GetPoint(300f);
+        }
+        Debug.DrawRay(transform.position, (targetPosition - transform.position), Color.magenta, 0.4f);
 
         if(hitInfo.collider != null && hitInfo.collider.gameObject.TryGetComponent(out IKillable component)) {
             component.ApplyDamage(bulletData);
@@ -21,7 +27,6 @@ public class BulletRaycast : MonoBehaviour
     }
     void Update()
     {
-        if (targetPosition == Vector3.zero) { return; }
         
         float distanceBefore = Vector3.Distance(transform.position, targetPosition);
 
@@ -31,8 +36,9 @@ public class BulletRaycast : MonoBehaviour
 
         float distanceAfter = Vector3.Distance(transform.position, targetPosition);
 
-        if(distanceBefore < distanceAfter) {
+        if(distanceBefore < distanceAfter || lifetime > 2f) {
             Destroy(gameObject);
         }
+        lifetime += Time.deltaTime;
     }
 }
