@@ -13,7 +13,7 @@ namespace Poligon.Ai.Commands {
         public override void execute() {
             squad.UpdateLastKnownPosition(new LastKnownPosition(enemy, enemy.transform.position));
             foreach(var character in squad.characters) {
-                if(character != sender) character.EnemySpotted(enemy);
+                if(character != sender && character.attackingLogic.opponent == null) character.EnemySpotted(enemy);
             }
         }
     }

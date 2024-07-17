@@ -162,6 +162,7 @@ public class EnemyController : MonoBehaviour, IAICharacterController, IStateMana
     public void EnemySpotted(Character character) {
         enemy.GetAimPosition().OnLineOfSight -= EnemySpotted;
         attackingLogic.opponent = character;
+        enemy.GetAimPosition().alerted = true;
         attackingLogic.EnemySpotted(character);
     }
     public void SetUpdateStateCallback(Action callback) {

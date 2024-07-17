@@ -97,7 +97,7 @@ namespace Poligon.Ai.EnemyStates.Utils {
              
             Vector3 eyesPosition = enemyController.eyes.transform.position;
             Ray ray = new Ray(eyesPosition, enemyController.enemy.GetAimPosition().GetPosition() - eyesPosition);
-            int layerMask = (1 << 8) | (1 << 9); // ingore Enemy and Character masks
+            int layerMask = (1 << 8) | (1 << 9) | (1 << 20); // ingore Enemy, Cover and Character masks
             layerMask = ~layerMask;
 
             if (Physics.Raycast(ray, out RaycastHit hit, maxDistance, layerMask)) {
@@ -122,7 +122,7 @@ namespace Poligon.Ai.EnemyStates.Utils {
             Vector3 eyesPosition = enemyController.eyes.transform.position;
             foreach(var detectionPoint in target.detectionPoints) {
                 Ray ray = new Ray(eyesPosition, detectionPoint.transform.position - eyesPosition);
-                int layerMask = (1 << 8) | (1 << 9); // ingore Enemy and Character masks
+                int layerMask = (1 << 8) | (1 << 9) | (1 << 20); // ingore Enemy, Cover and Character masks
                 layerMask = ~layerMask; ;
 
                 if (Physics.Raycast(ray, out RaycastHit hit, maxDistance, layerMask)) {

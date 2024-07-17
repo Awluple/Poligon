@@ -82,7 +82,7 @@ namespace Poligon.Ai.EnemyStates {
         }
         public void SetBehindCoverPosition() {
 
-            if (!Methods.HasAimOnOpponent(out Character chara, enemyController)) {
+            if (!Methods.HasAimOnOpponent(out Character chara, enemyController, 60f)) {
                 enemyController.enemy.RotateSelf(-enemyController.hidingLogic.currentCoverPosition.transform.position);
                 List<CoverPose> poses = enemyController.hidingLogic.currentCoverPosition.GetCoverPoses();
                 if (poses.Count == 1) {
@@ -92,8 +92,6 @@ namespace Poligon.Ai.EnemyStates {
                     }
                 }
                 enemyController.aiState = AiState.BehindCover;
-                //coveredAttackCoroutine = ContinueAttackingWhileCovered();
-                //enemyController.StartCoroutine(coveredAttackCoroutine);
             } else {
                 enemyController.aiState = AiState.Attacking;
             }

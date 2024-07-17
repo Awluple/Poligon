@@ -13,6 +13,7 @@ public class EnemyAimPosition : AimPosition {
     [SerializeField] Enemy enemy;
     public bool aimingAtCharacter = false;
     public bool alerted = false;
+    public float alertedMaxDistance = 40f;
 
     public event EventHandler<CharacterEventArgs> OnLineOfSight;
     public event EventHandler OnLineOfSightLost;
@@ -206,22 +207,22 @@ public class EnemyAimPosition : AimPosition {
         if (aimingAtCharacter) { // keep track of the target if detected
             return true;
         }
-        int layerMask = (1 << 8) | (1 << 9); // ingore Enemy and Character masks
+        int layerMask = (1 << 8) | (1 << 9) | (1 << 20); // ingore Enemy, Cover and Character masks
         layerMask = ~layerMask;
         Vector3 rayStartPoint = enemy.GetController().eyes.transform.position;
         Ray ray = new Ray(rayStartPoint, rayTarget - rayStartPoint);
         float distanceToEnemy = Vector3.Distance(enemy.transform.position, rayTarget);
 
         if (distanceToEnemy < 4f &&
-            Physics.Raycast(ray, out RaycastHit hit2, (alerted ? 40f : 25f), layerMask)) { // Always detect within 4f distance
+            Physics.Raycast(ray, out RaycastHit hit2, (alerted ? alertedMaxDistance : 25f), layerMask)) { // Always detect within 4f distance
             //if (OnLineOfSight != null && sightEventsCalled == false) {
             //    OnLineOfSight(this, new CharacterEventArgs(opponent));
             //    sightEventsCalled = true;
             //};
             return true;
-        } else if (distanceToEnemy < (alerted ? 35f : 20f) && // Detect within 20f if visable or 35f if alerted
+        } else if (distanceToEnemy < (alerted ? alertedMaxDistance : 20f) && // Detect within 20f if visable or alertedMaxDistance if alerted
             Vector3.Angle(rayTarget - enemy.transform.position, enemy.transform.forward) < 75) { // Must be within 75 degerees angle
-            if (Physics.Raycast(ray, out RaycastHit hit, (alerted ? 40f : 25f), layerMask)) {
+            if (Physics.Raycast(ray, out RaycastHit hit, (alerted ? alertedMaxDistance : 25f), layerMask)) {
                 if (!hit.collider.gameObject.TryGetComponent<Character>(out Character player)) {
                     return false;
                 }

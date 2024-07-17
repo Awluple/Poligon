@@ -5,13 +5,23 @@ using Poligon.Ai.EnemyStates.Utils;
 
 namespace Poligon.Ai.EnemyStates {
     public class AttackingState : EnemyBaseState {
+        private float timeInState = 0f;
         public override AiState state { get; protected set; } = AiState.Attacking;
 
         private IEnumerator shootingCoroutine;
 
         public AttackingState(EnemyController controller) : base(controller) {
         }
-
+        public override void UpdateState() {
+            //timeInState += Time.deltaTime;
+            //if(timeInState > 6f) {
+            //    bool hasVision = Methods.HasAimOnOpponent(out Character character, enemyController, 40f);
+            //    if(!hasVision) {
+            //        enemyController.aiState = AiState.BehindCover;
+            //    }
+            //    timeInState = 0f;
+            //}
+        }
         public override void EnterState() {
             CoverPosition coverPosition = enemyController.hidingLogic.currentCoverPosition;
             bool hasVision = Methods.HasAimOnOpponent(out Character character, enemyController, 40f);
