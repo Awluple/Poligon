@@ -1,23 +1,22 @@
-using Poligon.Ai;
-using System.Collections;
+using Poligon.Ai.Commands;
+using Poligon.EvetArgs;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.TextCore.Text;
-using Poligon.Ai.Commands;
-using System;
-using Poligon.EvetArgs;
 
 namespace Poligon.Ai {
     public class Squad : MonoBehaviour {
         public List<IAICharacterController> characters = new List<IAICharacterController>();
-        public Dictionary<Character,LastKnownPosition> lastKnownPosition { get; private set; } = new Dictionary<Character, LastKnownPosition>();
+        public Dictionary<Character, LastKnownPosition> lastKnownPosition { get; private set; } = new Dictionary<Character, LastKnownPosition>();
         private float enemySinceLastSeen = 0f;
 
         void Start() {
-            characters = GetComponentsInChildren<IAICharacterController>().ToList();
-            foreach (var character in characters) {
-                character.setSquad(this);
+            List<IAICharacterController> childrenCharacters = GetComponentsInChildren<IAICharacterController>().ToList();
+            foreach (var character in childrenCharacters) {
+                if (character.isEnabled()) {
+                    characters.Add(character);
+                    character.setSquad(this);
+                }
             }
         }
         private void Update() {
@@ -25,7 +24,7 @@ namespace Poligon.Ai {
         }
 
         public void UpdateLastKnownPosition(LastKnownPosition lastKnownPos) {
-            if(!lastKnownPosition.ContainsKey(lastKnownPos.character)) {
+            if (!lastKnownPosition.ContainsKey(lastKnownPos.character)) {
                 lastKnownPos.character.OnDeath += RemoveCharacter;
             }
             lastKnownPosition[lastKnownPos.character] = lastKnownPos;

@@ -1,12 +1,9 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEditor;
 
-public class HidingCollisionSphere : MonoBehaviour
-{
+public class HidingCollisionSphere : MonoBehaviour {
     Dictionary<GameObject, GameObject> covers = new Dictionary<GameObject, GameObject>();
-    [Range(-1,1)]
+    [Range(-1, 1)]
     [SerializeField] float sensitivity = 0.3f;
     [SerializeField] float minDistanceFromPlayer = 8f;
 
@@ -17,7 +14,7 @@ public class HidingCollisionSphere : MonoBehaviour
 
     void OnCollisionEnter(Collision collision) {
         bool isCover = collision.GetContact(0).otherCollider.gameObject.TryGetComponent<Cover>(out Cover cover);
-        if(isCover) covers.Add(cover.gameObject, cover.gameObject);
+        if (isCover) covers.Add(cover.gameObject, cover.gameObject);
     }
 
     private void OnCollisionExit(Collision collision) {

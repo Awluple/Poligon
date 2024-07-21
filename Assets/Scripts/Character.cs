@@ -2,8 +2,6 @@ using Poligon.Enums;
 using Poligon.EvetArgs;
 using System;
 using System.Collections;
-using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Animations.Rigging;
 
@@ -132,7 +130,7 @@ public abstract class Character : MonoBehaviour, IKillable {
     }
 
     protected void AimStart(object sender, System.EventArgs e) {
-        if(currentWeapon == WeaponTypes.None) {
+        if (currentWeapon == WeaponTypes.None) {
             return;
         }
         if (isGrounded() && !stunned) {
@@ -144,7 +142,7 @@ public abstract class Character : MonoBehaviour, IKillable {
         }
         switch (currentWeapon) {
             case (WeaponTypes.Pistol):
-                
+
                 break;
             case (WeaponTypes.AssultRifle):
                 gun.SwitchPosition(1);
@@ -184,7 +182,7 @@ public abstract class Character : MonoBehaviour, IKillable {
 
     protected void ShootCancel(object sender, System.EventArgs e) {
         if (OnShootEnd != null) OnShootEnd(this, EventArgs.Empty);
-        if(shootingCoroutine != null) {
+        if (shootingCoroutine != null) {
             StopCoroutine(shootingCoroutine);
         }
     }
@@ -221,7 +219,7 @@ public abstract class Character : MonoBehaviour, IKillable {
     protected void ChangeWeapon(object sender, InputValueEventArgs args) {
         WeaponTypes weapon = (WeaponTypes)args.Value;
 
-        if(gun != null) {
+        if (gun != null) {
             gun.UnequipWeapon();
         }
 
@@ -234,7 +232,6 @@ public abstract class Character : MonoBehaviour, IKillable {
                 gun.SwitchPosition(0);
                 rigConstraints.data.offset = new Vector3(20, 17, 13);
 
-
                 break;
             case (WeaponTypes.AssultRifle):
                 gun = GetComponentInChildren<AssultRifle>();
@@ -244,7 +241,6 @@ public abstract class Character : MonoBehaviour, IKillable {
                 rigConstraints.data.offset = new Vector3(15, 25, 0);
                 break;
         }
-
         if (OnWeaponChange != null) OnWeaponChange(this, args);
     }
 
@@ -263,10 +259,11 @@ public abstract class Character : MonoBehaviour, IKillable {
         if (OnHeavyLandingEnd != null) OnHeavyLandingEnd(this, EventArgs.Empty);
     }
     public void ApplyDamage(BulletData bulletData) {
-        this.health -= bulletData.damage;
+        if (bulletData.source.team == team) return;
+        health -= bulletData.damage;
         if (OnHealthLoss != null) OnHealthLoss(this, new BulletDataEventArgs(bulletData));
 
-        if (this.health <= 0) {
+        if (health <= 0) {
             if (OnDeath != null) OnDeath(this, new CharacterEventArgs(this));
             Destroy(gameObject);
         }

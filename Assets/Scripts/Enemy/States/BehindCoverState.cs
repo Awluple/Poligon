@@ -1,6 +1,6 @@
-using UnityEngine;
-using System.Collections;
 using Poligon.Ai.EnemyStates.Utils;
+using System.Collections;
+using UnityEngine;
 
 namespace Poligon.Ai.EnemyStates {
     public class BehindCoverState : EnemyBaseState {
@@ -14,7 +14,7 @@ namespace Poligon.Ai.EnemyStates {
         public override void EnterState() {
             CoverPosition coverPosition = enemyController.hidingLogic.currentCoverPosition;
             enemyController.ShootCancel();
-            if(!enemyController.enemy.IsCrouching()) {
+            if (!enemyController.enemy.IsCrouching()) {
                 enemyController.CrouchStart();
                 enemyController.enemy.RotateSelf(-coverPosition.transform.forward);
             }
@@ -24,7 +24,7 @@ namespace Poligon.Ai.EnemyStates {
             enemyController.StartCoroutine(checkVisionCoroutine);
             coveredAttackCoroutine = ContinueAttackingWhileCovered();
             enemyController.StartCoroutine(coveredAttackCoroutine);
-            
+
         }
         public override void ExitState() {
             enemyController.OnHealthLoss -= HealthLost;
@@ -49,22 +49,22 @@ namespace Poligon.Ai.EnemyStates {
             for (; ; ) {
                 yield return new WaitForSeconds(Random.Range(4f, 8f));
                 enemyController.aiState = AiState.Attacking;
-            //    if (Methods.HasAimOnOpponent(out Character character, enemyController)) {
-            //        enemyController.aiState = AiState.Attacking;
-            //        goto End;
-            //    }
+                //    if (Methods.HasAimOnOpponent(out Character character, enemyController)) {
+                //        enemyController.aiState = AiState.Attacking;
+                //        goto End;
+                //    }
 
-            //    if (enemyController.aiState == AiState.BehindCover && (Time.time - enemyController.attackingLogic.enemySinceLastSeen > 30f)) {
-            //        enemyController.hidingLogic.GetHidingPosition(enemyController.enemy.GetAimPosition().transform.position, enemyController.enemy.GetAimPosition().transform.position, true, true, 3f, 30f, 11f);
-            //        enemyController.aiState = AiState.Chasing;
-            //        enemyController.StopCoroutine(coveredAttackCoroutine);
+                //    if (enemyController.aiState == AiState.BehindCover && (Time.time - enemyController.attackingLogic.enemySinceLastSeen > 30f)) {
+                //        enemyController.hidingLogic.GetHidingPosition(enemyController.enemy.GetAimPosition().transform.position, enemyController.enemy.GetAimPosition().transform.position, true, true, 3f, 30f, 11f);
+                //        enemyController.aiState = AiState.Chasing;
+                //        enemyController.StopCoroutine(coveredAttackCoroutine);
 
-            //        goto End;
-            //    }
+                //        goto End;
+                //    }
 
 
-                
-            //End:;
+
+                //End:;
 
             }
         }

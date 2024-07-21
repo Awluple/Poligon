@@ -1,17 +1,9 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.InputSystem;
-using UnityEngine.Animations.Rigging;
-using Poligon.Extensions;
-using TMPro;
-using Poligon.EvetArgs;
-using UnityEngine.UIElements;
-using UnityEngine.EventSystems;
-using System.Linq;
-using Poligon.Enums;
 using Poligon.Ai;
+using Poligon.Enums;
+using Poligon.EvetArgs;
+using System.Collections.Generic;
+using System.Linq;
+using UnityEngine;
 public class Enemy : Character, ISquadMember {
 
 
@@ -40,14 +32,15 @@ public class Enemy : Character, ISquadMember {
 
         characterController = GetComponent<CharacterController>();
 
-        if(enemyList == null ) {
+        if (enemyList == null) {
             enemyList = GetComponentsInParent<Enemy>().ToList();
         }
 
-        if(currentWeapon == WeaponTypes.None) {
-            ChangeWeapon(null,new InputValueEventArgs((int)WeaponTypes.AssultRifle));
+    }
+    private void Start() {
+        if (currentWeapon == WeaponTypes.None) {
+            ChangeWeapon(null, new InputValueEventArgs((int)WeaponTypes.AssultRifle));
         }
-
     }
 
     public EnemyAimPosition GetAimPosition() {
@@ -63,10 +56,10 @@ public class Enemy : Character, ISquadMember {
         base.Update();
         if (!stunned) {
             Move();
-            }// else {
-             //    movement.x = 0;
-             //    movement.z = 0;
-             //}
+        }// else {
+         //    movement.x = 0;
+         //    movement.z = 0;
+         //}
 
         movement.y += Physics.gravity.y * fallingGravityStrength * Time.deltaTime;
 

@@ -1,16 +1,7 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.InputSystem;
-using UnityEngine.Animations.Rigging;
-using Poligon.Extensions;
-using TMPro;
 using Poligon.EvetArgs;
 using UnityEngine.AI;
-using UnityEngine.UIElements;
-using System.IO;
-using Poligon.Ai.EnemyStates;
 
 public class Player : Character {
 
@@ -54,7 +45,6 @@ public class Player : Character {
 
         characterController = GetComponent<CharacterController>();
         originalStepOffset = characterController.stepOffset;
-        this.health = 10000;
 
     }
 

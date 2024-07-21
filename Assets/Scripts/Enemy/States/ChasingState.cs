@@ -46,7 +46,6 @@ namespace Poligon.Ai.EnemyStates {
 
         private void Hide(object sender, EventArgs args) {
             enemyController.hidingLogic.GetHidingPosition(enemyController.attackingLogic.opponent.transform.position);
-            enemyController.attackingLogic.StartTrackCoroutine();
             enemyController.aiState = AiState.Hiding;
         }
 

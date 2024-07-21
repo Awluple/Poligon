@@ -8,6 +8,7 @@ namespace Poligon.Ai.EnemyStates {
     public class HidingState : EnemyBaseState {
         private IEnumerator movingAttackCoroutine;
         private IEnumerator attemptHideCoroutine;
+        float timeSinceLastSeen = Time.time;
         float maxNavMeshSampleDistance = 5f;
         float maxBackOffDistance = 7f;
 
@@ -30,9 +31,8 @@ namespace Poligon.Ai.EnemyStates {
                 if(Vector3.Distance(enemyController.transform.position, enemyController.attackingLogic.opponent.transform.position) > 7f) {
                     enemyController.SetNewDestinaction(enemyController.transform.position);
                     if(Random.Range(1, 10) < 8) enemyController.CrouchStart();
+                    enemyController.enemy.GetAimPosition().LockOnTarget(enemyController.attackingLogic.opponent);
                 } else {
-                    
-                    //enemyController.SetNewDestinaction(enemyController.transform.position);
                     MoveAgentAwayFromPoint(enemyController.attackingLogic.opponent.transform.position);
                 }
                 attemptHideCoroutine = AttemptHideCoroutine();
@@ -46,25 +46,28 @@ namespace Poligon.Ai.EnemyStates {
 
         private IEnumerator AttemptHideCoroutine() {
             for (; ; ) {
-                if (Methods.HasAimOnOpponent(out Character character, enemyController)) {
+                bool hasVision = Methods.HasAimOnOpponent(out Character character, enemyController);
+                if (hasVision) {
                     enemyController.hidingLogic.GetHidingPosition(enemyController.attackingLogic.opponent.transform.position);
+                    timeSinceLastSeen = Time.time;
                 } else {
-                    enemyController.hidingLogic.GetHidingPosition(enemyController.enemy.GetAimPosition().transform.position);
+                    if(Time.time - timeSinceLastSeen > 5.9f) {
+                        enemyController.hidingLogic.GetHidingPosition(enemyController.enemy.squad.GetCharacterLastPosition(enemyController.attackingLogic.opponent).position, null, true, false, 8f, 30f, 32f);
+                    }
                 }
 
                 CoverPosition hidingSpot = enemyController.hidingLogic.currentCoverPosition;
                 if (hidingSpot != null && hidingSpot.transform.position != Vector3.zero) {
                     enemyController.CrouchCancel();
-
                     enemyController.SetNewDestinaction(hidingSpot.transform.position);
                     enemyController.OnFinalPositionEvent += OnPosition;
                     enemyController.OnFinalPositionEvent += (object sender, System.EventArgs e) => { enemyController.RunCancel(); };
+                    if (!hasVision) enemyController.RunStart();
 
                     enemyController.StopCoroutine(attemptHideCoroutine);
                 }
 
-
-                yield return new WaitForSeconds(3f);
+                yield return new WaitForSeconds(1f);
             }
         }
 
@@ -96,26 +99,6 @@ namespace Poligon.Ai.EnemyStates {
                 enemyController.aiState = AiState.Attacking;
             }
         }
-        void MoveAgentAwayFromPoint(Vector3 avoidPoint) {
-            // Calculate direction away from the point
-            Vector3 directionAway = (enemyController.navAgent.transform.position - avoidPoint).normalized;
-
-            // Determine the target position away from the point
-            Vector3 targetPosition = enemyController.navAgent.transform.position + directionAway * maxBackOffDistance;
-
-            // Find a valid position on the NavMesh near the target position
-            NavMeshHit hit;
-            if (NavMesh.SamplePosition(targetPosition, out hit, maxNavMeshSampleDistance, NavMesh.AllAreas)) {
-                if(IsPathWithinDistance(hit.position, maxBackOffDistance)) {
-                    enemyController.SetNewDestinaction(hit.position);
-                } else {
-                    TryDifferentDirection(avoidPoint);
-                }
-                
-            } else {
-                TryDifferentDirection(avoidPoint);
-            }
-        }
         bool IsPathWithinDistance(Vector3 targetPosition, float maxDistance) {
             NavMeshPath path = new NavMeshPath();
             enemyController.navAgent.CalculatePath(targetPosition, path);
@@ -130,10 +113,10 @@ namespace Poligon.Ai.EnemyStates {
             }
             return length;
         }
-        void TryDifferentDirection(Vector3 avoidPoint) {
+        void MoveAgentAwayFromPoint(Vector3 avoidPoint) {
             // If the straight line approach fails, try other directions
             float angleIncrement = 30f; // degrees to increment
-            for (float angle = angleIncrement; angle < 360f; angle += angleIncrement) {
+            for (float angle = 0f; angle < 360f; angle += angleIncrement) {
                 Vector3 direction = Quaternion.Euler(0, angle, 0) * (enemyController.navAgent.transform.position - avoidPoint).normalized;
                 Vector3 targetPosition = enemyController.navAgent.transform.position + direction * maxBackOffDistance;
 

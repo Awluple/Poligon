@@ -1,10 +1,8 @@
-using System.Collections;
+using Poligon.Enums;
 using System.Collections.Generic;
 using UnityEngine;
-using Poligon.Enums;
 
-public class CharactersSphere : MonoBehaviour
-{
+public class CharactersSphere : MonoBehaviour {
     Dictionary<GameObject, Character> enemyCharacters = new Dictionary<GameObject, Character>();
     Dictionary<GameObject, Character> friendlyCharacters = new Dictionary<GameObject, Character>();
 
@@ -22,7 +20,7 @@ public class CharactersSphere : MonoBehaviour
     void OnCollisionEnter(Collision collision) {
         bool isCharacter = collision.GetContact(0).otherCollider.gameObject.TryGetComponent<CharacterDetectionRef>(out CharacterDetectionRef characterRef);
         if (isCharacter && characterRef.character != parent) {
-            if(characterRef.character.team == Team.Friendly && parent.team == Team.Enemy) {
+            if (characterRef.character.team == Team.Friendly && parent.team == Team.Enemy) {
                 enemyCharacters.Add(characterRef.gameObject, characterRef.character);
             } else {
                 friendlyCharacters.Add(characterRef.gameObject, characterRef.character);
@@ -32,7 +30,7 @@ public class CharactersSphere : MonoBehaviour
     }
 
     private void OnCollisionExit(Collision collision) {
-        if(enemyCharacters.ContainsKey(collision.gameObject)) {
+        if (enemyCharacters.ContainsKey(collision.gameObject)) {
             enemyCharacters.Remove(collision.gameObject);
         } else {
             friendlyCharacters.Remove(collision.gameObject);

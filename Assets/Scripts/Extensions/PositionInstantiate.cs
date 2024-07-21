@@ -1,6 +1,4 @@
-using TMPro;
 using UnityEngine;
-using static Unity.VisualScripting.Member;
 
 namespace Poligon.Extensions {
     public static class PoligonExtensions {

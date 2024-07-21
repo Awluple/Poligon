@@ -1,13 +1,8 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.AI;
-using static UnityEditor.Experimental.GraphView.GraphView;
-using static UnityEngine.UI.GridLayoutGroup;
+
 /// <summary>
 /// Includes logic for finding cover positions
 /// </summary>

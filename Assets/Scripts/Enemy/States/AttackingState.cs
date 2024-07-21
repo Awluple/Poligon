@@ -38,8 +38,8 @@ namespace Poligon.Ai.EnemyStates {
                 Vector3 pos = coverPosition.transform.forward * 4 + enemyController.eyes.transform.position;
                 Vector3 opponentPosition = enemyController.enemy.squad.GetCharacterLastPosition(enemyController.attackingLogic.opponent).position;
                 Vector3 aimPosition = (opponentPosition == Vector3.zero) ? pos : enemyController.enemy.squad.GetCharacterLastPosition(enemyController.attackingLogic.opponent).position;
-                
-                enemyController.enemy.GetAimPosition().Reposition(aimPosition);
+
+                enemyController.enemy.GetAimPosition().MoveAim(aimPosition, 80f);
                 enemyController.enemy.RotateSelf(coverPosition.transform.forward);
             }
         }

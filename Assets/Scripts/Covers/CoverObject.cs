@@ -1,10 +1,8 @@
+using Poligon;
+using Poligon.Extensions;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-using Poligon;
-using Poligon.Extensions;
-using UnityEditor;
-using System.Linq;
 
 public class CoverObject : Cover {
 
@@ -61,12 +59,12 @@ public class CoverObject : Cover {
                 coverPositions.Push(pos.gameObject);
             };
         }
-        if(coverPositions.Count > 0) {
+        if (coverPositions.Count > 0) {
             pointsCreated = true;
         }
     }
     public void UpdateParent() {
-        if(!transform.parent.TryGetComponent<CoverParent>(out CoverParent parent)) {
+        if (!transform.parent.TryGetComponent<CoverParent>(out CoverParent parent)) {
             return;
         }
         parent.transform.position = transform.position;
@@ -83,18 +81,18 @@ public class CoverObject : Cover {
             m_Max = m_Collider.bounds.max;
         }
 
-        if(transform.localScale != scale || transform.parent.rotation != parentRotation) {
+        if (transform.localScale != scale || transform.parent.rotation != parentRotation) {
             parentRotation = transform.parent.rotation;
             Quaternion _originalRotation = transform.rotation;
             transform.rotation = Quaternion.identity;
             transform.parent.rotation = Quaternion.identity;
 
             m_Size = m_Renderer.bounds.size;
-            transform.rotation = _originalRotation;     
+            transform.rotation = _originalRotation;
 
             coverPoints = new List<CoverPoint>();
             scale = transform.localScale;
-            if(!pointsCreated) CreatePointsSketch();
+            if (!pointsCreated) CreatePointsSketch();
         }
 
         //TEMP
@@ -119,10 +117,10 @@ public class CoverObject : Cover {
     /// <summary>
     /// Adds cover points along a line - recursion on both directions
     /// </summary>
-    void AddPoints(float start, float end, List<CoverPoint> coverPointsLine,bool xAxis) {
+    void AddPoints(float start, float end, List<CoverPoint> coverPointsLine, bool xAxis) {
         float spaceBetween = end - start;
 
-        if(spaceBetween >= coverPointWidth + 2 * coverPointsMinMargin) { // if there is enough space to plase a point and it's margins on both sides\
+        if (spaceBetween >= coverPointWidth + 2 * coverPointsMinMargin) { // if there is enough space to plase a point and it's margins on both sides\
             float pointPosition = start + (spaceBetween / 2);
             float positionAfterMargin = (0.5f * (coverPointWidth + coverPointsMinMargin));
 
@@ -139,10 +137,10 @@ public class CoverObject : Cover {
     /// <param name="xAxis">Axis of a line, true if along X axis</param>
     /// <returns>List of cover points for the given line</returns>
     List<CoverPoint> GetPositions(float size, bool xAxis) {
-        
+
         List<CoverPoint> coverPointsLine = new List<CoverPoint>();
 
-        if(size >= coverPointWidth * 2 + 2 * coverPointsMinMargin) {
+        if (size >= coverPointWidth * 2 + 2 * coverPointsMinMargin) {
             float start = coverPointWidth + coverPointsMinMargin;
             float end = size - (coverPointWidth) - coverPointsMinMargin;
 
@@ -153,9 +151,9 @@ public class CoverObject : Cover {
             float firstPosition = coverPointWidth / 2;
             float secondPosition = size - (coverPointWidth / 2);
             coverPointsLine.Add(new CoverPoint(new Vector3(xAxis ? firstPosition : 0, coverPointWidth / 2, xAxis ? 0 : firstPosition), 0, true));
-            coverPointsLine.Add(new CoverPoint(new Vector3(xAxis ? secondPosition : 0, coverPointWidth / 2, xAxis ? 0 : secondPosition), 0 , true));
+            coverPointsLine.Add(new CoverPoint(new Vector3(xAxis ? secondPosition : 0, coverPointWidth / 2, xAxis ? 0 : secondPosition), 0, true));
 
-        } else if(size >= coverPointWidth) { // if there is only space for one point add it at the middle
+        } else if (size >= coverPointWidth) { // if there is only space for one point add it at the middle
             coverPointsLine.Add(new CoverPoint(new Vector3(xAxis ? m_Size.x / 2 : 0, coverPointWidth / 2, !xAxis ? m_Size.z / 2 : 0), 0, true));
 
         }
@@ -168,7 +166,7 @@ public class CoverObject : Cover {
         coverPoints = new List<CoverPoint>();
         float width = m_Size.x;
         float height = m_Size.z;
-        if(height >= coverPointWidth) {
+        if (height >= coverPointWidth) {
             List<CoverPoint> coverPointsLine = GetPositions(height, false);
             coverPoints.AddRange(coverPointsLine);
         }
@@ -206,7 +204,7 @@ public class CoverObject : Cover {
                 if (coverPointShotPositions.Count == 0 && debugRays.Count > 0) {
                     color = noShotSightColor;
                 }
-                if(debugRays.Count == 0) {
+                if (debugRays.Count == 0) {
                     color = positioInvalidColor;
                 }
                 if (Physics.CheckSphere(coverPoint.position, coverPointWidth / 2 - 0.1f)) {
@@ -262,7 +260,7 @@ public class CoverObject : Cover {
             if (vec.position.x != 0) {
                 float start = m_Center.x - m_Size.x / 2;
                 pos.x = pos.x + start;
-                pos.z = transform.position.z + coverSide*(m_Size.z / 2) + coverSide * (coverPointWidth / 2) + coverSide * distanceMargin;
+                pos.z = transform.position.z + coverSide * (m_Size.z / 2) + coverSide * (coverPointWidth / 2) + coverSide * distanceMargin;
                 pos = RotatePointAroundPivot(pos, transform.rotation, m_Center);
                 coverPoint.axis = CoverPointAxis.Y;
             } else {
@@ -278,8 +276,8 @@ public class CoverObject : Cover {
     }
 
 
-    #if UNITY_EDITOR
-        private void OnDrawGizmosSelected() {
+#if UNITY_EDITOR
+    private void OnDrawGizmosSelected() {
         if (pointsCreated) return;
         Gizmos.color = positionFreeColor;
 
@@ -310,5 +308,5 @@ public class CoverObject : Cover {
             }
         }
     }
-    #endif
+#endif
 }

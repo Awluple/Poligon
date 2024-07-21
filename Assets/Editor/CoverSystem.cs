@@ -1,9 +1,5 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
-using Unity.VisualScripting;
-using log4net.Util;
 
 [CustomEditor(typeof(CoverObject))]
 public class CoverSystem : Editor {

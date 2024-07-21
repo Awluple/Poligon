@@ -3,10 +3,10 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+#if UNITY_EDITOR
 using UnityEditor;
+#endif
 using UnityEngine;
-using static UnityEditor.ShaderData;
-
 public class CoverPosition : Cover
 {
     [SerializeField] bool isEdgeCover;
@@ -27,7 +27,6 @@ public class CoverPosition : Cover
         crouchLeanHeight = coverParams.crouchLeanHeight;
         checkEdgeCovers = coverParams.checkEdgeCovers;
         edgeCoverCheckDegree = coverParams.edgeCoverCheckDegree;
-        PrefabUtility.RecordPrefabInstancePropertyModifications(gameObject.transform);
     }
 
     public List<CoverPose> GetCoverPoses() {

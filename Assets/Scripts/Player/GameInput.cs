@@ -1,11 +1,7 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using Unity.VisualScripting;
-using UnityEngine.InputSystem;
-using UnityEngine;
 using Poligon.EvetArgs;
-using static UnityEditor.Timeline.TimelinePlaybackControls;
+using System;
+using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class GameInput : MonoBehaviour, ICharacterController {
     private PlayerInputActions playerInputActions;

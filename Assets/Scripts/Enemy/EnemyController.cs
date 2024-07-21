@@ -1,18 +1,11 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.AI;
-using System.Linq;
 using Poligon.Ai;
 using Poligon.Ai.EnemyStates;
 
-
-using static Cinemachine.CinemachineOrbitalTransposer;
-using static UnityEngine.UI.GridLayoutGroup;
-using System.Reflection;
-using UnityEngine.InputSystem.XR;
 using Poligon.Ai.Commands;
 using Poligon.EvetArgs;
 using Poligon.Enums;
@@ -85,7 +78,7 @@ public class EnemyController : MonoBehaviour, IAICharacterController, IStateMana
         navAgent = gameObject.transform.parent.GetComponent<NavMeshAgent>();
         destination = new NavMeshPath();
         hidingLogic = transform.GetComponent<HidingLogic>();
-        attackingLogic = transform.AddComponent<AttackingLogic>();
+        attackingLogic = transform.gameObject.AddComponent<AttackingLogic>();
         enemy = transform.GetComponentInParent<Enemy>();
 
         NoneState none = new(this);
@@ -138,12 +131,12 @@ public class EnemyController : MonoBehaviour, IAICharacterController, IStateMana
         return eyes;
     }
     private void Start() {
-        if (aiEnabled) {
-            //SetPatrollingPath();
-            enemy.GetAimPosition().OnLineOfSight += EnemySpotted;
-            enemy.OnHealthLoss += HealthLoss;
-            aiState = AiState.Patrolling;
-        }
+        if (!aiEnabled) return;
+
+
+        enemy.GetAimPosition().OnLineOfSight += EnemySpotted;
+        enemy.OnHealthLoss += HealthLoss;
+        aiState = AiState.Patrolling;
     }
 
     public Gun getWeapon() {
@@ -337,5 +330,9 @@ public class EnemyController : MonoBehaviour, IAICharacterController, IStateMana
         }
 
 
+    }
+
+    public bool isEnabled() {
+        return aiEnabled;
     }
 }

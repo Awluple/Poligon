@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using UnityEngine;
 
+
 namespace Poligon.Ai.EnemyStates.Utils {
 
     public static class Coroutines {
@@ -15,18 +16,24 @@ namespace Poligon.Ai.EnemyStates.Utils {
             bool shootCalled = false;
             yield return new WaitForSeconds(timeout);
             for (; ; ) {
-                if (Methods.HasAimOnOpponent(out Character character, enemyController)) {
+                bool hasVision = Methods.HasAimOnOpponent(out Character character, enemyController);
+                if (!hasVision) {
+                    enemyController.ShootCancel();
+                    shootCalled = false;
+                }
+                if (hasVision && !(enemyController.getWeapon().currentAmmo == 0)) {
                     if (!enemyController.enemy.IsAiming()) enemyController.AimStart();
                     if (character == enemyController.enemy) { yield return new WaitForSeconds(0.3f); } // don't shoot yourself...
-                    if(!enemyController.getWeapon().automatic) {
+
+                    if (!enemyController.getWeapon().automatic) {
                         enemyController.ShootPerformed();
-                    } else if(enemyController.getWeapon().automatic && ! shootCalled) {
+                    } else if (enemyController.getWeapon().automatic && !shootCalled) {
                         enemyController.ShootPerformed();
                         shootCalled = true;
                     }
-                    
+
                 } else {
-                   
+
                     if (runWhenNoVision) {
                         enemyController.AimCancel();
                         enemyController.RunStart();
@@ -50,6 +57,8 @@ namespace Poligon.Ai.EnemyStates.Utils {
             bool shootCalled = false;
             for (; ; ) {
                 bool hasVision = Methods.HasAimOnOpponent(out Character character, enemyController);
+                if (!hasVision) enemyController.ShootCancel();
+
                 if (hasVision && !(enemyController.getWeapon().currentAmmo == 0)) {
                     if (character != enemyController.enemy && !enemyController.getWeapon().automatic) {
                         enemyController.ShootPerformed();
@@ -57,22 +66,29 @@ namespace Poligon.Ai.EnemyStates.Utils {
                         enemyController.ShootPerformed();
                         shootCalled = true;
                     }
-                } else if(!hasVision && !(enemyController.getWeapon().currentAmmo == 0)) {
+                } else if (!hasVision && !(enemyController.getWeapon().currentAmmo == 0)) {
+                    Character opponent = enemyController.attackingLogic.opponent;
+                    if (opponent.transform.position != enemyController.enemy.squad.GetCharacterLastPosition(opponent).position
+                     && Methods.HasVisionOnCharacter(out Character ch, enemyController, opponent, 55f)
+                        ) {
+                        //enemyController.enemy.GetAimPosition().MoveAim(enemyController.enemy.squad.GetCharacterLastPosition(opponent).position, 80f);
+                    }
                     shootCalled = false;
                     enemyController.ShootCancel();
-                    if(enemyController.enemy.IsCrouching()) {
+                    if (enemyController.enemy.IsCrouching()) {
                         enemyController.CrouchCancel();
                     }
                 }
-                if(enemyController.getWeapon().currentAmmo == 0 && enemyController.getWeapon().ammoStock != 0) {
+
+                if (enemyController.getWeapon().currentAmmo == 0 && enemyController.getWeapon().ammoStock != 0) {
                     shootCalled = false;
                     enemyController.ShootCancel();
                     enemyController.Reload();
-                    if(!enemyController.enemy.IsCrouching()) {
+                    if (!enemyController.enemy.IsCrouching()) {
                         enemyController.CrouchStart();
                         enemyController.OnReloadCancel += Stand;
                     }
-                } else if(enemyController.getWeapon().currentAmmo == 0 && enemyController.getWeapon().ammoStock == 0) {
+                } else if (enemyController.getWeapon().currentAmmo == 0 && enemyController.getWeapon().ammoStock == 0) {
                     enemyController.ShootCancel();
                     enemyController.ChangeWeapon(Enums.WeaponTypes.Pistol);
                     yield return new WaitForSeconds(0.3f);
@@ -94,7 +110,7 @@ namespace Poligon.Ai.EnemyStates.Utils {
         /// <param name="maxDistance">Maximum distance to check visibility.</param>
         /// <returns></returns>
         public static bool HasAimOnOpponent(out Character character, EnemyController enemyController, float maxDistance = 40f) {
-             
+
             Vector3 eyesPosition = enemyController.eyes.transform.position;
             Ray ray = new Ray(eyesPosition, enemyController.enemy.GetAimPosition().GetPosition() - eyesPosition);
             int layerMask = (1 << 8) | (1 << 9) | (1 << 20); // ingore Enemy, Cover and Character masks
@@ -120,12 +136,11 @@ namespace Poligon.Ai.EnemyStates.Utils {
         public static bool HasVisionOnCharacter(out Character character, EnemyController enemyController, Character target, float maxDistance = 40f) {
 
             Vector3 eyesPosition = enemyController.eyes.transform.position;
-            foreach(var detectionPoint in target.detectionPoints) {
+            foreach (var detectionPoint in target.detectionPoints) {
                 Ray ray = new Ray(eyesPosition, detectionPoint.transform.position - eyesPosition);
                 int layerMask = (1 << 8) | (1 << 9) | (1 << 20); // ingore Enemy, Cover and Character masks
-                layerMask = ~layerMask; ;
 
-                if (Physics.Raycast(ray, out RaycastHit hit, maxDistance, layerMask)) {
+                if (Physics.Raycast(ray, out RaycastHit hit, maxDistance, ~layerMask)) {
                     if (hit.collider.gameObject.TryGetComponent<Character>(out Character hitCharacter)) {
                         character = hitCharacter;
                         return true;

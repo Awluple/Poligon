@@ -4,6 +4,7 @@ using UnityEngine;
 using Poligon.Ai;
 public interface IAICharacterController : ICharacterController
 {
+    bool isEnabled();
     void EnemySpotted(Character character);
 
     void setSquad(Squad squad);

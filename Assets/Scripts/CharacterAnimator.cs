@@ -94,7 +94,6 @@ public class CharacterAnimator : MonoBehaviour
     }
 
     protected void StartAiming(object sender, System.EventArgs e) {
-
         if (character.IsCrouching()) {
             animator.SetLayerWeight((int)CharacterAnimatorLayers.CrouchingBlend, 1);
             animator.SetBool("crouching", true);
