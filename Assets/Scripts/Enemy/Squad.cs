@@ -6,8 +6,9 @@ using UnityEngine;
 
 namespace Poligon.Ai {
     public class Squad : MonoBehaviour {
-        public List<IAICharacterController> characters = new List<IAICharacterController>();
+        public List<IAICharacterController> characters = new ();
         public Dictionary<Character, LastKnownPosition> lastKnownPosition { get; private set; } = new Dictionary<Character, LastKnownPosition>();
+        public Dictionary<Character, Character> knownEnemies = new ();
         private float enemySinceLastSeen = 0f;
 
         void Start() {
@@ -31,12 +32,20 @@ namespace Poligon.Ai {
         }
         private void RemoveCharacter(object sender, CharacterEventArgs e) {
             lastKnownPosition.Remove(e.character);
+            knownEnemies.Remove(e.character);
+            e.character.OnDeath -= RemoveCharacter;
         }
         public LastKnownPosition GetCharacterLastPosition(Character character) {
-            return lastKnownPosition[character];
+            return lastKnownPosition.GetValueOrDefault(character);
         }
         public LastKnownPosition GetChasingLocation() {
             return lastKnownPosition.Values.ToList()[0];
+        }
+        public void EnemySpotted(Character chara) {
+            if (!knownEnemies.ContainsKey(chara)) {
+                knownEnemies.Add(chara, chara);
+                chara.OnDeath += RemoveCharacter;
+            }
         }
 
         //IEnumerator CheckLastSeen() {

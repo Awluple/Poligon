@@ -65,8 +65,10 @@ public class EnemyController : MonoBehaviour, IAICharacterController, IStateMana
     private IEnumerator pathRecalc;
 
     // AI
+    [SerializeField] private AiState _debugAiState;
     public AiState aiState { get => stateMashine.GetState(); set {
             stateMashine.MoveNext(value);
+            _debugAiState = value;
         } }
     private AiStateMashine<AiState> stateMashine;
     private Action stateMashineCallback;
@@ -78,7 +80,7 @@ public class EnemyController : MonoBehaviour, IAICharacterController, IStateMana
         navAgent = gameObject.transform.parent.GetComponent<NavMeshAgent>();
         destination = new NavMeshPath();
         hidingLogic = transform.GetComponent<HidingLogic>();
-        attackingLogic = transform.gameObject.AddComponent<AttackingLogic>();
+        attackingLogic = transform.gameObject.GetComponent<AttackingLogic>();
         enemy = transform.GetComponentInParent<Enemy>();
 
         NoneState none = new(this);
@@ -107,6 +109,8 @@ public class EnemyController : MonoBehaviour, IAICharacterController, IStateMana
 
             { new StateTransition<AiState>(AiState.Hiding, AiState.Attacking), attacking },
             { new StateTransition<AiState>(AiState.Hiding, AiState.BehindCover), behindCover },
+            { new StateTransition<AiState>(AiState.Hiding, AiState.Chasing), chasing },
+
 
             { new StateTransition<AiState>(AiState.BehindCover, AiState.Attacking), attacking },
             { new StateTransition<AiState>(AiState.BehindCover, AiState.Chasing), chasing },
@@ -148,12 +152,12 @@ public class EnemyController : MonoBehaviour, IAICharacterController, IStateMana
     }
 
     private void EnemySpotted(object sender = null, CharacterEventArgs e = null) {
-        enemy.GetAimPosition().OnLineOfSight -= EnemySpotted;
+        
         ICommand command = new EnemySpottedCommand(enemy.squad, e.character);
         command.execute();
     }
     public void EnemySpotted(Character character) {
-        enemy.GetAimPosition().OnLineOfSight -= EnemySpotted;
+        
         attackingLogic.opponent = character;
         enemy.GetAimPosition().alerted = true;
         attackingLogic.EnemySpotted(character);

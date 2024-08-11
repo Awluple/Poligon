@@ -500,6 +500,7 @@ MonoBehaviour:
   enemy: {fileID: 0}
   aimingAtCharacter: 0
   alerted: 0
+  alertedMaxDistance: 40
   sightEventsCalled: 0
 --- !u!1 &858184380083284765
 GameObject:
@@ -2963,8 +2964,7 @@ GameObject:
   - component: {fileID: 2144929853241006717}
   - component: {fileID: 1793394347641943726}
   - component: {fileID: 8506608336701991928}
-  - component: {fileID: 6614165476819050724}
-  - component: {fileID: 2971752913153066803}
+  - component: {fileID: 5656594091647974632}
   m_Layer: 0
   m_Name: EnemyController
   m_TagString: Untagged
@@ -3004,6 +3004,7 @@ MonoBehaviour:
   groundSpot: {fileID: 6765729937081592859}
   eyes: {fileID: 2851140620001918182}
   currentPatrolPosition: -1
+  _debugAiState: 0
 --- !u!114 &8506608336701991928
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3021,7 +3022,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 1048576
   hidingSphere: {fileID: 6047332393817101487}
---- !u!114 &6614165476819050724
+--- !u!114 &5656594091647974632
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -3030,30 +3031,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 7693305229908513171}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e741851cba3ad425c91ecf922cc6b379, type: 3}
+  m_Script: {fileID: 11500000, guid: d572d96b19f1e9e44a91505401c1e25b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _data:
-    _json: '{"declarations":{"Kind":"Object","collection":{"$content":[{"name":"EnemyController","value":{"$content":0,"$type":"UnityEngine.Object"},"typeHandle":{"Identification":"EnemyController,
-      Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null","$version":"A"},"$version":"A"}],"$version":"A"},"$version":"A"}}'
-    _objectReferences:
-    - {fileID: 1793394347641943726}
---- !u!114 &2971752913153066803
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7693305229908513171}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: efe58df89b5b74a97a123b5ed2b70422, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _data:
-    _json: '{"nest":{"source":"Macro","macro":0,"embed":null}}'
-    _objectReferences:
-    - {fileID: 11400000, guid: d09a3d9ff9caf6e4191a92ed6f490e85, type: 2}
+  charactersSphere: {fileID: 1678285974399363786}
+  _opponent: {fileID: 0}
 --- !u!1 &7695132112727814107
 GameObject:
   m_ObjectHideFlags: 0

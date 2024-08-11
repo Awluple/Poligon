@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.TextCore.Text;
 
 public class EnemyAimPosition : AimPosition {
     [SerializeField] CharactersSphere charactersSphere;
@@ -14,9 +15,8 @@ public class EnemyAimPosition : AimPosition {
     public event EventHandler<CharacterEventArgs> OnLineOfSight;
     public event EventHandler OnLineOfSightLost;
 
-    public bool sightEventsCalled = false;
-
     private IEnumerator checkCoroutine;
+    private IEnumerator lookForEnemiesCoroutine;
 
     Character opponent;
     DetectionPoint opponentDetectionPoint;
@@ -31,6 +31,10 @@ public class EnemyAimPosition : AimPosition {
         enemy.OnDeath += RemoveTarget;
         checkCoroutine = DoCheck(false);
         StartCoroutine(checkCoroutine);
+
+        lookForEnemiesCoroutine = LookForEnemies();
+        StartCoroutine(lookForEnemiesCoroutine);
+
         transform.SetParent(enemy.transform.parent);
     }
 
@@ -101,14 +105,12 @@ public class EnemyAimPosition : AimPosition {
                 yield return new WaitForSeconds(.4f);
                 continue;
             }
-
             if (opponentDetectionPoint != null) {
                 Vector3 rayTarget = opponentDetectionPoint.transform.position;
                 if (ProximityCheck(rayTarget)) {
-                    MoveToCharacter(opponent, ref moveAimCalled, opponentDetectionPoint);
-                    if (OnLineOfSight != null && sightEventsCalled == false) {
+                    MoveToCharacter(enemy.GetController().attackingLogic.opponent, ref moveAimCalled, opponentDetectionPoint);
+                    if (OnLineOfSight != null) {
                         OnLineOfSight(this, new CharacterEventArgs(opponent));
-                        sightEventsCalled = true;
                     };
                     alerted = true;
                     yield return new WaitForSeconds(0f);
@@ -119,27 +121,45 @@ public class EnemyAimPosition : AimPosition {
                     opponent = null;
                     if (aimingAtCharacter && OnLineOfSightLost != null) OnLineOfSightLost(this, EventArgs.Empty);
                     aimingAtCharacter = false;
-                    sightEventsCalled = false;
                 }
             } else {
-
                 foreach (var character in charactersSphere.GetEnemyCharacters().Values.ToList()) {
                     foreach (var detectionPoint in character.detectionPoints) {
-                        Vector3 rayTarget = detectionPoint.transform.position;
-                        if (ProximityCheck(rayTarget)) {
-                            opponentDetectionPoint = detectionPoint;
-                            opponent = character;
-                        } else {
-                            if (repositionOnFailed) {
-                                transform.position = enemy.transform.position;
-                            }
+                        if (detectionPoint == null) {
+                            opponent = null;
+                            opponentDetectionPoint = null;
                             yield return new WaitForSeconds(.4f);
+                        } else {
+                            Vector3 rayTarget = detectionPoint.transform.position;
+                            if (ProximityCheck(rayTarget)) {
+                                opponentDetectionPoint = detectionPoint;
+                                opponent = character;
+                            } else {
+                                if (repositionOnFailed) {
+                                    transform.position = enemy.transform.position;
+                                }
+                                yield return new WaitForSeconds(.4f);
+                            }
                         }
+                        
                     }
                 }
             }
         }
     }
+
+    IEnumerator LookForEnemies() {
+        foreach (var character in charactersSphere.GetEnemyCharacters().Values.ToList()) {
+            foreach (var detectionPoint in character.detectionPoints) {
+                Vector3 rayTarget = detectionPoint.transform.position;
+                if (ProximityCheck(rayTarget)) {
+                    OnLineOfSight(this, new CharacterEventArgs(character));
+                }
+                yield return new WaitForSeconds(UnityEngine.Random.Range(.4f, .6f));
+            }
+        }
+    }
+
     /// <summary>
     /// Resets the aim point back to the initial position
     /// </summary>
@@ -147,7 +167,6 @@ public class EnemyAimPosition : AimPosition {
         transform.position = enemy.transform.position;
         if (aimingAtCharacter && OnLineOfSightLost != null) OnLineOfSightLost(this, EventArgs.Empty);
         aimingAtCharacter = false;
-        sightEventsCalled = false;
     }
     /// <summary>
     /// Immediately repositions the aim
@@ -159,7 +178,6 @@ public class EnemyAimPosition : AimPosition {
         StopCoroutine(checkCoroutine);
         if (aimingAtCharacter && OnLineOfSightLost != null) OnLineOfSightLost(this, EventArgs.Empty);
         aimingAtCharacter = false;
-        sightEventsCalled = false;
         checkCoroutine = DoCheck(false);
         StartCoroutine(checkCoroutine);
     }
@@ -193,7 +211,6 @@ public class EnemyAimPosition : AimPosition {
         MoveToCharacter(character, ref moveAimCalled, null);
         if (OnLineOfSight != null) {
             OnLineOfSight(this, new CharacterEventArgs(character));
-            sightEventsCalled = true;
         };
         checkCoroutine = DoCheck(false);
         StartCoroutine(checkCoroutine);
@@ -204,7 +221,12 @@ public class EnemyAimPosition : AimPosition {
     /// </summary>
     /// <returns>True if within range</returns>
     bool ProximityCheck(Vector3 rayTarget) {
-        int layerMask = (1 << 8) | (1 << 9) | (1 << 20); // ingore Enemy, Cover and Character masks
+        int layerMask = (1 << 9) | (1 << 20); // ignore Enemy, Cover and Character masks
+        if (enemy.team == Poligon.Enums.Team.Enemy) {
+            layerMask |= (1 << 8);
+        } else {
+            layerMask |= (1 << 11);
+        }
         layerMask = ~layerMask;
         Vector3 rayStartPoint = enemy.GetController().eyes.transform.position;
         Ray ray = new Ray(rayStartPoint, rayTarget - rayStartPoint);
@@ -216,8 +238,11 @@ public class EnemyAimPosition : AimPosition {
         } else if (distanceToEnemy < (alerted ? alertedMaxDistance : 20f) && // Detect within 20f if visable or alertedMaxDistance if alerted
             Vector3.Angle(rayTarget - enemy.transform.position, enemy.transform.forward) < 75) { // Must be within 75 degerees angle
             if (Physics.Raycast(ray, out RaycastHit hit, (alerted ? alertedMaxDistance : 25f), layerMask)) {
-                if (!hit.collider.gameObject.TryGetComponent<Character>(out Character player)) {
+                bool isChar = hit.collider.gameObject.TryGetComponent<Character>(out Character character);
+                if (!isChar) {
                     return false;
+                } else {
+                    return true;
                 }
 
             }

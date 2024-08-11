@@ -67,12 +67,12 @@ namespace Poligon.Ai.EnemyStates.Utils {
                         shootCalled = true;
                     }
                 } else if (!hasVision && !(enemyController.getWeapon().currentAmmo == 0)) {
-                    Character opponent = enemyController.attackingLogic.opponent;
-                    if (opponent.transform.position != enemyController.enemy.squad.GetCharacterLastPosition(opponent).position
-                     && Methods.HasVisionOnCharacter(out Character ch, enemyController, opponent, 55f)
-                        ) {
-                        //enemyController.enemy.GetAimPosition().MoveAim(enemyController.enemy.squad.GetCharacterLastPosition(opponent).position, 80f);
-                    }
+                    //Character opponent = enemyController.attackingLogic.opponent;
+                    //if (opponent.transform.position != enemyController.enemy.squad.GetCharacterLastPosition(opponent).position
+                    // && Methods.HasVisionOnCharacter(out Character ch, enemyController, opponent, 55f)
+                    //    ) {
+                    //    //enemyController.enemy.GetAimPosition().MoveAim(enemyController.enemy.squad.GetCharacterLastPosition(opponent).position, 80f);
+                    //}
                     shootCalled = false;
                     enemyController.ShootCancel();
                     if (enemyController.enemy.IsCrouching()) {
@@ -113,7 +113,12 @@ namespace Poligon.Ai.EnemyStates.Utils {
 
             Vector3 eyesPosition = enemyController.eyes.transform.position;
             Ray ray = new Ray(eyesPosition, enemyController.enemy.GetAimPosition().GetPosition() - eyesPosition);
-            int layerMask = (1 << 8) | (1 << 9) | (1 << 20); // ingore Enemy, Cover and Character masks
+            int layerMask = (1 << 9) | (1 << 20); // ignore Enemy, Cover and Character masks
+            if (enemyController.enemy.team == Enums.Team.Enemy) {
+                layerMask |= (1 << 8);
+            } else {
+                layerMask |= (1 << 11);
+            }
             layerMask = ~layerMask;
 
             if (Physics.Raycast(ray, out RaycastHit hit, maxDistance, layerMask)) {
@@ -136,10 +141,19 @@ namespace Poligon.Ai.EnemyStates.Utils {
         public static bool HasVisionOnCharacter(out Character character, EnemyController enemyController, Character target, float maxDistance = 40f) {
 
             Vector3 eyesPosition = enemyController.eyes.transform.position;
+            if (target == null) {
+                character = null;
+                return false;
+            }
             foreach (var detectionPoint in target.detectionPoints) {
                 Ray ray = new Ray(eyesPosition, detectionPoint.transform.position - eyesPosition);
-                int layerMask = (1 << 8) | (1 << 9) | (1 << 20); // ingore Enemy, Cover and Character masks
-
+                int layerMask = (1 << 9) | (1 << 20); // ignore Enemy, Cover and Character masks
+                if (enemyController.enemy.team == Enums.Team.Enemy) {
+                    layerMask |= (1 << 8);
+                } else {
+                    layerMask |= (1 << 11);
+                }
+                layerMask = ~layerMask;
                 if (Physics.Raycast(ray, out RaycastHit hit, maxDistance, ~layerMask)) {
                     if (hit.collider.gameObject.TryGetComponent<Character>(out Character hitCharacter)) {
                         character = hitCharacter;
