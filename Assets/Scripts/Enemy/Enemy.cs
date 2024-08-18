@@ -1,6 +1,7 @@
 using Poligon.Ai;
 using Poligon.Enums;
 using Poligon.EvetArgs;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -54,7 +55,7 @@ public class Enemy : Character, ISquadMember {
     // Update is called once per frame
     protected override void Update() {
         base.Update();
-        if (!stunned) {
+        if (!stunned && health > 0) {
             Move();
         }// else {
          //    movement.x = 0;
@@ -71,11 +72,12 @@ public class Enemy : Character, ISquadMember {
         //    characterController.stepOffset = originalStepOffset;
         //}
 
-        if ((isWalking && !stunned) || isAiming) {
+
+        if (health > 0 && ((isWalking && !stunned) || isAiming)) {
             Rotate(new Vector3(movement.x, 0f, movement.z));
             //Rotate(aimingTarget.transform.position);
         }
-        characterController.Move(movement * Time.deltaTime);
+        if(health > 0) characterController.Move(movement * Time.deltaTime);
 
         //int layer_mask = LayerMask.GetMask("Ground");
         //bool hit = false;

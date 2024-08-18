@@ -8,6 +8,7 @@ public interface IAICharacterController : ICharacterController
     void EnemySpotted(Character character);
 
     void setSquad(Squad squad);
+    Character GetCharacter();
     HidingLogic hidingLogic { get; }
     AttackingLogic attackingLogic { get; }
 }

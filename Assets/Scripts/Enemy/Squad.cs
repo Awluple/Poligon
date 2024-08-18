@@ -1,5 +1,6 @@
 using Poligon.Ai.Commands;
 using Poligon.EvetArgs;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -17,6 +18,7 @@ namespace Poligon.Ai {
                 if (character.isEnabled()) {
                     characters.Add(character);
                     character.setSquad(this);
+                    character.GetCharacter().OnDeath += (object e, CharacterEventArgs args) => { characters.Remove(character); };
                 }
             }
         }

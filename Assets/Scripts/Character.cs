@@ -264,8 +264,13 @@ public abstract class Character : MonoBehaviour, IKillable {
         if (OnHealthLoss != null) OnHealthLoss(this, new BulletDataEventArgs(bulletData));
 
         if (health <= 0) {
+            Debug.Log("Destroying: " + gameObject.name);
             if (OnDeath != null) OnDeath(this, new CharacterEventArgs(this));
+            OnDeath = null;
+            Destroy(rig);
+            rig = null;
             Destroy(gameObject);
+            Debug.Log("Dead: " + gameObject.name);
         }
     }
 
@@ -284,6 +289,7 @@ public abstract class Character : MonoBehaviour, IKillable {
     }
 
     protected Vector2 GetAimWalkBlendTreeValues(Vector2 inputVector) {
+        if (aimingTarget.GetPosition() == null) Debug.Log("ASDASD");
         var moveAngle = Vector2.Angle(inputVector, new Vector2(aimingTarget.GetPosition().x - transform.position.x, aimingTarget.GetPosition().z - transform.position.z));
 
         float radians = (Mathf.PI / 180) * moveAngle;

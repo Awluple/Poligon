@@ -31,7 +31,7 @@ namespace Poligon.Ai.EnemyStates {
                 if(Vector3.Distance(enemyController.transform.position, enemyController.attackingLogic.opponent.transform.position) > 7f) {
                     enemyController.SetNewDestinaction(enemyController.transform.position);
                     if(Random.Range(1, 10) < 8) enemyController.CrouchStart();
-                    enemyController.enemy.GetAimPosition().LockOnTarget(enemyController.attackingLogic.opponent);
+                    enemyController.enemy.GetAimPosition().LockOnTarget(enemyController.attackingLogic.opponent, !enemyController.enemy.IsAiming());
                 } else {
                     MoveAgentAwayFromPoint(enemyController.attackingLogic.opponent.transform.position);
                 }
@@ -48,11 +48,11 @@ namespace Poligon.Ai.EnemyStates {
             for (; ; ) {
                 bool hasVision = Methods.HasAimOnOpponent(out Character character, enemyController);
                 if (hasVision) {
-                    enemyController.hidingLogic.GetHidingPosition(enemyController.attackingLogic.opponent.transform.position);
+                    enemyController.hidingLogic.GetHidingPosition(enemyController.attackingLogic.opponent.transform.position, enemyController.enemy);
                     timeSinceLastSeen = Time.time;
                 } else {
-                    if(Time.time - timeSinceLastSeen > 5.9f) {
-                        enemyController.hidingLogic.GetHidingPosition(enemyController.enemy.squad.GetCharacterLastPosition(enemyController.attackingLogic.opponent).position, null, true, false, 8f, 30f, 32f);
+                    if(Time.time - timeSinceLastSeen > 5.9f && enemyController.attackingLogic.opponent != null) {
+                        enemyController.hidingLogic.GetHidingPosition(enemyController.enemy.squad.GetCharacterLastPosition(enemyController.attackingLogic.opponent).position, enemyController.enemy, null, true, false, 8f, 30f, 32f);
                     }
                 }
 

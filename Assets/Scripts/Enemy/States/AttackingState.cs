@@ -2,6 +2,7 @@ using UnityEngine;
 using System.Collections;
 
 using Poligon.Ai.EnemyStates.Utils;
+using Poligon.Ai.Commands;
 
 namespace Poligon.Ai.EnemyStates {
     public class AttackingState : EnemyBaseState {
@@ -36,11 +37,13 @@ namespace Poligon.Ai.EnemyStates {
             enemyController.StartCoroutine(shootingCoroutine);
             if (coverPosition!= null && !hasVision) {
                 Vector3 pos = coverPosition.transform.forward * 4 + enemyController.eyes.transform.position;
-                Vector3 opponentPosition = enemyController.enemy.squad.GetCharacterLastPosition(enemyController.attackingLogic.opponent).position;
-                Vector3 aimPosition = (opponentPosition == Vector3.zero) ? pos : enemyController.enemy.squad.GetCharacterLastPosition(enemyController.attackingLogic.opponent).position;
+                LastKnownPosition opponentPosition = enemyController.enemy.squad.GetCharacterLastPosition(enemyController.attackingLogic.opponent);
+                if(opponentPosition != null) {
+                    Vector3 aimPosition = (opponentPosition.position == Vector3.zero) ? pos : enemyController.enemy.squad.GetCharacterLastPosition(enemyController.attackingLogic.opponent).position;
 
-                enemyController.enemy.GetAimPosition().MoveAim(aimPosition, 80f);
-                enemyController.enemy.RotateSelf(coverPosition.transform.forward);
+                    enemyController.enemy.GetAimPosition().MoveAim(aimPosition, 80f);
+                    enemyController.enemy.RotateSelf(coverPosition.transform.forward);
+                }
             }
         }
 

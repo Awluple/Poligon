@@ -97,7 +97,7 @@ public abstract class Gun : MonoBehaviour
     /// Fire a bullet, checks if a gun is able to shoot
     /// </summary>
     public void Shoot() {
-        if (!CanShoot()) return;
+        if (!CanShoot() || aimingTarget == null) return;
         //Appy accurancy to the shot
         Vector3 target = aimingTarget.GetPosition();
         Vector3 direction = target - spawnBulletPosition.transform.position;

@@ -141,10 +141,16 @@ public class EnemyController : MonoBehaviour, IAICharacterController, IStateMana
         enemy.GetAimPosition().OnLineOfSight += EnemySpotted;
         enemy.OnHealthLoss += HealthLoss;
         aiState = AiState.Patrolling;
+
+        enemy.OnDeath += (object e, CharacterEventArgs ch) => { StopAllCoroutines(); };
     }
 
     public Gun getWeapon() {
         return enemy.gun;
+    }
+
+    public Character GetCharacter() {
+        return enemy;
     }
 
     public void setSquad(Squad squad) {
@@ -176,10 +182,10 @@ public class EnemyController : MonoBehaviour, IAICharacterController, IStateMana
     
     public void HealthLoss(object sender, BulletDataEventArgs eventArgs) {
         if (OnHealthLoss != null) OnHealthLoss(this, eventArgs);
-        if (!enemy.GetAimPosition().aimingAtCharacter) {
-            enemy.GetAimPosition().LockOnTarget(eventArgs.BulletData.source); // Move the aim to the attacker.
+        if (enemy.GetAimPosition() != null && !enemy.GetAimPosition().aimingAtCharacter) {
+            enemy.GetAimPosition().LockOnTarget(eventArgs.BulletData.source, !enemy.IsAiming()); // Move the aim to the attacker.
         }
-        ICommand command = new CharacterAttacledCommand(enemy,enemy.squad, eventArgs.BulletData.source);
+        ICommand command = new CharacterAttackedCommand(enemy,enemy.squad, eventArgs.BulletData.source);
         command.execute();
     }
 
@@ -229,12 +235,14 @@ public class EnemyController : MonoBehaviour, IAICharacterController, IStateMana
     }
 
     public void CrouchStart() {
+        if (enemy.IsCrouching()) return;
         if (OnCrouchStart != null) OnCrouchStart(this, EventArgs.Empty);
     }
     public void CrouchPerformed() {
         if (OnCrouchPerformed != null) OnCrouchPerformed(this, EventArgs.Empty);
     }
     public void CrouchCancel() {
+        if (!enemy.IsCrouching()) return;
         if (OnCrouchCancel != null) OnCrouchCancel(this, EventArgs.Empty);
     }
     public void ShootStart() {

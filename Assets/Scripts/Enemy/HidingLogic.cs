@@ -66,6 +66,7 @@ public class HidingLogic : MonoBehaviour {
     /// Get the cover position
     /// </summary>
     /// <param name="hidingSourcePosition">The source to hide from</param>
+    /// <param name="character">Character that wants to hide</param>
     /// <param name="originPosition">The position of object that is wants to hide</param>
     /// <param name="closestCover">If true returns the closest cover to originPos, if false - the farthest</param>
     /// <param name="ignoreDot">If true calculate cover position in ralation to the target to return ones that are on target's side, if false return any cover that meets distance requirements</param>
@@ -73,7 +74,7 @@ public class HidingLogic : MonoBehaviour {
     /// <param name="maxCoverPathDistance">Maximum distanse to travel</param>
     /// <param name="maxSearchDistance">Maximum distance to search for cover</param>
     /// <returns>Cover position</returns>
-    public Vector3 GetHidingPosition(Vector3 hidingSourcePosition, Vector3? originPosition = null,
+    public Vector3 GetHidingPosition(Vector3 hidingSourcePosition, Character character, Vector3? originPosition = null,
         bool closestCover = true, bool ignoreDot = false, float minDistanceFromSource = 8f, float maxCoverPathDistance = 20f, float maxSearchDistance = 21f) {
 
         // Get the starting point, if not provided use transform.position
@@ -92,7 +93,7 @@ public class HidingLogic : MonoBehaviour {
             if (Vector3.Distance(originPos, cover.transform.position) > maxSearchDistance) { continue; };
 
             CoverPosition coverPosition = cover.GetComponent<CoverPosition>();
-            if (coverPosition.occuped) continue;
+            if (coverPosition.occuped && coverPosition.occupedBy != character) continue;
 
             Vector3 direction = Vector3.Normalize(hidingSourcePosition - cover.transform.position);
             float dotToTarget = Vector3.Dot(cover.transform.forward, direction);
@@ -122,6 +123,7 @@ public class HidingLogic : MonoBehaviour {
                 if (currentCoverPosition != null ) currentCoverPosition.occuped = false;
                 currentCoverPosition = coverPosition;
                 currentCoverPosition.occuped = true;
+                currentCoverPosition.occupedBy = character;
                 return cover.transform.position;
             }
         }

@@ -57,7 +57,8 @@ namespace Poligon.Ai.EnemyStates.Utils {
             bool shootCalled = false;
             for (; ; ) {
                 bool hasVision = Methods.HasAimOnOpponent(out Character character, enemyController);
-                if (!hasVision) enemyController.ShootCancel();
+                if (!hasVision) enemyController.ShootCancel(); shootCalled = false;
+                if(!hasVision && enemyController.enemy.IsCrouching() && enemyController.getWeapon().currentAmmo != 0) enemyController.CrouchCancel() ;
 
                 if (hasVision && !(enemyController.getWeapon().currentAmmo == 0)) {
                     if (character != enemyController.enemy && !enemyController.getWeapon().automatic) {
@@ -67,12 +68,6 @@ namespace Poligon.Ai.EnemyStates.Utils {
                         shootCalled = true;
                     }
                 } else if (!hasVision && !(enemyController.getWeapon().currentAmmo == 0)) {
-                    //Character opponent = enemyController.attackingLogic.opponent;
-                    //if (opponent.transform.position != enemyController.enemy.squad.GetCharacterLastPosition(opponent).position
-                    // && Methods.HasVisionOnCharacter(out Character ch, enemyController, opponent, 55f)
-                    //    ) {
-                    //    //enemyController.enemy.GetAimPosition().MoveAim(enemyController.enemy.squad.GetCharacterLastPosition(opponent).position, 80f);
-                    //}
                     shootCalled = false;
                     enemyController.ShootCancel();
                     if (enemyController.enemy.IsCrouching()) {
@@ -110,7 +105,7 @@ namespace Poligon.Ai.EnemyStates.Utils {
         /// <param name="maxDistance">Maximum distance to check visibility.</param>
         /// <returns></returns>
         public static bool HasAimOnOpponent(out Character character, EnemyController enemyController, float maxDistance = 40f) {
-
+            if (enemyController.enemy == null || enemyController.enemy.GetAimPosition() == null) { character = null; return false; }
             Vector3 eyesPosition = enemyController.eyes.transform.position;
             Ray ray = new Ray(eyesPosition, enemyController.enemy.GetAimPosition().GetPosition() - eyesPosition);
             int layerMask = (1 << 9) | (1 << 20); // ignore Enemy, Cover and Character masks
@@ -139,7 +134,7 @@ namespace Poligon.Ai.EnemyStates.Utils {
         /// <param name="target">The targer character</param>
         /// <param name="maxDistance">Maximum distance to check visibility.</param>
         public static bool HasVisionOnCharacter(out Character character, EnemyController enemyController, Character target, float maxDistance = 40f) {
-
+            if(enemyController.enemy == null) { character = null;  return false; }
             Vector3 eyesPosition = enemyController.eyes.transform.position;
             if (target == null) {
                 character = null;

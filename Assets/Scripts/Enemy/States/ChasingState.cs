@@ -3,6 +3,7 @@ using Poligon.Ai.EnemyStates.Utils;
 using System.Collections;
 using System;
 using UnityEngine.TextCore.Text;
+using Poligon.EvetArgs;
 
 namespace Poligon.Ai.EnemyStates {
     public class ChasingState : EnemyBaseState {
@@ -22,7 +23,7 @@ namespace Poligon.Ai.EnemyStates {
             enemyController.StartCoroutine(movingAttackCoroutine);
 
             if (coverPosition != null && coverPosition.transform.position != Vector3.zero) {
-                enemyController.enemy.GetAimPosition().Reposition(enemyController.enemy.squad.GetChasingLocation().position);
+                enemyController.enemy.GetAimPosition().Reposition(enemyController.enemy.squad.GetCharacterLastPosition(enemyController.attackingLogic.opponent).position);
                 enemyController.AimStart();
                 enemyController.CrouchCancel();
                 enemyController.SetNewDestinaction(coverPosition.transform.position);
@@ -44,8 +45,11 @@ namespace Poligon.Ai.EnemyStates {
             enemyController.enemy.GetAimPosition().OnLineOfSight -= Hide;
         }
 
-        private void Hide(object sender, EventArgs args) {
-            enemyController.hidingLogic.GetHidingPosition(enemyController.attackingLogic.opponent.transform.position);
+        private void Hide(object sender, CharacterEventArgs args) {
+            if(args.character != enemyController.attackingLogic.opponent && UnityEngine.Random.Range(0, 5) > 5) {
+                enemyController.attackingLogic.opponent = args.character;
+            }
+            enemyController.hidingLogic.GetHidingPosition(enemyController.attackingLogic.opponent.transform.position, enemyController.enemy);
             enemyController.aiState = AiState.Hiding;
         }
 

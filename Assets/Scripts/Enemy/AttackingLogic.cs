@@ -17,42 +17,26 @@ public class AttackingLogic : MonoBehaviour {
     [SerializeField] private Character _opponent;
     public Character opponent {
         get {
-            if (_opponent != null) {
-                return _opponent;
-            } else {
-                var enemies = enemyController.enemy.squad.knownEnemies.Values.ToList();
-                if (enemies.Count > 0) {
-                    // Try to get visible character
-                    foreach (var character in enemies) {
-                        if (Methods.HasVisionOnCharacter(out Character chara, enemyController, character)) {
-                            opponent = character;
-                            return character;
-                        }
-                    }
-                    // Get closest character
-                    enemies.Sort((obj1, obj2) =>
-                    {
-                        float distanceToObj1 = Vector3.Distance(transform.position, obj1.transform.position);
-                        float distanceToObj2 = Vector3.Distance(transform.position, obj2.transform.position);
-
-                        return distanceToObj1.CompareTo(distanceToObj2);
-                    });
-                    return enemies.First();
-                }
-                
-                    
-                return null;
-            }
-        
+            //if (_opponent != null) {
+            //    return _opponent;
+            //} else {
+            //    opponent = GetOpponent();
+            //    return _opponent;
+            //}
+            return _opponent;
         }
         set {
             if (_opponent != null) {
                 _opponent.OnDeath -= OpponentDeath;
             }
             _opponent = value;
-            _opponent.OnDeath += OpponentDeath;
+            if (_opponent != null) {
+                _opponent.OnDeath += OpponentDeath;
+            }
+            timeSinceLastOpponentChange = 0;
         }
     }
+    float timeSinceLastOpponentChange = 0f;
 
     private void Awake() {
         enemyController = transform.GetComponentInParent<EnemyController>();
@@ -63,13 +47,46 @@ public class AttackingLogic : MonoBehaviour {
         enemyController.enemy.GetAimPosition().OnLineOfSight += VisionGained;
 
     }
+
+    private Character GetOpponent() {
+        if(this == null) {
+            return null;
+        }
+        var enemies = enemyController.enemy.squad.knownEnemies.Values.ToList();
+        var validEnemies = enemies.Where(e => e != null && e.gameObject != null).ToList();
+        if (validEnemies.Count > 0) {
+            // Try to get visible character
+            foreach (var character in validEnemies) {
+                if (Methods.HasVisionOnCharacter(out Character chara, enemyController, character)) {
+                    opponent = character;
+                    return character;
+                }
+            }
+            // Get closest character
+            validEnemies.Sort((obj1, obj2) => {
+                if (obj1 == null || obj1.gameObject == null) return 1;
+                if (obj2 == null || obj2.gameObject == null) return -1;
+                float distanceToObj1 = Vector3.Distance(transform.position, obj1.transform.position);
+                float distanceToObj2 = Vector3.Distance(transform.position, obj2.transform.position);
+
+                return distanceToObj1.CompareTo(distanceToObj2);
+            });
+            return validEnemies.FirstOrDefault();
+        }
+        return null;
+    }
+
     private void Update() {
         if (enemyController.enemy.GetAimPosition().aimingAtCharacter && opponent != null) {
-            UpdateLastKnownPosition(opponent, enemyController.enemy.GetAimPosition().transform.position);
+            if(enemyController.enemy.GetAimPosition() != null) UpdateLastKnownPosition(opponent, enemyController.enemy.GetAimPosition().transform.position);
         }
+        timeSinceLastOpponentChange += Time.deltaTime;
     }
     private void OpponentDeath(object sender, CharacterEventArgs args) {
         args.character.OnDeath -= OpponentDeath;
+        if (enemyController.aiState == AiState.Chasing || enemyController.aiState == AiState.Searching) {
+            ChangeOpponent();
+        }
     }
     private void UpdateLastKnownPosition(Character character, Vector3 newPosition) {
         enemyController.enemy.squad.UpdateLastKnownPosition(new LastKnownPosition(character, newPosition));
@@ -80,18 +97,34 @@ public class AttackingLogic : MonoBehaviour {
         if (hasVision && Vector3.Distance(transform.position, opponent.transform.position) < Vector3.Distance(transform.position, hitChar.transform.position)) {
             opponent = hitChar;
         }
-        if (!hasVision) {
+        if (!hasVision && enemyController.aiState != AiState.Chasing) {
+            enemyController.enemy.GetAimPosition().LockOnTarget(opponent, !enemyController.enemy.IsAiming());
             enemyController.aiState = AiState.Chasing;
         } else if (hasVision && enemyController.aiState == AiState.Attacking) {
-            enemyController.hidingLogic.GetHidingPosition(character.transform.position);
+            enemyController.hidingLogic.GetHidingPosition(character.transform.position, character);
             enemyController.aiState = AiState.Hiding;
-        } else if(hasVision && enemyController.aiState == AiState.Hiding) {
+        } else if (hasVision && enemyController.aiState == AiState.Hiding) {
 
         }
-
-
     }
+
+    void ChangeOpponent() {
+        opponent = GetOpponent();
+        if (opponent != null) {
+            enemyController.enemy.GetAimPosition().LockOnTarget2(opponent, !enemyController.enemy.IsAiming());
+            if (enemyController.aiState != AiState.Chasing && !Methods.HasVisionOnCharacter(out Character newOpponent, enemyController, opponent)) {
+                enemyController.aiState = AiState.Chasing;
+            } else if (enemyController.aiState != AiState.Hiding) {
+                enemyController.aiState = AiState.Hiding;
+            }
+        } else {
+        }
+    }
+
     void VisionGained(object sender, EventArgs args) {
+        if (!Methods.HasAimOnOpponent(out Character character, enemyController) && timeSinceLastOpponentChange > 4f) {
+            ChangeOpponent();
+        }
     }
     void VisionLost(object sender, EventArgs args) {
     }
