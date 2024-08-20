@@ -699,7 +699,8 @@ MonoBehaviour:
   isAiming: 0
   isCrouching: 0
   stunned: 0
-  health: 200
+  _health: 800
+  _maxHealth: 800
   detectionPoints:
   - {fileID: 8056032063288288747}
   enemyController: {fileID: 1319538167934939892}

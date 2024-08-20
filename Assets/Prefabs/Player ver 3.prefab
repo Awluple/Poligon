@@ -2601,7 +2601,8 @@ MonoBehaviour:
   isAiming: 0
   isCrouching: 0
   stunned: 0
-  health: 100
+  _health: 10000
+  _maxHealth: 10000
   detectionPoints:
   - {fileID: 8351096138420546127}
   jumpStrength: 14

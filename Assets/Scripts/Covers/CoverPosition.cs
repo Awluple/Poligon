@@ -21,7 +21,7 @@ public class CoverPosition : Cover
             Material myMaterial = GetComponent<Renderer>().material;
             Color ocupp = new Color(0.4f, 0.9f, 0.7f, 1.0f);
             Color free = new Color(0.7f, 0.3f, 0.5f, 1.0f);
-            if (occuped == false) {
+            if (value == false) {
                 occupedBy = null;
                 myMaterial.color = free;
             } else {

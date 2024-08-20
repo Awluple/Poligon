@@ -87,7 +87,7 @@ public class EnemyController : MonoBehaviour, IAICharacterController, IStateMana
         PatrollingState patrolling = new(this);
         HidingState hiding = new(this);
         BehindCoverState behindCover = new(this);
-        AttackingState attacking = new(this);
+        StationaryAttackState attacking = new(this);
         ChasingState chasing = new(this);
         SearchingState searching = new(this);
 
@@ -103,23 +103,24 @@ public class EnemyController : MonoBehaviour, IAICharacterController, IStateMana
 
             { new StateTransition<AiState>(AiState.Patrolling, AiState.None), none },
             { new StateTransition<AiState>(AiState.Patrolling, AiState.Hiding), hiding },
-            { new StateTransition<AiState>(AiState.Patrolling, AiState.Attacking), attacking },
+            { new StateTransition<AiState>(AiState.Patrolling, AiState.StationaryAttacking), attacking },
             { new StateTransition<AiState>(AiState.Patrolling, AiState.Chasing), chasing },
 
 
-            { new StateTransition<AiState>(AiState.Hiding, AiState.Attacking), attacking },
+            { new StateTransition<AiState>(AiState.Hiding, AiState.StationaryAttacking), attacking },
             { new StateTransition<AiState>(AiState.Hiding, AiState.BehindCover), behindCover },
             { new StateTransition<AiState>(AiState.Hiding, AiState.Chasing), chasing },
 
 
-            { new StateTransition<AiState>(AiState.BehindCover, AiState.Attacking), attacking },
+            { new StateTransition<AiState>(AiState.BehindCover, AiState.StationaryAttacking), attacking },
             { new StateTransition<AiState>(AiState.BehindCover, AiState.Chasing), chasing },
 
-            { new StateTransition<AiState>(AiState.Attacking, AiState.Chasing), chasing },
-            { new StateTransition<AiState>(AiState.Attacking, AiState.BehindCover), behindCover },
+            { new StateTransition<AiState>(AiState.StationaryAttacking, AiState.Chasing), chasing },
+            { new StateTransition<AiState>(AiState.StationaryAttacking, AiState.Hiding), hiding },
+            { new StateTransition<AiState>(AiState.StationaryAttacking, AiState.BehindCover), behindCover },
 
             { new StateTransition<AiState>(AiState.Chasing, AiState.Hiding), hiding },
-            { new StateTransition<AiState>(AiState.Chasing, AiState.Attacking), attacking },
+            { new StateTransition<AiState>(AiState.Chasing, AiState.StationaryAttacking), attacking },
             { new StateTransition<AiState>(AiState.Chasing, AiState.Patrolling), patrolling },
             { new StateTransition<AiState>(AiState.Chasing, AiState.Searching), searching },
 

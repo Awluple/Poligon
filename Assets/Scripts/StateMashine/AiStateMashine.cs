@@ -31,6 +31,7 @@ namespace Poligon.Ai {
         Dictionary<StateTransition<T>, State<T>> transitions;
         public State<T> CurrentState { get; private set; }
         IStateManager stateManager;
+        
 
         public void SetupTransitions(Dictionary<StateTransition<T>, State<T>> transitionsToSetup) {
             transitions = transitionsToSetup;
@@ -47,8 +48,6 @@ namespace Poligon.Ai {
             State<T> nextState;
             if (!transitions.TryGetValue(transition, out nextState))
                 throw new Exception("Invalid transition: " + CurrentState.state + " -> " + command);
-
-            //Debug.Log("Tansition from: " + CurrentState + " to: " + nextState);
             return nextState;
         }
 

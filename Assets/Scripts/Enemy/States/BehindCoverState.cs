@@ -28,17 +28,17 @@ namespace Poligon.Ai.EnemyStates {
         }
         public override void ExitState() {
             enemyController.OnHealthLoss -= HealthLost;
-            enemyController.StopCoroutine(checkVisionCoroutine);
-            enemyController.StopCoroutine(coveredAttackCoroutine);
+            if (checkVisionCoroutine != null) enemyController.StopCoroutine(checkVisionCoroutine);
+            if(coveredAttackCoroutine != null) enemyController.StopCoroutine(coveredAttackCoroutine);
         }
 
         private void HealthLost(object sender, BulletDataEventArgs eventArgs) {
-            enemyController.aiState = AiState.Attacking;
+            enemyController.aiState = AiState.StationaryAttacking;
         }
         private IEnumerator CheckVision() {
             for (; ; ) {
                 if (Methods.HasAimOnOpponent(out Character character, enemyController, 40f)) {
-                    enemyController.aiState = AiState.Attacking;
+                    enemyController.aiState = AiState.StationaryAttacking;
                 }
                 yield return new WaitForSeconds(0.2f);
             }
@@ -48,7 +48,7 @@ namespace Poligon.Ai.EnemyStates {
 
             for (; ; ) {
                 yield return new WaitForSeconds(Random.Range(4f, 8f));
-                enemyController.aiState = AiState.Attacking;
+                enemyController.aiState = AiState.StationaryAttacking;
                 //    if (Methods.HasAimOnOpponent(out Character character, enemyController)) {
                 //        enemyController.aiState = AiState.Attacking;
                 //        goto End;

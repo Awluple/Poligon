@@ -15,7 +15,8 @@ public class Enemy : Character, ISquadMember {
     public Squad squad { get; set; }
 
     // Start is called before the first frame update
-    void Awake() {
+    protected override void Awake() {
+        base.Awake();
         enemyController.OnRunStart += StartRun;
         enemyController.OnRunCancel += CancelRun;
 

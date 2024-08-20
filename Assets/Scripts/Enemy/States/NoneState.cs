@@ -10,7 +10,7 @@ namespace Poligon.Ai.EnemyStates {
         BehindCover,
         Hiding,
         Chasing,
-        Attacking,
+        StationaryAttacking,
         Searching
     }
 

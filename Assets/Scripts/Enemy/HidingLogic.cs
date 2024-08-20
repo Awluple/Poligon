@@ -1,3 +1,4 @@
+using Poligon.EvetArgs;
 using System;
 using System.Linq;
 using UnityEngine;
@@ -15,33 +16,46 @@ public class HidingLogic : MonoBehaviour {
 
     [SerializeField] HidingCollisionSphere hidingSphere;
 
-    private Mesh mesh;
+    //private Mesh mesh;
 
     private LineRenderer pathLine;
 
     public CoverPosition currentCoverPosition { get; private set; }
 
+    private bool achievedPosition = false;
+
+    private void Update() {
+        if (currentCoverPosition && achievedPosition && Vector3.Distance(character.transform.position, currentCoverPosition.transform.position) > 1f) {
+            currentCoverPosition.occuped = false;
+            currentCoverPosition = null;
+        } else if (currentCoverPosition && Vector3.Distance(character.transform.position, currentCoverPosition.transform.position) < 1f) {
+            achievedPosition = true;
+        }
+    }
 
     private void Awake() {
         agent = gameObject.transform.parent.GetComponent<NavMeshAgent>();
-        mesh = new Mesh();
+        //mesh = new Mesh();
         player = FindObjectOfType<Player>();
 
-        NavMeshTriangulation navmeshData = NavMesh.CalculateTriangulation();
+        //NavMeshTriangulation navmeshData = NavMesh.CalculateTriangulation();
 
-        mesh.SetVertices(navmeshData.vertices.ToList());
-        mesh.SetIndices(navmeshData.indices, MeshTopology.Triangles, 0);
+        //mesh.SetVertices(navmeshData.vertices.ToList());
+        //mesh.SetIndices(navmeshData.indices, MeshTopology.Triangles, 0);
 
         character = GetComponentInParent<Character>();
         hidingSphere = character.GetComponentInChildren<HidingCollisionSphere>();
+        character.OnDeath += (object sender, CharacterEventArgs args) => { if(currentCoverPosition != null) currentCoverPosition.occuped = false; };
 
+    }
 
+    private void Start() {
         pathLine = gameObject.AddComponent<LineRenderer>();
         pathLine.startWidth = 0.2f;
         pathLine.endWidth = 0.2f;
         pathLine.positionCount = 0;
-
     }
+
     /// <summary>
     /// Calculates path to the cover position
     /// </summary>
@@ -124,6 +138,7 @@ public class HidingLogic : MonoBehaviour {
                 currentCoverPosition = coverPosition;
                 currentCoverPosition.occuped = true;
                 currentCoverPosition.occupedBy = character;
+                achievedPosition = false;
                 return cover.transform.position;
             }
         }

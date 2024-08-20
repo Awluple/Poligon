@@ -84,9 +84,10 @@ public class AttackingLogic : MonoBehaviour {
     }
     private void OpponentDeath(object sender, CharacterEventArgs args) {
         args.character.OnDeath -= OpponentDeath;
-        if (enemyController.aiState == AiState.Chasing || enemyController.aiState == AiState.Searching) {
-            ChangeOpponent();
-        }
+        //if (enemyController.aiState == AiState.Chasing || enemyController.aiState == AiState.Searching) {
+        //    ChangeOpponent();
+        //}
+        ChangeOpponent();
     }
     private void UpdateLastKnownPosition(Character character, Vector3 newPosition) {
         enemyController.enemy.squad.UpdateLastKnownPosition(new LastKnownPosition(character, newPosition));
@@ -100,7 +101,7 @@ public class AttackingLogic : MonoBehaviour {
         if (!hasVision && enemyController.aiState != AiState.Chasing) {
             enemyController.enemy.GetAimPosition().LockOnTarget(opponent, !enemyController.enemy.IsAiming());
             enemyController.aiState = AiState.Chasing;
-        } else if (hasVision && enemyController.aiState == AiState.Attacking) {
+        } else if (hasVision && enemyController.aiState == AiState.StationaryAttacking) {
             enemyController.hidingLogic.GetHidingPosition(character.transform.position, character);
             enemyController.aiState = AiState.Hiding;
         } else if (hasVision && enemyController.aiState == AiState.Hiding) {

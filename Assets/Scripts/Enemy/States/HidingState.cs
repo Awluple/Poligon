@@ -96,7 +96,7 @@ namespace Poligon.Ai.EnemyStates {
                 }
                 enemyController.aiState = AiState.BehindCover;
             } else {
-                enemyController.aiState = AiState.Attacking;
+                enemyController.aiState = AiState.StationaryAttacking;
             }
         }
         bool IsPathWithinDistance(Vector3 targetPosition, float maxDistance) {

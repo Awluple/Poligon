@@ -47,6 +47,9 @@ public class Player : Character {
         originalStepOffset = characterController.stepOffset;
 
     }
+    protected override void Awake() { 
+        base.Awake();
+    }
 
 
     // Update is called once per frame

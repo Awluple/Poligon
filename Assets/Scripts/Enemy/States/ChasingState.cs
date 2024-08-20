@@ -26,7 +26,8 @@ namespace Poligon.Ai.EnemyStates {
                 enemyController.enemy.GetAimPosition().Reposition(enemyController.enemy.squad.GetCharacterLastPosition(enemyController.attackingLogic.opponent).position);
                 enemyController.AimStart();
                 enemyController.CrouchCancel();
-                enemyController.SetNewDestinaction(coverPosition.transform.position);
+                //enemyController.SetNewDestinaction(coverPosition.transform.position);
+                enemyController.SetNewDestinaction(enemyController.enemy.squad.GetCharacterLastPosition(enemyController.attackingLogic.opponent).position);
 
             } else {
                 chasingCoroutine = ChasingCoroutine();
@@ -34,7 +35,7 @@ namespace Poligon.Ai.EnemyStates {
                 enemyController.OnFinalPositionEvent += Search;
             }
 
-            enemyController.enemy.GetAimPosition().OnLineOfSight += Hide;
+            enemyController.enemy.GetAimPosition().OnLineOfSight += EnemyFound;
         }
         private void Search(object sender, EventArgs e) {
             enemyController.aiState = AiState.Searching;
@@ -42,21 +43,23 @@ namespace Poligon.Ai.EnemyStates {
         }
         public override void ExitState() {
             enemyController.StopCoroutine(movingAttackCoroutine);
-            enemyController.enemy.GetAimPosition().OnLineOfSight -= Hide;
+            enemyController.enemy.GetAimPosition().OnLineOfSight -= EnemyFound;
         }
 
-        private void Hide(object sender, CharacterEventArgs args) {
-            if(args.character != enemyController.attackingLogic.opponent && UnityEngine.Random.Range(0, 5) > 5) {
+        private void EnemyFound(object sender, CharacterEventArgs args) {
+            if(args.character != enemyController.attackingLogic.opponent) {
                 enemyController.attackingLogic.opponent = args.character;
             }
-            enemyController.hidingLogic.GetHidingPosition(enemyController.attackingLogic.opponent.transform.position, enemyController.enemy);
-            enemyController.aiState = AiState.Hiding;
+            //enemyController.hidingLogic.GetHidingPosition(enemyController.attackingLogic.opponent.transform.position, enemyController.enemy);
+            if(UnityEngine.Random.Range(0, 10) > 6) { enemyController.CrouchStart(); }
+            enemyController.SetNewDestinaction(enemyController.transform.position);
+            enemyController.aiState = AiState.StationaryAttacking;
         }
 
         public IEnumerator ChasingCoroutine() {
             for (; ; ) {
-                if(enemyController.enemy.squad.GetChasingLocation().position != Vector3.zero) {
-                    enemyController.SetNewDestinaction(enemyController.enemy.squad.GetChasingLocation().position);
+                if(enemyController.enemy.squad.GetCharacterLastPosition(enemyController.attackingLogic.opponent).position != Vector3.zero) {
+                    enemyController.SetNewDestinaction(enemyController.enemy.squad.GetCharacterLastPosition(enemyController.attackingLogic.opponent).position);
                     enemyController.RunStart();
                     enemyController.StopCoroutine(chasingCoroutine);
                 }

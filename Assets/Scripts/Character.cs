@@ -37,7 +37,17 @@ public abstract class Character : MonoBehaviour, IKillable {
 
     private bool lastFrameMoving = false;
 
-    [SerializeField] protected float health = 100;
+
+    [SerializeField] protected float _health = 100;
+    [SerializeField] protected float _maxHealth = 100;
+    public float health {
+        get { return _health; }
+        private set { _health = value; }
+    }
+    public float maxHealth {
+        get { return _maxHealth; }
+        private set { _maxHealth = value; }
+    }
 
     public DetectionPoint[] detectionPoints;
 
@@ -86,6 +96,9 @@ public abstract class Character : MonoBehaviour, IKillable {
             if (OnMovingEnd != null) OnMovingEnd(this, EventArgs.Empty);
         }
         lastFrameMoving = isWalking || isRunning;
+    }
+    protected virtual void Awake() {
+        maxHealth = health;
     }
 
     //public event Vector2EventHandler OnAimingWalk;
@@ -264,13 +277,11 @@ public abstract class Character : MonoBehaviour, IKillable {
         if (OnHealthLoss != null) OnHealthLoss(this, new BulletDataEventArgs(bulletData));
 
         if (health <= 0) {
-            Debug.Log("Destroying: " + gameObject.name);
             if (OnDeath != null) OnDeath(this, new CharacterEventArgs(this));
             OnDeath = null;
             Destroy(rig);
             rig = null;
             Destroy(gameObject);
-            Debug.Log("Dead: " + gameObject.name);
         }
     }
 

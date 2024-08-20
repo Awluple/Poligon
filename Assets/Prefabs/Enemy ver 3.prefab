@@ -501,7 +501,6 @@ MonoBehaviour:
   aimingAtCharacter: 0
   alerted: 0
   alertedMaxDistance: 40
-  sightEventsCalled: 0
 --- !u!1 &858184380083284765
 GameObject:
   m_ObjectHideFlags: 0
@@ -2901,7 +2900,8 @@ MonoBehaviour:
   isAiming: 0
   isCrouching: 0
   stunned: 0
-  health: 200
+  _health: 800
+  _maxHealth: 800
   detectionPoints:
   - {fileID: 8351096138420546127}
   enemyController: {fileID: 1793394347641943726}

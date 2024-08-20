@@ -11,7 +11,7 @@ public class EnemyAimPosition : AimPosition {
     [SerializeField] Enemy enemy;
     public bool aimingAtCharacter = false;
     public bool alerted = false;
-    public float alertedMaxDistance = 40f;
+    public float alertedMaxDistance = 55f;
 
     public event EventHandler<CharacterEventArgs> OnLineOfSight;
     public event EventHandler OnLineOfSightLost;
