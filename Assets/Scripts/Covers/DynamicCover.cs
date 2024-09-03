@@ -1,9 +1,11 @@
 using System.Collections.Generic;
 using System.Linq;
+using UnityEditor.PackageManager;
 using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.TextCore.Text;
-
+using static UnityEngine.Rendering.DebugUI;
+using static UnityEngine.UI.Image;
 
 /// <summary>
 /// Holds information about NavMesh edge
@@ -11,6 +13,7 @@ using UnityEngine.TextCore.Text;
 public struct Edge {
     public Vector3 point1;
     public Vector3 point2;
+    public Vector3 forward;
     public float distance;
 
     public Edge(Vector3 v1, Vector3 v2) {
@@ -22,6 +25,7 @@ public struct Edge {
             point2 = v1;
         }
         distance = Vector3.Distance(v1, v2);
+        forward = Vector3.zero;
     }
     public override bool Equals(object obj) {
         if (!(obj is Edge))
@@ -94,6 +98,10 @@ public class NavMeshBorderExtractor {
     /// </summary>
     /// <returns>List of edges next to buildings</returns>
     public List<Edge> FilterEdges() {
+
+        var buildingsLayer = LayerMask.NameToLayer("Buildings");
+
+
         if (triangles == null) {
             GetNavMeshTriangles();
         }
@@ -110,7 +118,22 @@ public class NavMeshBorderExtractor {
                     EdgeBorderComparer comparer = new EdgeBorderComparer();
                     if (hitColliders.Intersect(hitColliders2, comparer).ToArray().Length > 0 ||
                         hitColliders2.Intersect(hitColliders3, comparer).ToArray().Length > 0) {
-                        edges.Add(triangle[i]);
+                        middlePoint.y -= 1f;
+
+                        //attempt to find the forward direction of an edge
+
+                        float extraHeight = 0f;
+                        float maxDistance = 0.7f;
+                        while (triangle[i].forward == Vector3.zero && extraHeight < 1.6f) {
+                            Vector3 startPoint = triangle[i].point1;
+                            startPoint.y += extraHeight;
+                            middlePoint.y += extraHeight;
+                            triangle[i].forward = GetForwardDirectionNormalized(startPoint, middlePoint, maxDistance, layerMask);
+                            extraHeight += 0.2f;
+                            maxDistance += 0.1f;
+                        }
+                        if(triangle[i].forward != Vector3.zero) edges.Add(triangle[i]);
+
                     }
                 }
 
@@ -118,6 +141,54 @@ public class NavMeshBorderExtractor {
         }
         return edges;
     }
+    /// <summary>
+    /// Get normalized direction of 90 degree relative to start point and end point where RayCast hit object on layerMask
+    /// </summary>
+    /// <param name="start">The start of a line</param>
+    /// <param name="end">The end of a line</param>
+    /// <param name="distance">The distance for raycast</param>
+    /// <param name="layerMask">Layers to seek collision</param>
+    /// <returns>Normalized Vector3 direction or Vector3.zero if no raycast hits</returns>
+    public Vector3 GetForwardDirectionNormalized(Vector3 start, Vector3 end, float distance, LayerMask layerMask) {
+        var (directionA, directionB) = GetPerpendicularDirectionsNormalized(start, end);
+        var rayA = Physics.Raycast(new Ray(end, directionA), out RaycastHit hitA, distance, layerMask);
+        var rayB = Physics.Raycast(new Ray(end, directionB), out RaycastHit hitB, distance, layerMask);
+
+        if (rayA && rayB) {
+            if (Vector3.Distance(hitA.point, end) < Vector3.Distance(hitB.point, end)) {
+                return directionB;
+            } else {
+                return directionA;
+            }
+        } else if (rayA) {
+            return directionA;
+        } else if (rayB) {
+            return directionB;
+        }
+        return Vector3.zero;
+    }
+    /// <summary>
+    /// Get two normalised directions of 90 degree relative to pointA and pointB 
+    /// </summary>
+    /// <param name="pointA">The start of a line</param>
+    /// <param name="pointB">The end of a line</param>
+    /// <returns>Two normalised Vector3 directions</returns>
+    public (Vector3, Vector3) GetPerpendicularDirectionsNormalized(Vector3 pointA, Vector3 pointB) {
+        // Calculate direction vector from A to B
+        Vector3 direction = (pointB - pointA).normalized;
+
+        // Create a perpendicular vector
+        Vector3 perpendicular = Vector3.Cross(direction, Vector3.up).normalized;
+
+        // If the result is zero (direction is parallel to Vector3.up), use Vector3.forward instead
+        if (perpendicular == Vector3.zero) {
+            perpendicular = Vector3.Cross(direction, Vector3.forward).normalized;
+        }
+
+        // Return both perpendicular directions
+        return (perpendicular, -perpendicular);
+    }
+
     /// <summary>
     /// Retrieves points from Edges
     /// </summary>
@@ -161,6 +232,8 @@ public class NavMeshBorderExtractor {
 public class DynamicCover : MonoBehaviour {
     private NavMeshTriangulation navMeshData;
     private NavMeshBorderExtractor extractor;
+    private Character character;
+    private NavMeshAgent agent;
     List<Edge> edges = new();
 
     void Start() {
@@ -186,29 +259,68 @@ public class DynamicCover : MonoBehaviour {
             e2.y += 1f;
             Color color = edge.distance > .5f ? Color.red : Color.blue;
             Debug.DrawLine(e1, e2, color, 50f);
+            Debug.DrawRay(NavMeshBorderExtractor.GetMiddlePoint(e1, e2), edge.forward, Color.green, 100f);
         }
     }
-    //bool CheckEdge(Edge edge) {
+    bool isCloseCover(Vector3 position, float maxCoverDistance, out NavMeshPath path) {
+        path = new NavMeshPath();
 
-    //    //Vector3 edgeDirection = (edge.vertex2 - edge.vertex1).normalized;
+        if (!agent.CalculatePath(position, path)) {
+            return false;
+        }
+        float distance = 0;
+        for (int i = 0; i < path.corners.Length; i++) {
+            if (i + 1 > path.corners.Length - 1) break;
+            distance += Vector3.Distance(path.corners[i], path.corners[i + 1]);
+        }
+        return distance < maxCoverDistance;
+    }
+    //void CheckEdge(List<Edge> edges, Vector3 hidingSourcePosition, Character character, Vector3? originPosition = null,
+    //    bool closestCover = true, bool ignoreDot = false, float minDistanceFromSource = 8f, float maxCoverPathDistance = 20f, float maxSearchDistance = 21f) {
+    //    var sorted = edges.OrderBy(e => (e.point1 - character.transform.position).sqrMagnitude).ToList();
+    //    Vector3 originPos = Vector3.zero;
+    //    if (originPosition == null) originPos = transform.position;
+    //    else { originPos = originPosition.GetValueOrDefault(); }
+        
+    //    foreach (var edge in sorted) {
+    //        Vector3 middlePoint = NavMeshBorderExtractor.GetMiddlePoint(edge.point1, edge.point2);
+    //        if (Vector3.Distance(originPos, middlePoint) > maxSearchDistance) { continue; };
 
-    //    Vector3 edgeMidpoint = GetMiddlePoint(edge.point1, edge.point2);
-    //    Vector3 playerToEdge = (edgeMidpoint - player.position).normalized;
 
-    //    //float angle = Vector3.Angle(playerToEdge, edgeDirection);
+    //        Vector3 direction = Vector3.Normalize(hidingSourcePosition - middlePoint);
+    //        //float dotToTarget = Vector3.Dot(middlePoint.transform.forward, direction);
 
-    //    // Check if the wall (edge) is facing away from the player (angle > 90)
-    //    //if (angle > 90f) {
-    //    //    // Perform a raycast to see if the player has line of sight to the edge
+    //        if (Vector3.Distance(hidingSourcePosition, middlePoint) > minDistanceFromSource &&  isCloseCover(middlePoint, maxCoverPathDistance, out NavMeshPath path)) {
 
-    //    //}
-    //    if (Physics.Raycast(player.position, playerToEdge, out RaycastHit hit, Vector3.Distance(player.position, edgeMidpoint))) {
-    //        edge.point1.y += 1f;
-    //        edge.point2.y += 1f;
-    //        Debug.DrawLine(edge.point1, edge.point2, Color.green, 100.0f); 
-    //        return true;
+    //            //Vector3 towards = Vector3.RotateTowards(transform.forward, hidingSourcePosition - transform.position, 999f, 999f);
+    //            //Debug.DrawRay(transform.position, towards * 10, Color.red, 40f);
+
+    //            Vector3 vectorTowardsSource = Vector3.RotateTowards(transform.forward, hidingSourcePosition - transform.position, 999f, 999f);
+
+    //            Vector3 directionToMe = Vector3.Normalize(transform.position - middlePoint);
+    //            //float dotToMe = Vector3.Dot(cover.transform.forward, directionToMe);
+
+    //            if (!ignoreDot && Vector3.Angle(vectorTowardsSource, cover.transform.position - transform.position) < 60) {
+    //                if (!(dotToTarget > 0.6f && dotToMe < 0.25f)) {
+    //                    continue;
+    //                }
+    //            }
+    //            // Draw path for debug
+    //            pathLine.positionCount = path.corners.Length;
+    //            pathLine.SetPosition(0, transform.position);
+    //            for (int i = 1; i < path.corners.Length; i++) {
+    //                pathLine.SetPosition(i, path.corners[i]);
+    //            }
+
+    //            if (currentCoverPosition != null) currentCoverPosition.occuped = false;
+    //            currentCoverPosition = coverPosition;
+    //            currentCoverPosition.occuped = true;
+    //            currentCoverPosition.occupedBy = character;
+    //            achievedPosition = false;
+    //            return cover.transform.position;
+    //        }
     //    }
-    //    return false;
+
     //}
 
     private void OnDrawGizmos() {
