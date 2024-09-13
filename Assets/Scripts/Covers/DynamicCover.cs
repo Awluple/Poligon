@@ -1,5 +1,10 @@
+using NUnit.Framework;
+using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
+using UnityEditor.Build;
 using UnityEditor.PackageManager;
 using UnityEngine;
 using UnityEngine.AI;
@@ -11,12 +16,16 @@ using static UnityEngine.UI.Image;
 /// Holds information about NavMesh edge
 /// </summary>
 public struct Edge {
+    public int id;
     public Vector3 point1;
     public Vector3 point2;
+    public Vector3 middle;
     public Vector3 forward;
     public float distance;
+    public int maxCapacity;
+    public List<Character> currentOccupants;
 
-    public Edge(Vector3 v1, Vector3 v2) {
+    public Edge(Vector3 v1, Vector3 v2, int id) {
         if (v1.x < v2.x || (v1.x == v2.x && v1.z < v2.z)) {
             point1 = v1;
             point2 = v2;
@@ -24,8 +33,15 @@ public struct Edge {
             point1 = v2;
             point2 = v1;
         }
+        this.id = id;
+        middle = GetMiddlePoint(v1, v2);
         distance = Vector3.Distance(v1, v2);
         forward = Vector3.zero;
+        maxCapacity = 0;
+        currentOccupants = new();
+    }
+    public static Vector3 GetMiddlePoint(Vector3 point1, Vector3 point2) {
+        return point2 + (point1 - point2) / 2f;
     }
     public override bool Equals(object obj) {
         if (!(obj is Edge))
@@ -78,26 +94,12 @@ public class EdgeBorderComparer : EqualityComparer<Collider> {
 /// </summary>
 public class NavMeshBorderExtractor {
     List<Edge[]> triangles;
-    public List<Vector3> GetPoints() {
-        List<Vector3> borderPoints = GetNavMeshPoints(GetEdges());
-        return borderPoints;
-    }
-
-    public List<Edge> GetEdges() {
-        List<Edge> allEdges = new List<Edge>();
-        if (triangles == null) {
-            GetNavMeshTriangles();
-        }
-        return allEdges;
-    }
-    public static Vector3 GetMiddlePoint(Vector3 point1, Vector3 point2) {
-        return point2 + (point1 - point2) / 2f;
-    }
+    
     /// <summary>
     /// Filter out edges that are not next to some building object
     /// </summary>
     /// <returns>List of edges next to buildings</returns>
-    public List<Edge> FilterEdges() {
+    public Dictionary<int,Edge> FilterEdges() {
 
         var buildingsLayer = LayerMask.NameToLayer("Buildings");
 
@@ -105,35 +107,42 @@ public class NavMeshBorderExtractor {
         if (triangles == null) {
             GetNavMeshTriangles();
         }
-        int layerMask = (1 << 10);
-        List<Edge> edges = new List<Edge>();
+        int buildingsLayerMask = (1 << 10);
+        int groundLayerMask = (1 << 6) | (1 << 10);
+        Dictionary<int, Edge> edges = new Dictionary<int, Edge>();
         foreach (var triangle in triangles) {
             for (int i = 0; i < triangle.Length; i++) {
-                Collider[] hitColliders = Physics.OverlapBox(triangle[i].point1, new Vector3(1.2f, 1.2f, 1.2f) / 2, Quaternion.identity, layerMask);
-                Collider[] hitColliders2 = Physics.OverlapBox(triangle[i].point2, new Vector3(1.2f, 1.2f, 1.2f) / 2, Quaternion.identity, layerMask);
-                Vector3 middlePoint = GetMiddlePoint(triangle[i].point1, triangle[i].point2);
+                Collider[] hitColliders = Physics.OverlapBox(triangle[i].point1, new Vector3(1.2f, 1.2f, 1.2f) / 2, Quaternion.identity, buildingsLayerMask);
+                Collider[] hitColliders2 = Physics.OverlapBox(triangle[i].point2, new Vector3(1.2f, 1.2f, 1.2f) / 2, Quaternion.identity, buildingsLayerMask);
+                Vector3 middlePoint = triangle[i].middle;
                 middlePoint.y += 1f; // increase height in case that a building has floor 
-                Collider[] hitColliders3 = Physics.OverlapBox(middlePoint, new Vector3(1.2f, 1.2f, 1.2f) / 2, Quaternion.identity, layerMask);
+                Collider[] hitColliders3 = Physics.OverlapBox(middlePoint, new Vector3(1.2f, 1.2f, 1.2f) / 2, Quaternion.identity, buildingsLayerMask);
                 if (hitColliders.Length > 0 && hitColliders2.Length > 0 && hitColliders3.Length > 0) {
                     EdgeBorderComparer comparer = new EdgeBorderComparer();
                     if (hitColliders.Intersect(hitColliders2, comparer).ToArray().Length > 0 ||
                         hitColliders2.Intersect(hitColliders3, comparer).ToArray().Length > 0) {
                         middlePoint.y -= 1f;
 
-                        //attempt to find the forward direction of an edge
 
+                        if (!Physics.Raycast(middlePoint, Vector3.down, 1.2f, groundLayerMask)) {// Remove flying edges
+                            continue;
+                        }
+                        //attempt to find the forward direction of an edge
                         float extraHeight = 0f;
                         float maxDistance = 0.7f;
-                        while (triangle[i].forward == Vector3.zero && extraHeight < 1.6f) {
+                        while (triangle[i].forward == Vector3.zero && extraHeight < 1.2f) {
                             Vector3 startPoint = triangle[i].point1;
                             startPoint.y += extraHeight;
                             middlePoint.y += extraHeight;
-                            triangle[i].forward = GetForwardDirectionNormalized(startPoint, middlePoint, maxDistance, layerMask);
+                            triangle[i].forward = GetForwardDirectionNormalized(startPoint, middlePoint, maxDistance, buildingsLayerMask);
                             extraHeight += 0.2f;
                             maxDistance += 0.1f;
                         }
-                        if(triangle[i].forward != Vector3.zero) edges.Add(triangle[i]);
-
+                        if (triangle[i].forward != Vector3.zero) {
+                            triangle[i].maxCapacity = (int)Mathf.Floor(triangle[i].distance / 1.2f);
+                            edges.Add(triangle[i].id, triangle[i]);
+                        } 
+                        
                     }
                 }
 
@@ -208,7 +217,6 @@ public class NavMeshBorderExtractor {
     /// <returns>List of NavMesh triangles</returns>
     public List<Edge[]> GetNavMeshTriangles() {
         NavMeshTriangulation navMeshData = NavMesh.CalculateTriangulation();
-
         List<Edge[]> triangles = new List<Edge[]>();
         for (int i = 0; i < navMeshData.indices.Length; i += 3) {
             int index1 = navMeshData.indices[i];
@@ -217,9 +225,10 @@ public class NavMeshBorderExtractor {
 
             Edge[] triangle = new Edge[]
             {
-                new Edge(navMeshData.vertices[index1], navMeshData.vertices[index2]),
-                new Edge(navMeshData.vertices[index2], navMeshData.vertices[index3]),
-                new Edge(navMeshData.vertices[index3], navMeshData.vertices[index1])
+                new Edge(navMeshData.vertices[index1], navMeshData.vertices[index2], i-2),
+                new Edge(navMeshData.vertices[index2], navMeshData.vertices[index3], i-1),
+                new Edge(navMeshData.vertices[index3], navMeshData.vertices[index1], i)
+
             };
             triangles.Add(triangle);
         }
@@ -233,115 +242,222 @@ public class DynamicCover : MonoBehaviour {
     private NavMeshTriangulation navMeshData;
     private NavMeshBorderExtractor extractor;
     private Character character;
-    private NavMeshAgent agent;
-    List<Edge> edges = new();
+    Dictionary<int, Edge> edges = new();
 
     void Start() {
         navMeshData = NavMesh.CalculateTriangulation();
         extractor = new NavMeshBorderExtractor();
+        edges = extractor.FilterEdges();
     }
 
     void Update() {
         if (Input.GetKeyDown(KeyCode.C))
         {
-            if (edges.Count == 0) {
-                edges = extractor.FilterEdges();
-            }
-            ShowEdges();
+            //if (edges.Count == 0) {
+            //    edges = extractor.FilterEdges();
+            //}
+            //ShowEdges();
         }
     }
-
+    /// <summary>
+    /// Add a character to a cover edge
+    /// </summary>
+    /// <param name="id">Id of an  edge</param>
+    /// <param name="character">Character to add</param>
+    /// <returns>True if character is successfully added, otherwise false</returns>
+    public bool Subscribe(int id, Character character) {
+        Edge edge = edges[id];
+        if(edge.currentOccupants.Count >= edge.maxCapacity) return false;
+        edge.currentOccupants.Add(character);
+        return true;
+    }
+    /// <summary>
+    /// Remove a character from a cover edge
+    /// </summary>
+    /// <param name="id">Id of an  edge</param>
+    /// <param name="character">Character to remove</param>
+    /// <returns>true if character is successfully removed; otherwise, false. This method also returns false if item was not found in the </returns>
+    public bool UnSubscribe(int id, Character character) {
+        Edge edge = edges[id];
+        return edge.currentOccupants.Remove(character);
+    }
+    /// <summary>
+    /// Shows edges for debug
+    /// </summary>
     void ShowEdges() {
-        foreach (var edge in edges) {
+        foreach (var edge in edges.Values) {
             var e1 = edge.point1;
             e1.y += 1f;
             var e2 = edge.point2;
             e2.y += 1f;
             Color color = edge.distance > .5f ? Color.red : Color.blue;
             Debug.DrawLine(e1, e2, color, 50f);
-            Debug.DrawRay(NavMeshBorderExtractor.GetMiddlePoint(e1, e2), edge.forward, Color.green, 100f);
+            Debug.DrawRay(edge.middle, edge.forward, Color.green, 100f);
         }
     }
-    bool isCloseCover(Vector3 position, float maxCoverDistance, out NavMeshPath path) {
-        path = new NavMeshPath();
-
-        if (!agent.CalculatePath(position, path)) {
-            return false;
-        }
-        float distance = 0;
-        for (int i = 0; i < path.corners.Length; i++) {
-            if (i + 1 > path.corners.Length - 1) break;
-            distance += Vector3.Distance(path.corners[i], path.corners[i + 1]);
-        }
-        return distance < maxCoverDistance;
+    /// <summary>
+    /// Get covers close to a position.
+    /// </summary>
+    /// <param name="position">Position where to seek close covers</param>
+    /// <param name="agent">Navmesh agent for path calculation</param>
+    /// <param name="absoluteDistance">Maximum distance to covers in straight line</param>
+    /// <param name="pathingDistance">Maximum distance to covers that navmesh agent must travel</param>
+    /// <returns></returns>
+    public async Awaitable<List<Edge>> GetCovers(Vector3 position, NavMeshAgent agent, float absoluteDistance = 25f, float pathingDistance = 20f) {
+        var absolute = await GetAboluteCloseCovers(position, absoluteDistance);
+        var navmesh = GetNavmeshCloseCovers(absolute, agent, position, pathingDistance);
+        return navmesh;
     }
-    //void CheckEdge(List<Edge> edges, Vector3 hidingSourcePosition, Character character, Vector3? originPosition = null,
-    //    bool closestCover = true, bool ignoreDot = false, float minDistanceFromSource = 8f, float maxCoverPathDistance = 20f, float maxSearchDistance = 21f) {
-    //    var sorted = edges.OrderBy(e => (e.point1 - character.transform.position).sqrMagnitude).ToList();
-    //    Vector3 originPos = Vector3.zero;
-    //    if (originPosition == null) originPos = transform.position;
-    //    else { originPos = originPosition.GetValueOrDefault(); }
-        
-    //    foreach (var edge in sorted) {
-    //        Vector3 middlePoint = NavMeshBorderExtractor.GetMiddlePoint(edge.point1, edge.point2);
-    //        if (Vector3.Distance(originPos, middlePoint) > maxSearchDistance) { continue; };
 
+    public List<Edge> GetValidHidingPositions(Vector3 hidingSourcePosition, Character character, List<Edge> edges, Vector3? originPosition = null,
+        bool closestCover = true, bool ignoreDot = false, float minDistanceFromSource = 8f, float maxCoverPathDistance = 20f, float maxSearchDistance = 21f) {
+        // Get the starting point, if not provided use transform.position
+        List<Edge> validEdges = new List<Edge>();
+        Vector3 originPos = Vector3.zero;
+        if (originPosition == null) originPos = transform.position;
+        else { originPos = originPosition.GetValueOrDefault(); }
 
-    //        Vector3 direction = Vector3.Normalize(hidingSourcePosition - middlePoint);
-    //        //float dotToTarget = Vector3.Dot(middlePoint.transform.forward, direction);
+        // Sort covers by distance from origin position
+        if (closestCover) {
+            Array.Sort(edges.ToArray(), (a, b) => Vector3.Distance(a.middle, originPos).CompareTo(Vector3.Distance(b.middle, originPos)));
+        } else {
+            Array.Sort(edges.ToArray(), (a, b) => Vector3.Distance(b.middle, originPos).CompareTo(Vector3.Distance(a.middle, originPos)));
+        }
+        foreach (Edge edge in edges) {
+            if (edge.maxCapacity < 1) continue;
 
-    //        if (Vector3.Distance(hidingSourcePosition, middlePoint) > minDistanceFromSource &&  isCloseCover(middlePoint, maxCoverPathDistance, out NavMeshPath path)) {
+            Vector3 direction = Vector3.Normalize(hidingSourcePosition - edge.middle);
+            float dotToTarget = Vector3.Dot(edge.forward, direction);
 
-    //            //Vector3 towards = Vector3.RotateTowards(transform.forward, hidingSourcePosition - transform.position, 999f, 999f);
-    //            //Debug.DrawRay(transform.position, towards * 10, Color.red, 40f);
+            if (Vector3.Distance(hidingSourcePosition, edge.middle) > minDistanceFromSource && dotToTarget > 0.3f) {
 
-    //            Vector3 vectorTowardsSource = Vector3.RotateTowards(transform.forward, hidingSourcePosition - transform.position, 999f, 999f);
+                Vector3 vectorTowardsSource = Vector3.RotateTowards(edge.forward, hidingSourcePosition - originPosition.GetValueOrDefault(), 999f, 999f);
+                Vector3 directionToMe = Vector3.Normalize(originPosition.GetValueOrDefault() - edge.middle);
+                float dotToMe = Vector3.Dot(edge.forward, directionToMe);
 
-    //            Vector3 directionToMe = Vector3.Normalize(transform.position - middlePoint);
-    //            //float dotToMe = Vector3.Dot(cover.transform.forward, directionToMe);
+                if (!ignoreDot && Vector3.Angle(vectorTowardsSource, edge.middle - originPosition.GetValueOrDefault()) < 60) {
+                    if (!(dotToTarget > 0.6f && dotToMe < 0.25f)) {
+                        continue;
+                    }
+                }
+                validEdges.Add(edge);
+            }
+        }
 
-    //            if (!ignoreDot && Vector3.Angle(vectorTowardsSource, cover.transform.position - transform.position) < 60) {
-    //                if (!(dotToTarget > 0.6f && dotToMe < 0.25f)) {
-    //                    continue;
-    //                }
-    //            }
-    //            // Draw path for debug
-    //            pathLine.positionCount = path.corners.Length;
-    //            pathLine.SetPosition(0, transform.position);
-    //            for (int i = 1; i < path.corners.Length; i++) {
-    //                pathLine.SetPosition(i, path.corners[i]);
-    //            }
+        return validEdges;
+    }
+    /// <summary>
+    /// Scores cover edges and selects the best one
+    /// </summary>
+    /// <param name="hidingSourcePosition">The location of object from which to hide</param>
+    /// <param name="edges">List of edges to check</param>
+    /// <param name="agent">Navmesh agent for path calculation</param>
+    /// <returns>The best cover edge or null if nothing found</returns>
+    public Edge? GetBestPosition(Vector3 hidingSourcePosition, List<Edge> edges, NavMeshAgent agent) {
+        NavMeshPath path = new NavMeshPath();
+        List<(float, Edge)> positions = new();
+        foreach (Edge edge in edges) {
+            float points = 0;
+            agent.CalculatePath(edge.middle, path);
+            float distance = CalculatePath(path.corners);
+            points += 85 - ((distance * 10) / 3);
+            if (Vector3.Distance(hidingSourcePosition, edge.middle) < 10f) {
+                points -= 35;
+            }
+            int layerMask = (1 << 9) | (1 << 20) | (1 << 8) | (1 << 11);
+            // Check shooting positions
+            Vector3 position = edge.middle;
+            position.y += 1.8f;
+            bool hasVisionMiddle = Physics.Raycast(position, edge.forward, 7f, layerMask);
+            position = edge.point1;
+            position.y += 1.8f;
+            bool hasVision1 = Physics.Raycast(position, edge.forward, 7f, layerMask);
+            position = edge.point2;
+            position.y += 1.8f;
+            bool hasVision2 = Physics.Raycast(position, edge.forward, 7f, layerMask);
 
-    //            if (currentCoverPosition != null) currentCoverPosition.occuped = false;
-    //            currentCoverPosition = coverPosition;
-    //            currentCoverPosition.occuped = true;
-    //            currentCoverPosition.occupedBy = character;
-    //            achievedPosition = false;
-    //            return cover.transform.position;
-    //        }
-    //    }
+            if (hasVisionMiddle || hasVision1 || hasVision2) {
+                points += 50;
+            }else { // There are no easy (standing) shooting positions, check leaning from corners instead
+                position = edge.point1;
+                Vector3 direction = (edge.middle - edge.point1).normalized;
+                position = edge.point1 + direction * 1.5f;
+                position.y += 1.8f;
+                hasVision1 = Physics.Raycast(position, edge.forward, 7f, layerMask);
 
-    //}
+                position = edge.point2;
+                direction = (edge.middle - edge.point2).normalized;
+                position = edge.point2 + direction * 1.5f;
+                position.y += 1.8f;
+                hasVision2 = Physics.Raycast(position, edge.forward, 7f, layerMask);
+                if (hasVision1 || hasVision2) {
+                    points += 20;
+                }
+            }
 
-    private void OnDrawGizmos() {
+            // Check dot value to see if cover has good angle
+            Vector3 dir = Vector3.Normalize(hidingSourcePosition - edge.middle);
+            float dotToTarget = Vector3.Dot(edge.forward, dir);
+            if (dotToTarget > 0.75f) {
+                points += 50;
+            }
+            positions.Add((points, edge));
+        }
+        positions.Sort((a, b) => a.Item1.CompareTo(b.Item1));
+        if (positions.Count > 0) { 
+            return positions.Select(t => t.Item2).Last();
+        }
+        return null;
+    }
+    /// <summary>
+    /// Get close edge covers in straight line
+    /// </summary>
+    /// <param name="position">The starting position</param>
+    /// <param name="distance">Maximum distance</param>
+    /// <returns>List of clost edges</returns>
+    private async Awaitable<List<Edge>> GetAboluteCloseCovers(Vector3 position, float distance) {
+        List<Edge> filteredEdges = await Task.Run(() => {
+            return edges.Where(i => Vector3.Distance(position, i.Value.middle) < distance).Select(s => s.Value).ToList();
+        });
+        return filteredEdges;
+    }
+    /// <summary>
+    /// Calculate path from navmesh
+    /// </summary>
+    /// <param name="corners">Corners of path</param>
+    /// <returns>Distance to travel</returns>
+    private float CalculatePath(Vector3[] corners) {
+        float totalDistance = 0.0f;
 
-        //foreach (var cover in positions) {
-        //    Vector3 direction = Vector3.Normalize(player.transform.position - cover);
-        //    float distanceToPlayer = Vector3.Distance(player.transform.position, cover);
-        //    if (distanceToPlayer > 8f) {
-        //        Vector3 vectorTowardsPlayer = Vector3.RotateTowards(transform.forward, player.transform.position - transform.position, 999f, 999f);
+        for (int i = 0; i < corners.Length - 1; i++) {
+            totalDistance += Vector3.Distance(corners[i], corners[i + 1]);
+        }
+        return totalDistance;
+    }
+    /// <summary>
+    /// Get close edge covers by distance that navmesh agent needs to travel
+    /// </summary>
+    /// <param name="edges">List of close edges</param>
+    /// <param name="agent">Navmesh agent</param>
+    /// <param name="position">Starting position</param>
+    /// <param name="distance">Maximum travel distance</param>
+    /// <returns>List of clost edges</returns>
+    private List<Edge> GetNavmeshCloseCovers(List<Edge> edges, NavMeshAgent agent, Vector3 position, float distance) {
 
-        //        Vector3 directionToMe = Vector3.Normalize(transform.position - cover);
-        //        float dotToMe = Vector3.Dot(cover, directionToMe);
-
-        //        if (Vector3.Angle(vectorTowardsPlayer, cover - transform.position) < 60) {
-        //            Gizmos.DrawCube(cover, new Vector3(0.2f, 0.2f, 0.2f));
-        //        } else {
-        //            Gizmos.DrawCube(cover, new Vector3(0.2f, 0.2f, 0.2f));
-        //        }
-
-        //    } else {
-        //    }
-        //}
+        List<Edge> filteredEdges = new();
+        var path = new NavMeshPath();
+            try {
+            foreach (var edge in edges) {
+                var hasPath = false;
+                hasPath = agent.CalculatePath(edge.middle, path);
+                if (!hasPath) continue;
+                float totalPath = CalculatePath(path.corners);
+                if (totalPath < distance) filteredEdges.Add(edge);
+            }
+            } catch (Exception e) {
+            Debug.LogError(e);
+            throw;
+            }
+        return filteredEdges;
     }
 }
