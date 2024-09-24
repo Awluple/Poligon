@@ -30,7 +30,6 @@ namespace Poligon.Ai.EnemyStates {
         }
 
         public override void EnterState() {
-            CoverPosition coverPosition = enemyController.hidingLogic.currentCoverPosition;
             bool hasVision = Methods.HasAimOnOpponent(out Character character, enemyController, 40f);
             enemyController.enemy.OnShoot += ResetTimer;
             enemyController.enemy.OnHealthLoss += TryToHide;
@@ -43,14 +42,14 @@ namespace Poligon.Ai.EnemyStates {
             }
             shootingCoroutine = Coroutines.ShootingCoroutine(enemyController);
             enemyController.StartCoroutine(shootingCoroutine);
-            if (coverPosition!= null && !hasVision) {
-                Vector3 pos = coverPosition.transform.forward * 4 + enemyController.eyes.transform.position;
+            if (enemyController.hidingLogic.currentCoverSubEdge != null && !hasVision) {
+                Vector3 pos = enemyController.hidingLogic.currentCoverEdge.forward * 4 + enemyController.eyes.transform.position;
                 LastKnownPosition opponentPosition = enemyController.enemy.squad.GetCharacterLastPosition(enemyController.attackingLogic.opponent);
                 if(opponentPosition != null) {
                     Vector3 aimPosition = (opponentPosition.position == Vector3.zero) ? pos : enemyController.enemy.squad.GetCharacterLastPosition(enemyController.attackingLogic.opponent).position;
 
                     enemyController.enemy.GetAimPosition().MoveAim(aimPosition, 80f);
-                    enemyController.enemy.RotateSelf(coverPosition.transform.forward);
+                    enemyController.enemy.RotateSelf(enemyController.hidingLogic.currentCoverEdge.forward);
                 }
             }
         }
@@ -61,10 +60,10 @@ namespace Poligon.Ai.EnemyStates {
             } else if (UnityEngine.Random.Range(0, 10) > 7) {
                 return;
             }
-            if (enemyController.hidingLogic.currentCoverPosition != null) {
+            if (enemyController.hidingLogic.currentCoverSubEdge != null) {
                 enemyController.aiState = AiState.BehindCover;
             } else {
-                enemyController.hidingLogic.GetHidingPosition(enemyController.attackingLogic.opponent.transform.position, enemyController.enemy);
+                //enemyController.hidingLogic.GetHidingPosition(enemyController.attackingLogic.opponent.transform.position, enemyController.enemy);
                 enemyController.aiState = AiState.Hiding;
             }
         }

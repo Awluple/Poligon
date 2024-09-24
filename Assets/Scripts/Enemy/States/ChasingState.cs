@@ -16,13 +16,12 @@ namespace Poligon.Ai.EnemyStates {
         public override AiState state { get; protected set; } = AiState.Chasing;
 
         public override void EnterState() {
-            CoverPosition coverPosition = enemyController.hidingLogic.currentCoverPosition;
 
             if (movingAttackCoroutine != null) enemyController.StopCoroutine(movingAttackCoroutine);
             movingAttackCoroutine = Coroutines.ContinueAttackingWhileMoving(enemyController, false);
             enemyController.StartCoroutine(movingAttackCoroutine);
 
-            if (coverPosition != null && coverPosition.transform.position != Vector3.zero) {
+            if (enemyController.hidingLogic.currentCoverSubEdge != null) {
                 enemyController.enemy.GetAimPosition().Reposition(enemyController.enemy.squad.GetCharacterLastPosition(enemyController.attackingLogic.opponent).position);
                 enemyController.AimStart();
                 enemyController.CrouchCancel();
@@ -60,6 +59,7 @@ namespace Poligon.Ai.EnemyStates {
             for (; ; ) {
                 if(enemyController.enemy.squad.GetCharacterLastPosition(enemyController.attackingLogic.opponent).position != Vector3.zero) {
                     enemyController.SetNewDestinaction(enemyController.enemy.squad.GetCharacterLastPosition(enemyController.attackingLogic.opponent).position);
+                    enemyController.AimCancel();
                     enemyController.RunStart();
                     enemyController.StopCoroutine(chasingCoroutine);
                 }

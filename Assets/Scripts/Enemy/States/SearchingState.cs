@@ -18,7 +18,7 @@ namespace Poligon.Ai.EnemyStates {
         public override AiState state { get; protected set; } = AiState.Searching;
 
         public override void EnterState() {
-
+            enemyController.CrouchCancel();
             GetPoints();
 
             for(int i = 0; i < areas.Count; i++) {
@@ -63,7 +63,7 @@ namespace Poligon.Ai.EnemyStates {
         }
 
         private void Hide(object sender, EventArgs args) {
-            enemyController.aiState = AiState.Hiding;
+            if(enemyController.aiState == AiState.Searching) enemyController.aiState = AiState.Hiding;
         }
 
         public void NextCorner(object sender = null, EventArgs args = null) {

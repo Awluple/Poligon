@@ -265,21 +265,6 @@ public class EnemyAimPosition : AimPosition {
         StartCoroutine(checkCoroutine);
     }
 
-    public void LockOnTarget2(Character character, bool immediately = false) {
-        bool moveAimCalled = false;
-        if (checkCoroutine != null) {
-            StopCoroutine(checkCoroutine);
-        }
-        MoveToCharacter(character, ref moveAimCalled, null, immediately);
-        opponent = character;
-        opponentDetectionPoint = character.detectionPoints[0];
-        //if (OnLineOfSight != null) {
-        //    OnLineOfSight(this, new CharacterEventArgs(character));
-        //};
-        checkCoroutine = DoCheck(false);
-        StartCoroutine(checkCoroutine);
-    }
-
     /// <summary>
     /// Logic for checking if an enemy is within range
     /// </summary>

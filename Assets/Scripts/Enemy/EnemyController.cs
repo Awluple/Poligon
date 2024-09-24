@@ -9,6 +9,7 @@ using Poligon.Ai.EnemyStates;
 using Poligon.Ai.Commands;
 using Poligon.EvetArgs;
 using Poligon.Enums;
+using System.Linq;
 
 public class EnemyController : MonoBehaviour, IAICharacterController, IStateManager {
     public event EventHandler OnRunStart;
@@ -125,6 +126,7 @@ public class EnemyController : MonoBehaviour, IAICharacterController, IStateMana
             { new StateTransition<AiState>(AiState.Chasing, AiState.Searching), searching },
 
             { new StateTransition<AiState>(AiState.Searching, AiState.Hiding), hiding },
+            { new StateTransition<AiState>(AiState.Searching, AiState.Chasing), chasing },
 
 
 
@@ -190,12 +192,15 @@ public class EnemyController : MonoBehaviour, IAICharacterController, IStateMana
         command.execute();
     }
 
-    public Vector3[] SetNewDestinaction(Vector3 spot) {
+    public Vector3[] SetNewDestinaction(Vector3 spot, object sender = null) {
         currentCorner = 1;
         onFinalPosition = false;
         OnFinalPositionEvent = null;
         OnNextCornerEvent = null;
         navAgent.CalculatePath(spot, destination);
+        if (sender != null) {
+            Debug.Log("Sender: " + sender + "| Corners: " + destination.corners.Count());
+        }
         return destination.corners;
     }
     //public Vector3 GetOpponentLastKnownPosition() {
@@ -265,36 +270,6 @@ public class EnemyController : MonoBehaviour, IAICharacterController, IStateMana
         if (OnChangeWeapon != null) OnChangeWeapon(this, new InputValueEventArgs((int)weapon));
     }
 
-
-    //public void SetPatrollingPath(object sender = null, System.EventArgs e = null) {
-    //    if (patrolPositions.Length == 0) {
-    //        onFinalPosition = true;
-
-    //        return;
-    //    };
-    //    if ((currentPatrolPosition == -1 || onFinalPosition) && aiState == AiState.Patrolling) {
-    //        patrolPointSelection();
-    //        if(pathRecalc != null) StopCoroutine(pathRecalc);
-    //        pathRecalc = RecalculatePath();
-    //        StartCoroutine(pathRecalc);
-    //    }
-    //}
-
-    //private void patrolPointSelection() {
-    //    System.Random random = new System.Random();
-    //    currentPatrolPosition = random.Next(0, 3);
-    //    SetNewDestinaction(patrolPositions[currentPatrolPosition].transform.position);
-    //    OnFinalPositionEvent += SetPatrollingPath;
-    //}
-
-    //private IEnumerator RecalculatePath() {
-    //    while(!onFinalPosition) {
-    //        currentCorner = 1;
-    //        navAgent.CalculatePath(destination.corners[destination.corners.Length - 1], destination);
-    //        yield return new WaitForSeconds(.5f);
-    //    }
-    //}
-
     private void DrawLine() {
         pathLine.positionCount = destination.corners.Length;
         pathLine.SetPosition(0, transform.parent.position);
@@ -319,7 +294,15 @@ public class EnemyController : MonoBehaviour, IAICharacterController, IStateMana
             //OnFinalPositionEvent = null;
             return new Vector2(0, 0);
         }
-        moveDir = destination.corners[currentCorner] - groundSpot.position;
+        try {
+            if(destination.corners.Length == 1) {
+                currentCorner = 0;
+            }
+            moveDir = destination.corners[currentCorner] - groundSpot.position;
+        } catch (Exception e) {
+            Debug.LogError($"Current corner: {currentCorner} | Corners Count: {destination.corners.Length} | {destination.corners[0]} - {groundSpot.position}");
+            throw;
+        }
 
         if (Vector3.Distance(groundSpot.position, destination.corners[currentCorner]) < .2f && !onFinalPosition) {
             if(destination.corners.Length > 2) {

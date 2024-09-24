@@ -12,11 +12,10 @@ namespace Poligon.Ai.EnemyStates {
         public override AiState state { get; protected set; } = AiState.BehindCover;
 
         public override void EnterState() {
-            CoverPosition coverPosition = enemyController.hidingLogic.currentCoverPosition;
             enemyController.ShootCancel();
             if (!enemyController.enemy.IsCrouching()) {
                 enemyController.CrouchStart();
-                enemyController.enemy.RotateSelf(-coverPosition.transform.forward);
+                enemyController.enemy.RotateSelf(-enemyController.hidingLogic.currentCoverEdge.forward);
             }
             enemyController.AimCancel();
             enemyController.OnHealthLoss += HealthLost;
@@ -48,7 +47,7 @@ namespace Poligon.Ai.EnemyStates {
 
             for (; ; ) {
                 yield return new WaitForSeconds(Random.Range(4f, 8f));
-                enemyController.aiState = AiState.StationaryAttacking;
+                if(enemyController.aiState == AiState.BehindCover)enemyController.aiState = AiState.StationaryAttacking;
                 //    if (Methods.HasAimOnOpponent(out Character character, enemyController)) {
                 //        enemyController.aiState = AiState.Attacking;
                 //        goto End;

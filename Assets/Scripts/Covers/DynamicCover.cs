@@ -3,92 +3,20 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.ConstrainedExecution;
 using System.Threading.Tasks;
 using UnityEditor.Build;
 using UnityEditor.PackageManager;
 using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.TextCore.Text;
+using UnityEngine.UI;
 using static UnityEngine.Rendering.DebugUI;
 using static UnityEngine.UI.Image;
 
-/// <summary>
-/// Holds information about NavMesh edge
-/// </summary>
-public struct Edge {
-    public int id;
-    public Vector3 point1;
-    public Vector3 point2;
-    public Vector3 middle;
-    public Vector3 forward;
-    public float distance;
-    public int maxCapacity;
-    public List<Character> currentOccupants;
+namespace Poligon.Ai { 
 
-    public Edge(Vector3 v1, Vector3 v2, int id) {
-        if (v1.x < v2.x || (v1.x == v2.x && v1.z < v2.z)) {
-            point1 = v1;
-            point2 = v2;
-        } else {
-            point1 = v2;
-            point2 = v1;
-        }
-        this.id = id;
-        middle = GetMiddlePoint(v1, v2);
-        distance = Vector3.Distance(v1, v2);
-        forward = Vector3.zero;
-        maxCapacity = 0;
-        currentOccupants = new();
-    }
-    public static Vector3 GetMiddlePoint(Vector3 point1, Vector3 point2) {
-        return point2 + (point1 - point2) / 2f;
-    }
-    public override bool Equals(object obj) {
-        if (!(obj is Edge))
-            return false;
 
-        Edge edge = (Edge)obj;
-        return point1.Equals(edge.point1) && point2.Equals(edge.point2);
-    }
-
-    public override int GetHashCode() {
-        return point1.GetHashCode() ^ point2.GetHashCode();
-    }
-}
-public class EdgeBorderComparer : EqualityComparer<Collider> {
-    private readonly int buildingsLayer;
-
-    public EdgeBorderComparer() {
-        buildingsLayer = LayerMask.NameToLayer("Buildings");
-    }
-
-    public override bool Equals(Collider x, Collider y) {
-        if (ReferenceEquals(x.gameObject, y.gameObject)) {
-            return true;
-        }
-
-        // Check if they have the same parent and that parent is on the "buildings" layer
-        if (x != null && y != null &&
-            x.gameObject.transform.parent != null && y.gameObject.transform.parent != null &&
-            x.gameObject.transform.parent.gameObject.layer == buildingsLayer &&
-            x.gameObject.transform.parent == y.gameObject.transform.parent) {
-            return true;
-        }
-        return false;
-    }
-    public override int GetHashCode(Collider obj) {
-        if (obj == null) {
-            return 0;
-        }
-
-        int hash = obj.gameObject.GetHashCode();
-        if (obj.transform.parent != null && obj.gameObject.transform.parent.gameObject.layer == buildingsLayer) {
-            hash ^= obj.gameObject.transform.parent.GetHashCode();
-        }
-
-        return hash;
-    }
-}
 /// <summary>
 /// Gets NevMesh edges that surround buildings
 /// </summary>
@@ -139,7 +67,8 @@ public class NavMeshBorderExtractor {
                             maxDistance += 0.1f;
                         }
                         if (triangle[i].forward != Vector3.zero) {
-                            triangle[i].maxCapacity = (int)Mathf.Floor(triangle[i].distance / 1.2f);
+                            //triangle[i].maxCapacity = (int)Mathf.Floor(triangle[i].distance / 1.4f);
+                            triangle[i].subEdges = triangle[i].DivideEdge(triangle[i].point1, triangle[i].point2, 1.4f);
                             edges.Add(triangle[i].id, triangle[i]);
                         } 
                         
@@ -249,26 +178,19 @@ public class DynamicCover : MonoBehaviour {
         extractor = new NavMeshBorderExtractor();
         edges = extractor.FilterEdges();
     }
-
-    void Update() {
-        if (Input.GetKeyDown(KeyCode.C))
-        {
-            //if (edges.Count == 0) {
-            //    edges = extractor.FilterEdges();
-            //}
-            //ShowEdges();
-        }
-    }
     /// <summary>
     /// Add a character to a cover edge
     /// </summary>
     /// <param name="id">Id of an  edge</param>
+    /// <param name="subEdge">The edge to claim</param>
     /// <param name="character">Character to add</param>
     /// <returns>True if character is successfully added, otherwise false</returns>
-    public bool Subscribe(int id, Character character) {
-        Edge edge = edges[id];
-        if(edge.currentOccupants.Count >= edge.maxCapacity) return false;
-        edge.currentOccupants.Add(character);
+    public bool Subscribe(int id, SubEdge subEdge, Character character) {
+        if(edges[id].currentOccupants.Count >= edges[id].subEdges.Count) return false;
+        edges[id].currentOccupants.Add(character);
+        int index = edges[id].subEdges.IndexOf(subEdge);
+        if(index == -1) return false;
+        edges[id].subEdges[index].occupied = true;
         return true;
     }
     /// <summary>
@@ -277,9 +199,12 @@ public class DynamicCover : MonoBehaviour {
     /// <param name="id">Id of an  edge</param>
     /// <param name="character">Character to remove</param>
     /// <returns>true if character is successfully removed; otherwise, false. This method also returns false if item was not found in the </returns>
-    public bool UnSubscribe(int id, Character character) {
-        Edge edge = edges[id];
-        return edge.currentOccupants.Remove(character);
+    public bool UnSubscribe(int id, SubEdge subEdge, Character character) {
+        bool removedOccupant = edges[id].currentOccupants.Remove(character);
+        int index = edges[id].subEdges.IndexOf(subEdge);
+        edges[id].subEdges[index].occupied = false;
+        if (index == -1) return false;
+        return removedOccupant;
     }
     /// <summary>
     /// Shows edges for debug
@@ -290,7 +215,7 @@ public class DynamicCover : MonoBehaviour {
             e1.y += 1f;
             var e2 = edge.point2;
             e2.y += 1f;
-            Color color = edge.distance > .5f ? Color.red : Color.blue;
+            Color color = edge.length > .5f ? Color.red : Color.blue;
             Debug.DrawLine(e1, e2, color, 50f);
             Debug.DrawRay(edge.middle, edge.forward, Color.green, 100f);
         }
@@ -304,13 +229,18 @@ public class DynamicCover : MonoBehaviour {
     /// <param name="pathingDistance">Maximum distance to covers that navmesh agent must travel</param>
     /// <returns></returns>
     public async Awaitable<List<Edge>> GetCovers(Vector3 position, NavMeshAgent agent, float absoluteDistance = 25f, float pathingDistance = 20f) {
-        var absolute = await GetAboluteCloseCovers(position, absoluteDistance);
-        var navmesh = GetNavmeshCloseCovers(absolute, agent, position, pathingDistance);
-        return navmesh;
+            try {
+                var absolute = await GetAboluteCloseCovers(position, absoluteDistance);
+                var navmesh = GetNavmeshCloseCovers(absolute, agent, position, pathingDistance);
+                return navmesh;
+            } catch(Exception e) { 
+                Debug.LogException(e);
+            }
+            return new List<Edge>();
     }
 
-    public List<Edge> GetValidHidingPositions(Vector3 hidingSourcePosition, Character character, List<Edge> edges, Vector3? originPosition = null,
-        bool closestCover = true, bool ignoreDot = false, float minDistanceFromSource = 8f, float maxCoverPathDistance = 20f, float maxSearchDistance = 21f) {
+    public List<Edge> GetValidHidingPositions(Vector3 hidingSourcePosition, List<Edge> edges, Vector3? originPosition = null,
+        bool closestCover = true, bool ignoreDot = false, float minDistanceFromSource = 8f) {
         // Get the starting point, if not provided use transform.position
         List<Edge> validEdges = new List<Edge>();
         Vector3 originPos = Vector3.zero;
@@ -324,7 +254,7 @@ public class DynamicCover : MonoBehaviour {
             Array.Sort(edges.ToArray(), (a, b) => Vector3.Distance(b.middle, originPos).CompareTo(Vector3.Distance(a.middle, originPos)));
         }
         foreach (Edge edge in edges) {
-            if (edge.maxCapacity < 1) continue;
+            if (edge.currentOccupants.Count >= edge.subEdges.Count) continue;
 
             Vector3 direction = Vector3.Normalize(hidingSourcePosition - edge.middle);
             float dotToTarget = Vector3.Dot(edge.forward, direction);
@@ -426,7 +356,7 @@ public class DynamicCover : MonoBehaviour {
     /// </summary>
     /// <param name="corners">Corners of path</param>
     /// <returns>Distance to travel</returns>
-    private float CalculatePath(Vector3[] corners) {
+    public float CalculatePath(Vector3[] corners) {
         float totalDistance = 0.0f;
 
         for (int i = 0; i < corners.Length - 1; i++) {
@@ -460,4 +390,5 @@ public class DynamicCover : MonoBehaviour {
             }
         return filteredEdges;
     }
+}
 }

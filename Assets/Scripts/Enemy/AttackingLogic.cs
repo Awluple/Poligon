@@ -102,7 +102,7 @@ public class AttackingLogic : MonoBehaviour {
             enemyController.enemy.GetAimPosition().LockOnTarget(opponent, !enemyController.enemy.IsAiming());
             enemyController.aiState = AiState.Chasing;
         } else if (hasVision && enemyController.aiState == AiState.StationaryAttacking) {
-            enemyController.hidingLogic.GetHidingPosition(character.transform.position, character);
+            //enemyController.hidingLogic.GetHidingPosition(character.transform.position, character);
             enemyController.aiState = AiState.Hiding;
         } else if (hasVision && enemyController.aiState == AiState.Hiding) {
 
@@ -112,10 +112,14 @@ public class AttackingLogic : MonoBehaviour {
     void ChangeOpponent() {
         opponent = GetOpponent();
         if (opponent != null) {
-            enemyController.enemy.GetAimPosition().LockOnTarget2(opponent, !enemyController.enemy.IsAiming());
-            if (enemyController.aiState != AiState.Chasing && !Methods.HasVisionOnCharacter(out Character newOpponent, enemyController, opponent)) {
+            enemyController.enemy.GetAimPosition().LockOnTarget(opponent, !enemyController.enemy.IsAiming());
+            bool hasVision = Methods.HasVisionOnCharacter(out Character newOpponent, enemyController, opponent);
+            if (enemyController.aiState != AiState.Chasing && !hasVision) {
                 enemyController.aiState = AiState.Chasing;
-            } else if (enemyController.aiState != AiState.Hiding) {
+            } else if(hasVision && enemyController.aiState == AiState.BehindCover) {
+                enemyController.aiState = AiState.StationaryAttacking;
+            }
+            else if (enemyController.aiState != AiState.Hiding) {
                 enemyController.aiState = AiState.Hiding;
             }
         } else {
