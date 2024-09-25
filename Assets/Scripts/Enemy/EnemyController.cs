@@ -76,7 +76,7 @@ public class EnemyController : MonoBehaviour, IAICharacterController, IStateMana
 
     public HidingLogic hidingLogic { get; private set; }
     public AttackingLogic attackingLogic { get; private set; }
-
+    [SerializeField] bool stopped = false;
     void Awake() {
         navAgent = gameObject.transform.parent.GetComponent<NavMeshAgent>();
         destination = new NavMeshPath();
@@ -91,8 +91,8 @@ public class EnemyController : MonoBehaviour, IAICharacterController, IStateMana
         StationaryAttackState attacking = new(this);
         ChasingState chasing = new(this);
         SearchingState searching = new(this);
-
-
+        navAgent.angularSpeed = 780f;
+        navAgent.stoppingDistance = 0.4f;
 
         stateMashine = new AiStateMashine<AiState>(none, this);
 
@@ -180,7 +180,7 @@ public class EnemyController : MonoBehaviour, IAICharacterController, IStateMana
         if (!aiEnabled) return;
         stateMashine.UpdateState();
 
-        //Debug.Log(aiState);
+        stopped = navAgent.isStopped;
     }
     
     public void HealthLoss(object sender, BulletDataEventArgs eventArgs) {
@@ -201,6 +201,7 @@ public class EnemyController : MonoBehaviour, IAICharacterController, IStateMana
         if (sender != null) {
             Debug.Log("Sender: " + sender + "| Corners: " + destination.corners.Count());
         }
+        navAgent.SetDestination(spot);
         return destination.corners;
     }
     //public Vector3 GetOpponentLastKnownPosition() {
@@ -287,13 +288,27 @@ public class EnemyController : MonoBehaviour, IAICharacterController, IStateMana
         //if (aiState == AiState.Patrolling) SetPatrollingPath();
 
         if(destination == null || destination.corners.Length == 0 || onFinalPosition) return Vector2.zero;
-
-        if (Vector3.Distance(groundSpot.position, destination.corners[destination.corners.Length - 1]) < 0.2f && onFinalPosition == false) {
+        //Debug.Log(navAgent.remainingDistance);
+        //if (Vector3.Distance(groundSpot.position, destination.corners[destination.corners.Length - 1]) < 0.3f && onFinalPosition == false) {
+        //    onFinalPosition = true;
+        //    FinalPosition();
+        //    navAgent.isStopped = true;
+        //    return new Vector2(0, 0);
+        //}
+        if (!navAgent.pathPending && navAgent.remainingDistance <= navAgent.stoppingDistance) {
             onFinalPosition = true;
             FinalPosition();
-            //OnFinalPositionEvent = null;
+            navAgent.isStopped = true;
             return new Vector2(0, 0);
         }
+
+        //if (Vector3.Distance(groundSpot.position, destination.corners[destination.corners.Length - 1]) < 0.3f && onFinalPosition == false) {
+        //    onFinalPosition = true;
+        //    FinalPosition();
+        //    navAgent.isStopped = true;
+        //    return new Vector2(0, 0);
+        //}
+
         try {
             if(destination.corners.Length == 1) {
                 currentCorner = 0;
@@ -304,14 +319,14 @@ public class EnemyController : MonoBehaviour, IAICharacterController, IStateMana
             throw;
         }
 
-        if (Vector3.Distance(groundSpot.position, destination.corners[currentCorner]) < .2f && !onFinalPosition) {
+        if (Vector3.Distance(groundSpot.position, destination.corners[currentCorner]) < .35f && !onFinalPosition) {
             if(destination.corners.Length > 2) {
                 moveDir = destination.corners[currentCorner] - groundSpot.position;
                 currentCorner++;
                 NextCorner();
             }
         }
-
+        navAgent.isStopped = false;
         return new Vector2(moveDir.x, moveDir.z).normalized;
     }
 

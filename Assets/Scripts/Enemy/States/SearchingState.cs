@@ -128,27 +128,6 @@ namespace Poligon.Ai.EnemyStates {
                 Vector3 p1 = navMeshData.vertices[navMeshData.indices[i]];
                 Vector3 p2 = navMeshData.vertices[navMeshData.indices[i + 1]];
                 Vector3 p3 = navMeshData.vertices[navMeshData.indices[i + 2]];
-                //if(i > 10) {
-                //    Debug.Log("1: " + (navMeshData.indices[i - 1] == navMeshData.indices[i]));
-                //    Debug.Log("2: " + (navMeshData.indices[i - 2] == navMeshData.indices[i]));
-                //    Debug.Log("3: " + (navMeshData.indices[i - 3] == navMeshData.indices[i]));
-
-                //    Debug.Log("4: " + (navMeshData.indices[i - 1] == navMeshData.indices[i + 1]));
-                //    Debug.Log("5: " + (navMeshData.indices[i - 2] == navMeshData.indices[i + 1]));
-                //    Debug.Log("6: " + (navMeshData.indices[i - 3] == navMeshData.indices[i + 1]));
-
-                //    Debug.Log("7: " + (navMeshData.indices[i - 1] == navMeshData.indices[i + 2]));
-                //    Debug.Log("8: " + (navMeshData.indices[i - 2] == navMeshData.indices[i + 2]));
-                //    Debug.Log("9: " + (navMeshData.indices[i - 3] == navMeshData.indices[i + 2]));
-
-
-                //    if(navMeshData.indices[i - 3] == navMeshData.indices[i]) {
-                //        Debug.DrawRay(navMeshData.vertices[navMeshData.indices[i]], Vector2.up * 3, Color.red, 100f);
-                //    }
-                //    if (navMeshData.indices[i - 1] == navMeshData.indices[i + 1]) {
-                //        Debug.DrawRay(navMeshData.vertices[navMeshData.indices[i - 1]], Vector2.up * 3, Color.blue, 100f);
-                //    }
-                //}
 
                 Vector3 triangleCenter = (p1 + p2 + p3) / 3f;
 

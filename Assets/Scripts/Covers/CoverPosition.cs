@@ -50,6 +50,7 @@ public class CoverPosition : Cover
         Material myMaterial = GetComponent<Renderer>().material;
         Color free = new Color(0.7f, 0.3f, 0.5f, 1.0f);
         myMaterial.color = free;
+        GetComponent<Renderer>().enabled = false;
     }
 
     public List<CoverPose> GetCoverPoses() {

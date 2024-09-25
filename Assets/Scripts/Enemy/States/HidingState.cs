@@ -67,15 +67,15 @@ namespace Poligon.Ai.EnemyStates {
                         if (!claimed) {
                             enemyController.hidingLogic.ClearDynamicCover();
                             coverSearchingStarted = false;
-                        }
-
-                        enemyController.CrouchCancel();
-                        enemyController.SetNewDestinaction(hit.position);
-                        if (!hasVision) enemyController.RunStart();
-                        Debug.DrawLine(enemyController.hidingLogic.currentCoverSubEdge.start, enemyController.hidingLogic.currentCoverSubEdge.end, Color.green, 10f);
-                        enemyController.StopCoroutine(attemptHideCoroutine);
-                        enemyController.OnFinalPositionEvent += OnPosition;
-                        enemyController.OnFinalPositionEvent += (object sender, System.EventArgs e) => { enemyController.RunCancel(); };
+                        } else {
+                            enemyController.CrouchCancel();
+                            enemyController.SetNewDestinaction(hit.position);
+                            if (!hasVision) enemyController.RunStart();
+                            Debug.DrawLine(enemyController.hidingLogic.currentCoverSubEdge.start, enemyController.hidingLogic.currentCoverSubEdge.end, Color.green, 10f);
+                            enemyController.StopCoroutine(attemptHideCoroutine);
+                            enemyController.OnFinalPositionEvent += OnPosition;
+                            enemyController.OnFinalPositionEvent += (object sender, System.EventArgs e) => { enemyController.RunCancel(); };
+                        }  
                     }
                 }
 

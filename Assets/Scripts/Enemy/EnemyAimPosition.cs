@@ -38,6 +38,7 @@ public class EnemyAimPosition : AimPosition {
 
         lookForEnemiesCoroutine = LookForEnemies();
         StartCoroutine(lookForEnemiesCoroutine);
+        GetComponent<Renderer>().enabled = false;
     }
 
     // Update is called once per frame
@@ -137,35 +138,6 @@ public class EnemyAimPosition : AimPosition {
                 }else {
                     yield return new WaitForSeconds(.4f);
                 }
-
-
-                //bool found = false;
-                //foreach (var character in charactersSphere.GetEnemyCharacters().Values.ToList()) {
-                //    if (found) break;
-                //    foreach (var detectionPoint in character.detectionPoints) {
-                //        //if (detectionPoint == null) {
-                //        //    opponent = null;
-                //        //    opponentDetectionPoint = null;
-                //        //    yield return new WaitForSeconds(.4f);
-                //        //    break;
-                //        //} else {
-                //            Vector3 rayTarget = detectionPoint.transform.position;
-                //            if (ProximityCheck(rayTarget)) {
-                //                opponentDetectionPoint = detectionPoint;
-                //                opponent = character;
-                //                found = true;
-                //                yield return new WaitForSeconds(0f);
-                //                break;
-                //            } else {
-                //                if (repositionOnFailed) {
-                //                    transform.position = enemy.transform.position;
-                //                }
-                //                yield return new WaitForSeconds(.4f);
-                //            }
-
-                //    }
-                //}
-                //yield return new WaitForSeconds(0f);
             }
         }
     }

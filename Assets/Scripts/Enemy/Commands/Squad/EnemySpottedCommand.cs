@@ -12,7 +12,11 @@ namespace Poligon.Ai.Commands {
             squad.UpdateLastKnownPosition(new LastKnownPosition(enemy, enemy.transform.position));
             
             foreach(var character in squad.characters) {
-                if(character.attackingLogic.opponent == null) character.EnemySpotted(enemy);
+                if(character.attackingLogic.opponent == null) {
+                    character.EnemySpotted(enemy);
+                } else if (squad.knownEnemies.Count == 1) {
+                    character.attackingLogic.CallCharacter(enemy);
+                }
             }
             squad.EnemySpotted(enemy);
         }

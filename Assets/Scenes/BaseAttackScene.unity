@@ -3987,7 +3987,7 @@ Transform:
   m_GameObject: {fileID: 141041227}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 0.114, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 5.8982}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -6277,7 +6277,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   baseMaterial: {fileID: 2100000, guid: 405766222e000144089bacf69420b5b6, type: 2}
-  currentOffset: {x: 407.08786, y: 838.3894}
+  currentOffset: {x: 202.46649, y: 470.68768}
   rendererComponent: {fileID: 243814686}
 --- !u!1 &245847994
 GameObject:
@@ -18895,7 +18895,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   baseMaterial: {fileID: 2100000, guid: 405766222e000144089bacf69420b5b6, type: 2}
-  currentOffset: {x: 164.8972, y: 501.0204}
+  currentOffset: {x: 281.91977, y: 305.46088}
   rendererComponent: {fileID: 466739317}
 --- !u!64 &466739316
 MeshCollider:
@@ -21132,7 +21132,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   baseMaterial: {fileID: 2100000, guid: 405766222e000144089bacf69420b5b6, type: 2}
-  currentOffset: {x: 835.33093, y: 507.71268}
+  currentOffset: {x: 482.89902, y: 474.9474}
   rendererComponent: {fileID: 619832190}
 --- !u!64 &619832189
 MeshCollider:
@@ -30019,7 +30019,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   baseMaterial: {fileID: 2100000, guid: 405766222e000144089bacf69420b5b6, type: 2}
-  currentOffset: {x: 108.927246, y: 581.36804}
+  currentOffset: {x: 474.6614, y: 195.58359}
   rendererComponent: {fileID: 953447367}
 --- !u!64 &953447366
 MeshCollider:
@@ -36561,7 +36561,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   baseMaterial: {fileID: 2100000, guid: 405766222e000144089bacf69420b5b6, type: 2}
-  currentOffset: {x: 749.9068, y: 929.6317}
+  currentOffset: {x: 184.42476, y: 899.69244}
   rendererComponent: {fileID: 1044228166}
 --- !u!64 &1044228165
 MeshCollider:
@@ -45155,7 +45155,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   baseMaterial: {fileID: 2100000, guid: 405766222e000144089bacf69420b5b6, type: 2}
-  currentOffset: {x: 181.24283, y: 702.3598}
+  currentOffset: {x: 574.118, y: 955.02747}
   rendererComponent: {fileID: 1116512581}
 --- !u!64 &1116512580
 MeshCollider:
@@ -46215,7 +46215,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   baseMaterial: {fileID: 2100000, guid: 405766222e000144089bacf69420b5b6, type: 2}
-  currentOffset: {x: 32.919525, y: 269.75626}
+  currentOffset: {x: 779.1318, y: 334.81152}
   rendererComponent: {fileID: 1218248406}
 --- !u!64 &1218248405
 MeshCollider:
@@ -47716,7 +47716,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   baseMaterial: {fileID: 2100000, guid: 405766222e000144089bacf69420b5b6, type: 2}
-  currentOffset: {x: 836.22577, y: 847.05756}
+  currentOffset: {x: 352.2442, y: 949.49115}
   rendererComponent: {fileID: 1281233699}
 --- !u!64 &1281233698
 MeshCollider:
@@ -53215,7 +53215,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   baseMaterial: {fileID: 2100000, guid: 405766222e000144089bacf69420b5b6, type: 2}
-  currentOffset: {x: 494.7224, y: 637.9453}
+  currentOffset: {x: 71.49029, y: 41.643024}
   rendererComponent: {fileID: 1485114236}
 --- !u!64 &1485114235
 MeshCollider:
@@ -53267,7 +53267,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   baseMaterial: {fileID: 2100000, guid: 405766222e000144089bacf69420b5b6, type: 2}
-  currentOffset: {x: 19.868492, y: 347.5551}
+  currentOffset: {x: 886.52527, y: 724.30493}
   rendererComponent: {fileID: 1486825543}
 --- !u!64 &1486825542
 MeshCollider:
@@ -53625,7 +53625,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   baseMaterial: {fileID: 2100000, guid: 405766222e000144089bacf69420b5b6, type: 2}
-  currentOffset: {x: 633.3312, y: 204.44429}
+  currentOffset: {x: 378.13275, y: 730.31305}
   rendererComponent: {fileID: 1508690235}
 --- !u!64 &1508690234
 MeshCollider:
@@ -60589,6 +60589,70 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1650300346}
   m_Mesh: {fileID: 10207, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!1 &1654644697
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1654644699}
+  - component: {fileID: 1654644698}
+  m_Layer: 0
+  m_Name: Navmesh
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1654644698
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1654644697}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7a5ac11cc976e418e8d13136b07e1f52, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_SerializedVersion: 0
+  m_AgentTypeID: 0
+  m_CollectObjects: 0
+  m_Size: {x: 10, y: 10, z: 10}
+  m_Center: {x: 0, y: 2, z: 0}
+  m_LayerMask:
+    serializedVersion: 2
+    m_Bits: 1088
+  m_UseGeometry: 0
+  m_DefaultArea: 0
+  m_GenerateLinks: 0
+  m_IgnoreNavMeshAgent: 1
+  m_IgnoreNavMeshObstacle: 1
+  m_OverrideTileSize: 0
+  m_TileSize: 256
+  m_OverrideVoxelSize: 0
+  m_VoxelSize: 0.13333334
+  m_MinRegionArea: 2
+  m_NavMeshData: {fileID: 23800000, guid: 2021de185cba98f41a6ebd868db147d6, type: 2}
+  m_BuildHeightMesh: 0
+--- !u!4 &1654644699
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1654644697}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -18.184612, y: -26.614876, z: 5.5275345}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1657867855
 GameObject:
   m_ObjectHideFlags: 0
@@ -61021,7 +61085,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   baseMaterial: {fileID: 2100000, guid: 405766222e000144089bacf69420b5b6, type: 2}
-  currentOffset: {x: 887.52386, y: 748.8198}
+  currentOffset: {x: 811.74005, y: 875.8899}
   rendererComponent: {fileID: 1669029431}
 --- !u!64 &1669029430
 MeshCollider:
@@ -61073,7 +61137,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   baseMaterial: {fileID: 2100000, guid: 405766222e000144089bacf69420b5b6, type: 2}
-  currentOffset: {x: 745.5199, y: 565.1023}
+  currentOffset: {x: 447.29907, y: 715.0879}
   rendererComponent: {fileID: 1671105492}
 --- !u!64 &1671105491
 MeshCollider:
@@ -64245,7 +64309,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   baseMaterial: {fileID: 2100000, guid: 405766222e000144089bacf69420b5b6, type: 2}
-  currentOffset: {x: 647.6928, y: 833.6992}
+  currentOffset: {x: 492.08408, y: 696.68317}
   rendererComponent: {fileID: 1730135009}
 --- !u!64 &1730135008
 MeshCollider:
@@ -67124,7 +67188,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   baseMaterial: {fileID: 2100000, guid: 405766222e000144089bacf69420b5b6, type: 2}
-  currentOffset: {x: 272.64328, y: 652.0256}
+  currentOffset: {x: 125.23413, y: 895.29346}
   rendererComponent: {fileID: 1811462474}
 --- !u!64 &1811462473
 MeshCollider:
@@ -74577,7 +74641,7 @@ Transform:
   m_GameObject: {fileID: 1882847503}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -54.11, y: 0.54, z: -4.56}
+  m_LocalPosition: {x: -39.6, y: 0.54, z: -12.77}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -86266,7 +86330,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   baseMaterial: {fileID: 2100000, guid: 405766222e000144089bacf69420b5b6, type: 2}
-  currentOffset: {x: 524.44653, y: 104.57683}
+  currentOffset: {x: 494.94748, y: 676.45624}
   rendererComponent: {fileID: 2134772924}
 --- !u!64 &2134772923
 MeshCollider:
@@ -86771,3 +86835,4 @@ SceneRoots:
   - {fileID: 1238085635}
   - {fileID: 1420003480}
   - {fileID: 1882847508}
+  - {fileID: 1654644699}

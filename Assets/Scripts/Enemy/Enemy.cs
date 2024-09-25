@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.AI;
 public class Enemy : Character, ISquadMember {
 
 
@@ -75,10 +76,14 @@ public class Enemy : Character, ISquadMember {
 
 
         if (health > 0 && ((isWalking && !stunned) || isAiming)) {
-            Rotate(new Vector3(movement.x, 0f, movement.z));
+            //Rotate(new Vector3(movement.x, 0f, movement.z));
             //Rotate(aimingTarget.transform.position);
         }
-        if(health > 0) characterController.Move(movement * Time.deltaTime);
+        if(isAiming) {
+            var turnTowardNavSteeringTarget = enemyController.navAgent.steeringTarget;
+            transform.rotation = Quaternion.Slerp(transform.rotation, GetRotation(GetAimPosition().transform.position), rotationSpeed * Time.deltaTime);
+        }
+        //if(health > 0) characterController.Move(movement * Time.deltaTime);
 
         //int layer_mask = LayerMask.GetMask("Ground");
         //bool hit = false;
@@ -113,9 +118,23 @@ public class Enemy : Character, ISquadMember {
         }
         if (toRotation != null) transform.rotation = Quaternion.RotateTowards(transform.rotation, (Quaternion)toRotation, rotationSpeed * Time.deltaTime);
     }
+    protected Quaternion GetRotation(Vector3 moveDir) {
+        Quaternion? toRotation;
+        if (!isAiming) {
+            toRotation = Quaternion.LookRotation(moveDir, Vector3.up);
+        } else {
+            Vector3 target = aimingTarget.GetPosition();
+            target.y = transform.position.y;
+            toRotation = Quaternion.LookRotation(target - transform.position, Vector3.up);
+        }
+        return (Quaternion)toRotation;
+    }
 
     protected override void Move() {
-        Vector2 inputVector = enemyController.GetMovementVectorNormalized();
+        Vector2 velocity = new Vector2(enemyController.navAgent.velocity.x, enemyController.navAgent.velocity.z);
+        //Vector2 inputVector = enemyController.GetMovementVectorNormalized();
+        enemyController.GetMovementVectorNormalized();
+        Vector2 inputVector = velocity.normalized;
         isWalking = inputVector.x != 0 || inputVector.y != 0;
         Vector2 aimBlendTree = Vector2.zero;
 
@@ -137,9 +156,10 @@ public class Enemy : Character, ISquadMember {
                 speed = speed - speed * 0.3f;
             }
         }
+        enemyController.navAgent.speed = speed;
 
-        movement.x = inputVector.x * speed;
-        movement.z = inputVector.y * speed;
 
+        //movement.x = inputVector.x * speed;
+        //movement.z = inputVector.y * speed;
     }
 }

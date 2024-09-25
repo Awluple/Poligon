@@ -92,6 +92,14 @@ public class AttackingLogic : MonoBehaviour {
     private void UpdateLastKnownPosition(Character character, Vector3 newPosition) {
         enemyController.enemy.squad.UpdateLastKnownPosition(new LastKnownPosition(character, newPosition));
     }
+    public void CallCharacter(Character opponent) {
+        if(enemyController.aiState != AiState.StationaryAttacking && enemyController.aiState != AiState.StationaryAttacking
+            && enemyController.aiState != AiState.BehindCover && enemyController.aiState != AiState.Chasing
+            ) {
+            this.opponent = opponent;
+            enemyController.aiState = AiState.Chasing;
+        }
+    }
 
     public void EnemySpotted(Character character) {
         bool hasVision = Methods.HasVisionOnCharacter(out Character hitChar, enemyController, character, 70f);
@@ -100,7 +108,7 @@ public class AttackingLogic : MonoBehaviour {
         }
         if (!hasVision && enemyController.aiState != AiState.Chasing) {
             enemyController.enemy.GetAimPosition().LockOnTarget(opponent, !enemyController.enemy.IsAiming());
-            enemyController.aiState = AiState.Chasing;
+            if(enemyController.aiState != AiState.Chasing) enemyController.aiState = AiState.Chasing;
         } else if (hasVision && enemyController.aiState == AiState.StationaryAttacking) {
             //enemyController.hidingLogic.GetHidingPosition(character.transform.position, character);
             enemyController.aiState = AiState.Hiding;
