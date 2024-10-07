@@ -2856,6 +2856,7 @@ GameObject:
   - component: {fileID: -3422531968060488226}
   - component: {fileID: 5920607441069537772}
   - component: {fileID: 426511527988706998}
+  - component: {fileID: 5036883585504613744}
   m_Layer: 8
   m_Name: Enemy ver 3
   m_TagString: Untagged
@@ -2936,7 +2937,7 @@ CharacterController:
   m_LayerOverridePriority: 0
   m_IsTrigger: 0
   m_ProvidesContacts: 0
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 3
   m_Height: 2.8
   m_Radius: 0.5
@@ -2967,6 +2968,29 @@ NavMeshAgent:
   m_BaseOffset: 0
   m_WalkableMask: 4294967295
   m_ObstacleAvoidanceType: 4
+--- !u!136 &5036883585504613744
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7568573915068818869}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 0.5
+  m_Height: 2.8
+  m_Direction: 1
+  m_Center: {x: 0, y: 1.4, z: 0}
 --- !u!1 &7693305229908513171
 GameObject:
   m_ObjectHideFlags: 0
@@ -3019,6 +3043,7 @@ MonoBehaviour:
   eyes: {fileID: 2851140620001918182}
   currentPatrolPosition: -1
   _debugAiState: 0
+  stopped: 0
 --- !u!114 &8506608336701991928
 MonoBehaviour:
   m_ObjectHideFlags: 0

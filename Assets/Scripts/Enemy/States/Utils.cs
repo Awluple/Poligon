@@ -119,7 +119,9 @@ namespace Poligon.Ai.EnemyStates.Utils {
             if (Physics.Raycast(ray, out RaycastHit hit, maxDistance, layerMask)) {
                 if (hit.collider.gameObject.TryGetComponent<Character>(out Character hitCharacter)) {
                     character = hitCharacter;
-                    return true;
+                    if (character.team != enemyController.enemy.team) {
+                        return true;
+                    }
                 }
 
             }

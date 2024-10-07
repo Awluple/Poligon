@@ -11,6 +11,28 @@ namespace Poligon.Ai {
         public Dictionary<Character, LastKnownPosition> lastKnownPosition { get; private set; } = new Dictionary<Character, LastKnownPosition>();
         public Dictionary<Character, Character> knownEnemies = new ();
         private float enemySinceLastSeen = 0f;
+        public Character _leader;
+
+        public Character leader { get {
+                return _leader;
+            } set { 
+                _leader = value;
+                _leader.OnDeath += ReassignLeader;
+            } }
+
+        private void ReassignLeader(object sender, CharacterEventArgs ch) {
+            if (leader == ch.character) {
+                foreach (Character teamMember in characters) {
+                    if (teamMember != ch.character) { 
+                        leader = teamMember;
+                        break;
+                    }
+                }
+            }
+            if (leader == null || leader == ch.character) {
+                Debug.Log("Squad destroyed");
+            }
+        } 
 
         void Start() {
             List<IAICharacterController> childrenCharacters = GetComponentsInChildren<IAICharacterController>().ToList();
