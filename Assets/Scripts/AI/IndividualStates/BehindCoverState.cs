@@ -1,21 +1,21 @@
-using Poligon.Ai.EnemyStates.Utils;
+using Poligon.Ai.States.Utils;
 using System.Collections;
 using UnityEngine;
 
-namespace Poligon.Ai.EnemyStates {
-    public class BehindCoverState : EnemyBaseState {
+namespace Poligon.Ai.States {
+    public class BehindCoverState : IndividualBaseState {
         IEnumerator checkVisionCoroutine;
         private IEnumerator coveredAttackCoroutine;
-        public BehindCoverState(EnemyController controller) : base(controller) {
+        public BehindCoverState(AiCharacterController controller) : base(controller) {
         }
 
-        public override AiState state { get; protected set; } = AiState.BehindCover;
+        public override IndividualAiState state { get; protected set; } = IndividualAiState.BehindCover;
 
         public override void EnterState() {
             enemyController.ShootCancel();
-            if (!enemyController.enemy.IsCrouching()) {
+            if (!enemyController.aiCharacter.IsCrouching()) {
                 enemyController.CrouchStart();
-                enemyController.enemy.RotateSelf(-enemyController.hidingLogic.currentCoverEdge.forward);
+                enemyController.aiCharacter.RotateSelf(-enemyController.hidingLogic.currentCoverEdge.forward);
             }
             enemyController.AimCancel();
             enemyController.OnHealthLoss += HealthLost;
@@ -32,12 +32,12 @@ namespace Poligon.Ai.EnemyStates {
         }
 
         private void HealthLost(object sender, BulletDataEventArgs eventArgs) {
-            enemyController.aiState = AiState.StationaryAttacking;
+            enemyController.aiState = IndividualAiState.StationaryAttacking;
         }
         private IEnumerator CheckVision() {
             for (; ; ) {
                 if (Methods.HasAimOnOpponent(out Character character, enemyController, 40f)) {
-                    enemyController.aiState = AiState.StationaryAttacking;
+                    enemyController.aiState = IndividualAiState.StationaryAttacking;
                 }
                 yield return new WaitForSeconds(0.2f);
             }
@@ -47,7 +47,7 @@ namespace Poligon.Ai.EnemyStates {
 
             for (; ; ) {
                 yield return new WaitForSeconds(Random.Range(4f, 8f));
-                if(enemyController.aiState == AiState.BehindCover)enemyController.aiState = AiState.StationaryAttacking;
+                if(enemyController.aiState == IndividualAiState.BehindCover)enemyController.aiState = IndividualAiState.StationaryAttacking;
                 //    if (Methods.HasAimOnOpponent(out Character character, enemyController)) {
                 //        enemyController.aiState = AiState.Attacking;
                 //        goto End;

@@ -4,14 +4,14 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 using Poligon.Ai;
-using Poligon.Ai.EnemyStates;
+using Poligon.Ai.States;
 
 using Poligon.Ai.Commands;
 using Poligon.EvetArgs;
 using Poligon.Enums;
 using System.Linq;
 
-public class EnemyController : MonoBehaviour, IAICharacterController, IStateManager {
+public class AiCharacterController : MonoBehaviour, IAICharacterController, IStateManager {
     public event EventHandler OnRunStart;
     public event EventHandler OnRunCancel;
 
@@ -42,7 +42,7 @@ public class EnemyController : MonoBehaviour, IAICharacterController, IStateMana
 
     public event EventHandler<BulletDataEventArgs> OnHealthLoss;
 
-    public Enemy enemy { get; private set; }
+    public AICharacter aiCharacter { get; private set; }
 
     [SerializeField] private bool aiEnabled = true;
 
@@ -66,12 +66,12 @@ public class EnemyController : MonoBehaviour, IAICharacterController, IStateMana
     private IEnumerator pathRecalc;
 
     // AI
-    [SerializeField] private AiState _debugAiState;
-    public AiState aiState { get => stateMashine.GetState(); set {
+    [SerializeField] private IndividualAiState _debugAiState;
+    public IndividualAiState aiState { get => stateMashine.GetState(); set {
             stateMashine.MoveNext(value);
             _debugAiState = value;
         } }
-    private AiStateMashine<AiState> stateMashine;
+    private AiStateMashine<IndividualAiState> stateMashine;
     private Action stateMashineCallback;
 
     public HidingLogic hidingLogic { get; private set; }
@@ -82,7 +82,7 @@ public class EnemyController : MonoBehaviour, IAICharacterController, IStateMana
         destination = new NavMeshPath();
         hidingLogic = transform.GetComponent<HidingLogic>();
         attackingLogic = transform.gameObject.GetComponent<AttackingLogic>();
-        enemy = transform.GetComponentInParent<Enemy>();
+        aiCharacter = transform.GetComponentInParent<AICharacter>();
 
         NoneState none = new(this);
         PatrollingState patrolling = new(this);
@@ -94,39 +94,39 @@ public class EnemyController : MonoBehaviour, IAICharacterController, IStateMana
         navAgent.angularSpeed = 780f;
         navAgent.stoppingDistance = 0.4f;
 
-        stateMashine = new AiStateMashine<AiState>(none, this);
+        stateMashine = new AiStateMashine<IndividualAiState>(none, this);
 
-        Dictionary<StateTransition<AiState>, State<AiState>> transitions = new Dictionary<StateTransition<AiState>, State<AiState>>
+        Dictionary<StateTransition<IndividualAiState>, State<IndividualAiState>> transitions = new Dictionary<StateTransition<IndividualAiState>, State<IndividualAiState>>
         {
-            { new StateTransition<AiState>(AiState.None, AiState.Patrolling), patrolling },
-            { new StateTransition<AiState>(AiState.None, AiState.Searching), searching },
+            { new StateTransition<IndividualAiState>(IndividualAiState.None, IndividualAiState.Patrolling), patrolling },
+            { new StateTransition<IndividualAiState>(IndividualAiState.None, IndividualAiState.Searching), searching },
 
 
-            { new StateTransition<AiState>(AiState.Patrolling, AiState.None), none },
-            { new StateTransition<AiState>(AiState.Patrolling, AiState.Hiding), hiding },
-            { new StateTransition<AiState>(AiState.Patrolling, AiState.StationaryAttacking), attacking },
-            { new StateTransition<AiState>(AiState.Patrolling, AiState.Chasing), chasing },
+            { new StateTransition<IndividualAiState>(IndividualAiState.Patrolling, IndividualAiState.None), none },
+            { new StateTransition<IndividualAiState>(IndividualAiState.Patrolling, IndividualAiState.Hiding), hiding },
+            { new StateTransition<IndividualAiState>(IndividualAiState.Patrolling, IndividualAiState.StationaryAttacking), attacking },
+            { new StateTransition<IndividualAiState>(IndividualAiState.Patrolling, IndividualAiState.Chasing), chasing },
 
 
-            { new StateTransition<AiState>(AiState.Hiding, AiState.StationaryAttacking), attacking },
-            { new StateTransition<AiState>(AiState.Hiding, AiState.BehindCover), behindCover },
-            { new StateTransition<AiState>(AiState.Hiding, AiState.Chasing), chasing },
+            { new StateTransition<IndividualAiState>(IndividualAiState.Hiding, IndividualAiState.StationaryAttacking), attacking },
+            { new StateTransition<IndividualAiState>(IndividualAiState.Hiding, IndividualAiState.BehindCover), behindCover },
+            { new StateTransition<IndividualAiState>(IndividualAiState.Hiding, IndividualAiState.Chasing), chasing },
 
 
-            { new StateTransition<AiState>(AiState.BehindCover, AiState.StationaryAttacking), attacking },
-            { new StateTransition<AiState>(AiState.BehindCover, AiState.Chasing), chasing },
+            { new StateTransition<IndividualAiState>(IndividualAiState.BehindCover, IndividualAiState.StationaryAttacking), attacking },
+            { new StateTransition<IndividualAiState>(IndividualAiState.BehindCover, IndividualAiState.Chasing), chasing },
 
-            { new StateTransition<AiState>(AiState.StationaryAttacking, AiState.Chasing), chasing },
-            { new StateTransition<AiState>(AiState.StationaryAttacking, AiState.Hiding), hiding },
-            { new StateTransition<AiState>(AiState.StationaryAttacking, AiState.BehindCover), behindCover },
+            { new StateTransition<IndividualAiState>(IndividualAiState.StationaryAttacking, IndividualAiState.Chasing), chasing },
+            { new StateTransition<IndividualAiState>(IndividualAiState.StationaryAttacking, IndividualAiState.Hiding), hiding },
+            { new StateTransition<IndividualAiState>(IndividualAiState.StationaryAttacking, IndividualAiState.BehindCover), behindCover },
 
-            { new StateTransition<AiState>(AiState.Chasing, AiState.Hiding), hiding },
-            { new StateTransition<AiState>(AiState.Chasing, AiState.StationaryAttacking), attacking },
-            { new StateTransition<AiState>(AiState.Chasing, AiState.Patrolling), patrolling },
-            { new StateTransition<AiState>(AiState.Chasing, AiState.Searching), searching },
+            { new StateTransition<IndividualAiState>(IndividualAiState.Chasing, IndividualAiState.Hiding), hiding },
+            { new StateTransition<IndividualAiState>(IndividualAiState.Chasing, IndividualAiState.StationaryAttacking), attacking },
+            { new StateTransition<IndividualAiState>(IndividualAiState.Chasing, IndividualAiState.Patrolling), patrolling },
+            { new StateTransition<IndividualAiState>(IndividualAiState.Chasing, IndividualAiState.Searching), searching },
 
-            { new StateTransition<AiState>(AiState.Searching, AiState.Hiding), hiding },
-            { new StateTransition<AiState>(AiState.Searching, AiState.Chasing), chasing },
+            { new StateTransition<IndividualAiState>(IndividualAiState.Searching, IndividualAiState.Hiding), hiding },
+            { new StateTransition<IndividualAiState>(IndividualAiState.Searching, IndividualAiState.Chasing), chasing },
 
 
 
@@ -141,34 +141,34 @@ public class EnemyController : MonoBehaviour, IAICharacterController, IStateMana
         if (!aiEnabled) return;
 
 
-        enemy.GetAimPosition().OnLineOfSight += EnemySpotted;
-        enemy.OnHealthLoss += HealthLoss;
-        aiState = AiState.Patrolling;
+        aiCharacter.GetAimPosition().OnLineOfSight += EnemySpotted;
+        aiCharacter.OnHealthLoss += HealthLoss;
+        aiState = IndividualAiState.Patrolling;
 
-        enemy.OnDeath += (object e, CharacterEventArgs ch) => { StopAllCoroutines(); };
+        aiCharacter.OnDeath += (object e, CharacterEventArgs ch) => { StopAllCoroutines(); };
     }
 
     public Gun getWeapon() {
-        return enemy.gun;
+        return aiCharacter.gun;
     }
 
     public Character GetCharacter() {
-        return enemy;
+        return aiCharacter;
     }
 
     public void setSquad(Squad squad) {
-        enemy.squad = squad;
+        aiCharacter.squad = squad;
     }
 
     private void EnemySpotted(object sender = null, CharacterEventArgs e = null) {
         
-        ICommand command = new EnemySpottedCommand(enemy.squad, e.character);
+        ICommand command = new EnemySpottedCommand(aiCharacter.squad, e.character);
         command.execute();
     }
     public void EnemySpotted(Character character) {
         
         attackingLogic.opponent = character;
-        enemy.GetAimPosition().alerted = true;
+        aiCharacter.GetAimPosition().alerted = true;
         attackingLogic.EnemySpotted(character);
     }
     public void SetUpdateStateCallback(Action callback) {
@@ -185,10 +185,10 @@ public class EnemyController : MonoBehaviour, IAICharacterController, IStateMana
     
     public void HealthLoss(object sender, BulletDataEventArgs eventArgs) {
         if (OnHealthLoss != null) OnHealthLoss(this, eventArgs);
-        if (enemy.GetAimPosition() != null && !enemy.GetAimPosition().aimingAtCharacter) {
-            enemy.GetAimPosition().LockOnTarget(eventArgs.BulletData.source, !enemy.IsAiming()); // Move the aim to the attacker.
+        if (aiCharacter.GetAimPosition() != null && !aiCharacter.GetAimPosition().aimingAtCharacter) {
+            aiCharacter.GetAimPosition().LockOnTarget(eventArgs.BulletData.source, !aiCharacter.IsAiming()); // Move the aim to the attacker.
         }
-        ICommand command = new CharacterAttackedCommand(enemy,enemy.squad, eventArgs.BulletData.source);
+        ICommand command = new CharacterAttackedCommand(aiCharacter,aiCharacter.squad, eventArgs.BulletData.source);
         command.execute();
     }
 
@@ -242,14 +242,14 @@ public class EnemyController : MonoBehaviour, IAICharacterController, IStateMana
     }
 
     public void CrouchStart() {
-        if (enemy.IsCrouching()) return;
+        if (aiCharacter.IsCrouching()) return;
         if (OnCrouchStart != null) OnCrouchStart(this, EventArgs.Empty);
     }
     public void CrouchPerformed() {
         if (OnCrouchPerformed != null) OnCrouchPerformed(this, EventArgs.Empty);
     }
     public void CrouchCancel() {
-        if (!enemy.IsCrouching()) return;
+        if (!aiCharacter.IsCrouching()) return;
         if (OnCrouchCancel != null) OnCrouchCancel(this, EventArgs.Empty);
     }
     public void ShootStart() {

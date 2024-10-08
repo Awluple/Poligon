@@ -1,17 +1,30 @@
 using Poligon.Ai.Commands;
+using Poligon.Ai.States;
 using Poligon.EvetArgs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.UIElements.Experimental;
 
 namespace Poligon.Ai {
-    public class Squad : MonoBehaviour {
-        public List<IAICharacterController> characters = new ();
+    public class Squad : MonoBehaviour, IStateManager {
+        public List<AiCharacterController> characters = new ();
         public Dictionary<Character, LastKnownPosition> lastKnownPosition { get; private set; } = new Dictionary<Character, LastKnownPosition>();
         public Dictionary<Character, Character> knownEnemies = new ();
         private float enemySinceLastSeen = 0f;
         public Character _leader;
+        private Action stateMashineCallback;
+
+
+        [SerializeField] private SquadAiState _debugAiState;
+        public SquadAiState aiState {
+            get => stateMashine.GetState(); set {
+                stateMashine.MoveNext(value);
+                _debugAiState = value;
+            }
+        }
+        private AiStateMashine<SquadAiState> stateMashine;
 
         public Character leader { get {
                 return _leader;
@@ -22,9 +35,9 @@ namespace Poligon.Ai {
 
         private void ReassignLeader(object sender, CharacterEventArgs ch) {
             if (leader == ch.character) {
-                foreach (Character teamMember in characters) {
+                foreach (AiCharacterController teamMember in characters) {
                     if (teamMember != ch.character) { 
-                        leader = teamMember;
+                        leader = teamMember.GetCharacter();
                         break;
                     }
                 }
@@ -32,10 +45,13 @@ namespace Poligon.Ai {
             if (leader == null || leader == ch.character) {
                 Debug.Log("Squad destroyed");
             }
-        } 
+        }
+        public void SetUpdateStateCallback(Action callback) {
+            stateMashineCallback = callback;
+        }
 
         void Start() {
-            List<IAICharacterController> childrenCharacters = GetComponentsInChildren<IAICharacterController>().ToList();
+            List<AiCharacterController> childrenCharacters = GetComponentsInChildren<AiCharacterController>().ToList();
             foreach (var character in childrenCharacters) {
                 if (character.isEnabled()) {
                     characters.Add(character);
@@ -43,9 +59,20 @@ namespace Poligon.Ai {
                     character.GetCharacter().OnDeath += (object e, CharacterEventArgs args) => { characters.Remove(character); };
                 }
             }
+            SquadNoneState none = new(this);
+            FollowingState following = new(this);
+            stateMashine = new AiStateMashine<SquadAiState>(none, this);
+            Dictionary<StateTransition<SquadAiState>, State<SquadAiState>> transitions = new Dictionary<StateTransition<SquadAiState>, State<SquadAiState>>
+        {
+                { new StateTransition<SquadAiState>(SquadAiState.None, SquadAiState.FollowingState), following },
+        };
+            stateMashine.SetupTransitions(transitions);
+            aiState = SquadAiState.FollowingState;
         }
         private void Update() {
+            if (stateMashineCallback != null) stateMashineCallback();
             enemySinceLastSeen += Time.deltaTime;
+            stateMashine.UpdateState();
         }
 
         public void UpdateLastKnownPosition(LastKnownPosition lastKnownPos) {
@@ -63,7 +90,10 @@ namespace Poligon.Ai {
             return lastKnownPosition.GetValueOrDefault(character);
         }
         public LastKnownPosition GetChasingLocation() {
-            return lastKnownPosition.Values.ToList()[0];
+            if(lastKnownPosition.Count > 1 ) {
+                return lastKnownPosition.Values.ToList()[0];
+            }
+            return null;
         }
         public void EnemySpotted(Character chara) {
             if (!knownEnemies.ContainsKey(chara)) {

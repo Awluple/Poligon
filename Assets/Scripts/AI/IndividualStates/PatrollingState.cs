@@ -1,12 +1,12 @@
 using System.Collections;
 using UnityEngine;
 
-namespace Poligon.Ai.EnemyStates {
-    public class PatrollingState : EnemyBaseState {
-        public PatrollingState(EnemyController controller) : base(controller) {
+namespace Poligon.Ai.States {
+    public class PatrollingState : IndividualBaseState {
+        public PatrollingState(AiCharacterController controller) : base(controller) {
         }
 
-        public override AiState state { get; protected set; } = AiState.Patrolling;
+        public override IndividualAiState state { get; protected set; } = IndividualAiState.Patrolling;
 
         public int currentPatrolPosition = -1;
         private IEnumerator pathRecalcCoroutine;
@@ -28,7 +28,7 @@ namespace Poligon.Ai.EnemyStates {
 
                 return;
             };
-            if ((currentPatrolPosition == -1 || enemyController.onFinalPosition) && enemyController.aiState == AiState.Patrolling) {
+            if ((currentPatrolPosition == -1 || enemyController.onFinalPosition) && enemyController.aiState == IndividualAiState.Patrolling) {
                 waitInPatrolPositionCoroutine = WaitInPatrollingPosition();
                 enemyController.StartCoroutine(waitInPatrolPositionCoroutine);
             }

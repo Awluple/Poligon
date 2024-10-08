@@ -8,7 +8,7 @@ using UnityEngine.TextCore.Text;
 
 public class EnemyAimPosition : AimPosition {
     [SerializeField] CharactersSphere charactersSphere;
-    [SerializeField] Enemy enemy;
+    [SerializeField] AICharacter enemy;
     public bool aimingAtCharacter = false;
     public bool alerted = false;
     public float alertedMaxDistance = 55f;
@@ -28,7 +28,7 @@ public class EnemyAimPosition : AimPosition {
 
 
     void Awake() {
-        enemy = GetComponentInParent<Enemy>();
+        enemy = GetComponentInParent<AICharacter>();
         transform.SetParent(enemy.transform.parent);
     }
     private void Start() {

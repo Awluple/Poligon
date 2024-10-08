@@ -1,5 +1,5 @@
 using Poligon;
-using Poligon.Ai.EnemyStates;
+using Poligon.Ai.States;
 using System;
 using System.Collections;
 using System.Collections.Generic;

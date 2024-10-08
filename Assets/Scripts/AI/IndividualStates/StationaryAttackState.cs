@@ -1,25 +1,25 @@
 using UnityEngine;
 using System.Collections;
 
-using Poligon.Ai.EnemyStates.Utils;
+using Poligon.Ai.States.Utils;
 using Poligon.Ai.Commands;
 using System;
 
-namespace Poligon.Ai.EnemyStates {
-    public class StationaryAttackState : EnemyBaseState {
+namespace Poligon.Ai.States {
+    public class StationaryAttackState : IndividualBaseState {
         private float timeInState = 0f;
-        public override AiState state { get; protected set; } = AiState.StationaryAttacking;
+        public override IndividualAiState state { get; protected set; } = IndividualAiState.StationaryAttacking;
 
         private IEnumerator shootingCoroutine;
 
-        public StationaryAttackState(EnemyController controller) : base(controller) {
+        public StationaryAttackState(AiCharacterController controller) : base(controller) {
         }
         public override void UpdateState() {
             timeInState += Time.deltaTime;
             if (timeInState > 14f) {
                 bool hasVision = Methods.HasAimOnOpponent(out Character character, enemyController, 40f);
                 if (!hasVision) {
-                    enemyController.aiState = AiState.Chasing;
+                    enemyController.aiState = IndividualAiState.Chasing;
                 }
                 timeInState = 0f;
             }
@@ -31,50 +31,50 @@ namespace Poligon.Ai.EnemyStates {
 
         public override void EnterState() {
             bool hasVision = Methods.HasAimOnOpponent(out Character character, enemyController, 40f);
-            enemyController.enemy.OnShoot += ResetTimer;
-            enemyController.enemy.OnHealthLoss += TryToHide;
+            enemyController.aiCharacter.OnShoot += ResetTimer;
+            enemyController.aiCharacter.OnHealthLoss += TryToHide;
 
-            if (enemyController.enemy.IsCrouching() && !hasVision) {
+            if (enemyController.aiCharacter.IsCrouching() && !hasVision) {
                 enemyController.CrouchCancel();
             }
-            if(!enemyController.enemy.IsAiming()) {
+            if(!enemyController.aiCharacter.IsAiming()) {
                 enemyController.AimStart();
             }
             shootingCoroutine = Coroutines.ShootingCoroutine(enemyController);
             enemyController.StartCoroutine(shootingCoroutine);
             if (enemyController.hidingLogic.currentCoverSubEdge != null && !hasVision) {
                 Vector3 pos = enemyController.hidingLogic.currentCoverEdge.forward * 4 + enemyController.eyes.transform.position;
-                LastKnownPosition opponentPosition = enemyController.enemy.squad.GetCharacterLastPosition(enemyController.attackingLogic.opponent);
+                LastKnownPosition opponentPosition = enemyController.aiCharacter.squad.GetCharacterLastPosition(enemyController.attackingLogic.opponent);
                 if(opponentPosition != null) {
-                    Vector3 aimPosition = (opponentPosition.position == Vector3.zero) ? pos : enemyController.enemy.squad.GetCharacterLastPosition(enemyController.attackingLogic.opponent).position;
+                    Vector3 aimPosition = (opponentPosition.position == Vector3.zero) ? pos : enemyController.aiCharacter.squad.GetCharacterLastPosition(enemyController.attackingLogic.opponent).position;
 
-                    enemyController.enemy.GetAimPosition().MoveAim(aimPosition, 80f);
-                    enemyController.enemy.RotateSelf(enemyController.hidingLogic.currentCoverEdge.forward);
+                    enemyController.aiCharacter.GetAimPosition().MoveAim(aimPosition, 80f);
+                    enemyController.aiCharacter.RotateSelf(enemyController.hidingLogic.currentCoverEdge.forward);
                 }
             }
         }
 
         public void TryToHide(object sender, EventArgs args) {
-            if (enemyController.enemy.health / enemyController.enemy.maxHealth > 0.6) {
+            if (enemyController.aiCharacter.health / enemyController.aiCharacter.maxHealth > 0.6) {
                 return;
             } else if (UnityEngine.Random.Range(0, 10) > 7) {
                 return;
             }
             if (enemyController.hidingLogic.currentCoverSubEdge != null) {
-                enemyController.aiState = AiState.BehindCover;
+                enemyController.aiState = IndividualAiState.BehindCover;
             } else {
                 //enemyController.hidingLogic.GetHidingPosition(enemyController.attackingLogic.opponent.transform.position, enemyController.enemy);
-                enemyController.aiState = AiState.Hiding;
+                enemyController.aiState = IndividualAiState.Hiding;
             }
         }
 
         public override void ExitState() {
-            enemyController.enemy.OnHealthLoss -= TryToHide;
+            enemyController.aiCharacter.OnHealthLoss -= TryToHide;
             if (shootingCoroutine != null) {
                 enemyController.StopCoroutine(shootingCoroutine);
                 shootingCoroutine = null;
             }
-            enemyController.enemy.OnShoot -= ResetTimer;
+            enemyController.aiCharacter.OnShoot -= ResetTimer;
             enemyController.ShootCancel();
         }
     }

@@ -4,18 +4,18 @@ using UnityEngine.AI;
 using System.Linq;
 using System;
 
-namespace Poligon.Ai.EnemyStates {
-    public class SearchingState : EnemyBaseState {
+namespace Poligon.Ai.States {
+    public class SearchingState : IndividualBaseState {
         static bool navmeshReady = false;
         static NavMeshTriangulation navMeshData;
         public static List<SearchingArea> areas = new();
         private (SearchingArea area, int index) currentArea;
         private Vector3[] corners;
 
-        public SearchingState(EnemyController controller) : base(controller) {
+        public SearchingState(AiCharacterController controller) : base(controller) {
         }
 
-        public override AiState state { get; protected set; } = AiState.Searching;
+        public override IndividualAiState state { get; protected set; } = IndividualAiState.Searching;
 
         public override void EnterState() {
             enemyController.CrouchCancel();
@@ -52,18 +52,18 @@ namespace Poligon.Ai.EnemyStates {
             Vector3 direction = (enemyController.transform.position - pos).normalized * -1.5f;
             pos.y += 1.4f;
             pos += direction;
-            enemyController.enemy.GetAimPosition().Reposition(pos);
+            enemyController.aiCharacter.GetAimPosition().Reposition(pos);
 
-            enemyController.enemy.GetAimPosition().OnLineOfSight += Hide;
+            enemyController.aiCharacter.GetAimPosition().OnLineOfSight += Hide;
 
         }
 
         public override void ExitState() {
-            enemyController.enemy.GetAimPosition().OnLineOfSight -= Hide;
+            enemyController.aiCharacter.GetAimPosition().OnLineOfSight -= Hide;
         }
 
         private void Hide(object sender, EventArgs args) {
-            if(enemyController.aiState == AiState.Searching) enemyController.aiState = AiState.Hiding;
+            if(enemyController.aiState == IndividualAiState.Searching) enemyController.aiState = IndividualAiState.Hiding;
         }
 
         public void NextCorner(object sender = null, EventArgs args = null) {
@@ -73,7 +73,7 @@ namespace Poligon.Ai.EnemyStates {
             pos += direction;
 
 
-            enemyController.enemy.GetAimPosition().MoveAim(pos, 10f);
+            enemyController.aiCharacter.GetAimPosition().MoveAim(pos, 10f);
 
             for (int i = 0; i < areas.Count; i++) {
                 var area = areas[i];
@@ -89,7 +89,7 @@ namespace Poligon.Ai.EnemyStates {
         }
 
         private (SearchingArea area, int index) GetNextArea() {
-            (SearchingArea area, int index) area = areas.Select((area, index) => (area, index)).Where(a => a.area.AreaChecked == false).OrderBy(a => Vector3.Distance(enemyController.enemy.squad.GetChasingLocation().position, a.area.Position)).First();
+            (SearchingArea area, int index) area = areas.Select((area, index) => (area, index)).Where(a => a.area.AreaChecked == false).OrderBy(a => Vector3.Distance(enemyController.aiCharacter.squad.GetChasingLocation().position, a.area.Position)).First();
             NavMeshPath navMeshPath = new NavMeshPath();
             if (enemyController.navAgent.CalculatePath(area.area.Position, navMeshPath) && navMeshPath.status == NavMeshPathStatus.PathComplete) {
                 return area;

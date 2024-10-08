@@ -1,19 +1,19 @@
 using UnityEngine;
-using Poligon.Ai.EnemyStates.Utils;
+using Poligon.Ai.States.Utils;
 using System.Collections;
 using System;
 using UnityEngine.TextCore.Text;
 using Poligon.EvetArgs;
 
-namespace Poligon.Ai.EnemyStates {
-    public class ChasingState : EnemyBaseState {
+namespace Poligon.Ai.States {
+    public class ChasingState : IndividualBaseState {
         IEnumerator movingAttackCoroutine;
         IEnumerator chasingCoroutine;
 
-        public ChasingState(EnemyController controller) : base(controller) {
+        public ChasingState(AiCharacterController controller) : base(controller) {
         }
 
-        public override AiState state { get; protected set; } = AiState.Chasing;
+        public override IndividualAiState state { get; protected set; } = IndividualAiState.Chasing;
 
         public override void EnterState() {
 
@@ -22,11 +22,11 @@ namespace Poligon.Ai.EnemyStates {
             enemyController.StartCoroutine(movingAttackCoroutine);
 
             if (enemyController.hidingLogic.currentCoverSubEdge != null) {
-                enemyController.enemy.GetAimPosition().Reposition(enemyController.enemy.squad.GetCharacterLastPosition(enemyController.attackingLogic.opponent).position);
+                enemyController.aiCharacter.GetAimPosition().Reposition(enemyController.aiCharacter.squad.GetCharacterLastPosition(enemyController.attackingLogic.opponent).position);
                 enemyController.AimStart();
                 enemyController.CrouchCancel();
                 //enemyController.SetNewDestinaction(coverPosition.transform.position);
-                enemyController.SetNewDestinaction(enemyController.enemy.squad.GetCharacterLastPosition(enemyController.attackingLogic.opponent).position);
+                enemyController.SetNewDestinaction(enemyController.aiCharacter.squad.GetCharacterLastPosition(enemyController.attackingLogic.opponent).position);
 
             } else {
                 chasingCoroutine = ChasingCoroutine();
@@ -34,15 +34,15 @@ namespace Poligon.Ai.EnemyStates {
                 enemyController.OnFinalPositionEvent += Search;
             }
 
-            enemyController.enemy.GetAimPosition().OnLineOfSight += EnemyFound;
+            enemyController.aiCharacter.GetAimPosition().OnLineOfSight += EnemyFound;
         }
         private void Search(object sender, EventArgs e) {
-            enemyController.aiState = AiState.Searching;
+            enemyController.aiState = IndividualAiState.Searching;
             enemyController.OnFinalPositionEvent -= Search;
         }
         public override void ExitState() {
             enemyController.StopCoroutine(movingAttackCoroutine);
-            enemyController.enemy.GetAimPosition().OnLineOfSight -= EnemyFound;
+            enemyController.aiCharacter.GetAimPosition().OnLineOfSight -= EnemyFound;
         }
 
         private void EnemyFound(object sender, CharacterEventArgs args) {
@@ -52,13 +52,13 @@ namespace Poligon.Ai.EnemyStates {
             //enemyController.hidingLogic.GetHidingPosition(enemyController.attackingLogic.opponent.transform.position, enemyController.enemy);
             if(UnityEngine.Random.Range(0, 10) > 6) { enemyController.CrouchStart(); }
             enemyController.SetNewDestinaction(enemyController.transform.position);
-            enemyController.aiState = AiState.StationaryAttacking;
+            enemyController.aiState = IndividualAiState.StationaryAttacking;
         }
 
         public IEnumerator ChasingCoroutine() {
             for (; ; ) {
-                if(enemyController.enemy.squad.GetCharacterLastPosition(enemyController.attackingLogic.opponent).position != Vector3.zero) {
-                    enemyController.SetNewDestinaction(enemyController.enemy.squad.GetCharacterLastPosition(enemyController.attackingLogic.opponent).position);
+                if(enemyController.aiCharacter.squad.GetCharacterLastPosition(enemyController.attackingLogic.opponent).position != Vector3.zero) {
+                    enemyController.SetNewDestinaction(enemyController.aiCharacter.squad.GetCharacterLastPosition(enemyController.attackingLogic.opponent).position);
                     enemyController.AimCancel();
                     enemyController.RunStart();
                     enemyController.StopCoroutine(chasingCoroutine);

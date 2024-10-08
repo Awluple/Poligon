@@ -1,12 +1,12 @@
 using System.Collections;
 using UnityEngine;
-using Poligon.Ai.EnemyStates.Utils;
+using Poligon.Ai.States.Utils;
 using System.Collections.Generic;
 using UnityEngine.AI;
 using System;
 
-namespace Poligon.Ai.EnemyStates {
-    public class HidingState : EnemyBaseState {
+namespace Poligon.Ai.States {
+    public class HidingState : IndividualBaseState {
         private IEnumerator movingAttackCoroutine;
         private IEnumerator attemptHideCoroutine;
         float timeSinceLastSeen = Time.time;
@@ -15,10 +15,10 @@ namespace Poligon.Ai.EnemyStates {
         private SubEdge? subEdge = null;
         bool coverSearchingStarted = false;
 
-        public HidingState(EnemyController controller) : base(controller) {
+        public HidingState(AiCharacterController controller) : base(controller) {
         }
 
-        public override AiState state { get; protected set; } = AiState.Hiding;
+        public override IndividualAiState state { get; protected set; } = IndividualAiState.Hiding;
 
         public override void EnterState() {
             //CoverPosition hidingSpot = enemyController.hidingLogic.currentCoverPosition;
@@ -34,7 +34,7 @@ namespace Poligon.Ai.EnemyStates {
                 if (Vector3.Distance(enemyController.transform.position, enemyController.attackingLogic.opponent.transform.position) > 7f) {
                     enemyController.SetNewDestinaction(enemyController.transform.position);
                     if (UnityEngine.Random.Range(1, 10) < 8) enemyController.CrouchStart();
-                    enemyController.enemy.GetAimPosition().LockOnTarget(enemyController.attackingLogic.opponent, !enemyController.enemy.IsAiming());
+                    enemyController.aiCharacter.GetAimPosition().LockOnTarget(enemyController.attackingLogic.opponent, !enemyController.aiCharacter.IsAiming());
                 } else {
                     MoveAgentAwayFromPoint(enemyController.attackingLogic.opponent.transform.position);
                 }
@@ -61,7 +61,7 @@ namespace Poligon.Ai.EnemyStates {
                     }
                 }
                 if (enemyController.hidingLogic.currentCoverEdge != null && enemyController.hidingLogic.currentCoverSubEdge != null) {
-                    bool claimed = enemyController.hidingLogic.dynamicCover.Subscribe(enemyController.hidingLogic.currentCoverEdge.id, enemyController.hidingLogic.currentCoverSubEdge, enemyController.enemy);
+                    bool claimed = enemyController.hidingLogic.dynamicCover.Subscribe(enemyController.hidingLogic.currentCoverEdge.id, enemyController.hidingLogic.currentCoverSubEdge, enemyController.aiCharacter);
                     
                     if(NavMesh.SamplePosition(enemyController.hidingLogic.currentCoverSubEdge.middle, out NavMeshHit hit, 1f, NavMesh.AllAreas)) {
                         if (!claimed) {
@@ -101,7 +101,7 @@ namespace Poligon.Ai.EnemyStates {
             if (!Methods.HasAimOnOpponent(out Character chara, enemyController, 60f)) {
                 //enemyController.enemy.RotateSelf(-enemyController.hidingLogic.currentCoverPosition.transform.position);
                 try {
-                    enemyController.enemy.RotateSelf(-enemyController.hidingLogic.currentCoverEdge.forward);
+                    enemyController.aiCharacter.RotateSelf(-enemyController.hidingLogic.currentCoverEdge.forward);
                 } catch (Exception e) {
                     Debug.LogError("Cover Edge: " + enemyController.hidingLogic.currentCoverEdge);
                     throw;
@@ -114,9 +114,9 @@ namespace Poligon.Ai.EnemyStates {
                 //    }
                 //}
                 enemyController.CrouchStart();
-                enemyController.aiState = AiState.BehindCover;
+                enemyController.aiState = IndividualAiState.BehindCover;
             } else {
-                enemyController.aiState = AiState.StationaryAttacking;
+                enemyController.aiState = IndividualAiState.StationaryAttacking;
             }
         }
         bool IsPathWithinDistance(Vector3 targetPosition, float maxDistance) {

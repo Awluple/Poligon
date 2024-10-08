@@ -6,12 +6,11 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.AI;
-public class Enemy : Character, ISquadMember {
+public class AICharacter : Character, ISquadMember {
 
 
-    [SerializeField] private EnemyController enemyController;
+    [SerializeField] private AiCharacterController enemyController;
 
-    public static List<Enemy> enemyList;
 
     public Squad squad { get; set; }
 
@@ -35,10 +34,6 @@ public class Enemy : Character, ISquadMember {
 
         characterController = GetComponent<CharacterController>();
 
-        if (enemyList == null) {
-            enemyList = GetComponentsInParent<Enemy>().ToList();
-        }
-
     }
     private void Start() {
         if (currentWeapon == WeaponTypes.None) {
@@ -49,7 +44,7 @@ public class Enemy : Character, ISquadMember {
     public EnemyAimPosition GetAimPosition() {
         return (EnemyAimPosition)aimingTarget;
     }
-    public EnemyController GetController() {
+    public AiCharacterController GetController() {
         return enemyController;
     }
 
