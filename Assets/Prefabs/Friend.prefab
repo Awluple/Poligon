@@ -640,7 +640,6 @@ GameObject:
   m_Component:
   - component: {fileID: 4028715265438406047}
   - component: {fileID: 1666079562622170445}
-  - component: {fileID: 18477389191316012}
   - component: {fileID: 289530662383327434}
   - component: {fileID: 5523775216945712597}
   m_Layer: 11
@@ -681,16 +680,16 @@ MonoBehaviour:
   m_GameObject: {fileID: 1687499180143291795}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c798ebb20b47007439fe9bb05b7d46ae, type: 3}
+  m_Script: {fileID: 11500000, guid: f63aa77c400125d469c5cb9b9f504ddb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  groundCheck: {fileID: 2510724349917178919}
+  groundCheck: {fileID: 0}
   moveSpeed: 3.25
-  sprintSpeed: 7.5
+  sprintSpeed: 10
   aimSpeed: 2
   rotationSpeed: 720
   fallingGravityStrength: 5
-  heavyFallStunTime: 2.1
+  heavyFallStunTime: 3.1
   team: 1
   rig: {fileID: 7567847412988519442}
   gun: {fileID: 0}
@@ -701,37 +700,11 @@ MonoBehaviour:
   isAiming: 0
   isCrouching: 0
   stunned: 0
-  _health: 800
-  _maxHealth: 800
+  _health: 100
+  _maxHealth: 100
   detectionPoints:
   - {fileID: 8056032063288288747}
   enemyController: {fileID: 1319538167934939892}
---- !u!143 &18477389191316012
-CharacterController:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1687499180143291795}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 0
-  serializedVersion: 3
-  m_Height: 2.8
-  m_Radius: 0.5
-  m_SlopeLimit: 45
-  m_StepOffset: 0.3
-  m_SkinWidth: 0.08
-  m_MinMoveDistance: 0.001
-  m_Center: {x: 0, y: 1.4, z: 0}
 --- !u!195 &289530662383327434
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -1096,7 +1069,7 @@ GameObject:
   - component: {fileID: 4211714410039512642}
   - component: {fileID: 7746162921771835900}
   m_Layer: 9
-  m_Name: Target 1
+  m_Name: Aim Target
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3538,7 +3511,7 @@ GameObject:
   - component: {fileID: 4021876933742075669}
   - component: {fileID: 4840633049370520543}
   m_Layer: 0
-  m_Name: EnemyController
+  m_Name: AiController
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3568,7 +3541,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 8616911758810887723}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: abb53408166b1a64787df28875b5dff6, type: 3}
+  m_Script: {fileID: 11500000, guid: 5e3c8deb0c01a2b47b0bc0c9ab7a3ea0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   aiEnabled: 1
