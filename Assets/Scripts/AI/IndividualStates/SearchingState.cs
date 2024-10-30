@@ -3,6 +3,7 @@ using UnityEngine;
 using UnityEngine.AI;
 using System.Linq;
 using System;
+using Poligon.Ai.Commands;
 
 namespace Poligon.Ai.States {
     public class SearchingState : IndividualBaseState {
@@ -18,14 +19,14 @@ namespace Poligon.Ai.States {
         public override IndividualAiState state { get; protected set; } = IndividualAiState.Searching;
 
         public override void EnterState() {
-            enemyController.CrouchCancel();
+            aiController.CrouchCancel();
             GetPoints();
 
             for(int i = 0; i < areas.Count; i++) {
                 var area = areas[i];
-                if (Physics.Raycast(enemyController.eyes.transform.position, (area.Position - enemyController.eyes.transform.position), out RaycastHit hit, 15f)){
+                if (Physics.Raycast(aiController.eyes.transform.position, (area.Position - aiController.eyes.transform.position), out RaycastHit hit, 15f)){
                     
-                    if (Vector3.Distance(hit.point, enemyController.eyes.transform.position) +10f > Vector3.Distance(enemyController.eyes.transform.position, area.Position)) {
+                    if (Vector3.Distance(hit.point, aiController.eyes.transform.position) +10f > Vector3.Distance(aiController.eyes.transform.position, area.Position)) {
                         area.AreaChecked = true;
                         areas[i] = area;
                     }
@@ -34,11 +35,11 @@ namespace Poligon.Ai.States {
 
             (SearchingArea area, int index) nextArea = GetNextArea();
 
-            corners = enemyController.SetNewDestinaction(nextArea.area.Position);
-            enemyController.OnFinalPositionEvent += AreaReached;
+            corners = aiController.SetNewDestinaction(nextArea.area.Position);
+            aiController.OnFinalPositionEvent += AreaReached;
 
-            enemyController.OnFinalPositionEvent += NextCorner;
-            enemyController.OnNextCornerEvent += NextCorner;
+            aiController.OnFinalPositionEvent += NextCorner;
+            aiController.OnNextCornerEvent += NextCorner;
 
             currentArea = nextArea;
 
@@ -46,40 +47,40 @@ namespace Poligon.Ai.States {
             areas[currentArea.index] = currentArea.area;
 
 
-            enemyController.AimStart();
+            aiController.AimStart();
 
-            Vector3 pos = corners[enemyController.currentCorner];
-            Vector3 direction = (enemyController.transform.position - pos).normalized * -1.5f;
+            Vector3 pos = corners[aiController.currentCorner];
+            Vector3 direction = (aiController.transform.position - pos).normalized * -1.5f;
             pos.y += 1.4f;
             pos += direction;
-            enemyController.aiCharacter.GetAimPosition().Reposition(pos);
+            aiController.aiCharacter.GetAimPosition().Reposition(pos);
 
-            enemyController.aiCharacter.GetAimPosition().OnLineOfSight += Hide;
+            aiController.aiCharacter.GetAimPosition().OnLineOfSight += Hide;
 
         }
 
         public override void ExitState() {
-            enemyController.aiCharacter.GetAimPosition().OnLineOfSight -= Hide;
+            aiController.aiCharacter.GetAimPosition().OnLineOfSight -= Hide;
         }
 
         private void Hide(object sender, EventArgs args) {
-            if(enemyController.aiState == IndividualAiState.Searching) enemyController.aiState = IndividualAiState.Hiding;
+            if(aiController.aiState == IndividualAiState.Searching) aiController.aiState = IndividualAiState.Hiding;
         }
 
         public void NextCorner(object sender = null, EventArgs args = null) {
-            Vector3 pos = corners[enemyController.currentCorner];
-            Vector3 direction = (enemyController.transform.position - pos).normalized * -2.5f;
+            Vector3 pos = corners[aiController.currentCorner];
+            Vector3 direction = (aiController.transform.position - pos).normalized * -2.5f;
             pos.y += 1.6f;
             pos += direction;
 
 
-            enemyController.aiCharacter.GetAimPosition().MoveAim(pos, 10f);
+            aiController.aiCharacter.GetAimPosition().MoveAim(pos, 10f);
 
             for (int i = 0; i < areas.Count; i++) {
                 var area = areas[i];
-                if (Physics.Raycast(enemyController.eyes.transform.position, (area.Position - enemyController.eyes.transform.position), out RaycastHit hit, 15f)) {
+                if (Physics.Raycast(aiController.eyes.transform.position, (area.Position - aiController.eyes.transform.position), out RaycastHit hit, 15f)) {
 
-                    if (Vector3.Distance(hit.point, enemyController.eyes.transform.position) + 5f > Vector3.Distance(enemyController.eyes.transform.position, area.Position)) {
+                    if (Vector3.Distance(hit.point, aiController.eyes.transform.position) + 5f > Vector3.Distance(aiController.eyes.transform.position, area.Position)) {
                         area.AreaChecked = true;
                         areas[i] = area;
                     }
@@ -89,9 +90,10 @@ namespace Poligon.Ai.States {
         }
 
         private (SearchingArea area, int index) GetNextArea() {
-            (SearchingArea area, int index) area = areas.Select((area, index) => (area, index)).Where(a => a.area.AreaChecked == false).OrderBy(a => Vector3.Distance(enemyController.aiCharacter.squad.GetChasingLocation().position, a.area.Position)).First();
+            LastKnownPosition position = aiController.aiCharacter.squad.GetChasingLocation();
+            (SearchingArea area, int index) area = areas.Select((area, index) => (area, index)).Where(a => a.area.AreaChecked == false).OrderBy(a => Vector3.Distance(position != null ? position.position : aiController.aiCharacter.transform.position, a.area.Position)).First();
             NavMeshPath navMeshPath = new NavMeshPath();
-            if (enemyController.navAgent.CalculatePath(area.area.Position, navMeshPath) && navMeshPath.status == NavMeshPathStatus.PathComplete) {
+            if (aiController.navAgent.CalculatePath(area.area.Position, navMeshPath) && navMeshPath.status == NavMeshPathStatus.PathComplete) {
                 return area;
             } else {
                 area.area.AreaChecked = true;
@@ -108,10 +110,10 @@ namespace Poligon.Ai.States {
             currentArea.area.AreaChecked = true;
             areas[currentArea.index] = currentArea.area;
 
-            corners = enemyController.SetNewDestinaction(nextArea.area.Position);
-            enemyController.OnFinalPositionEvent += AreaReached;
-            enemyController.OnFinalPositionEvent += NextCorner;
-            enemyController.OnNextCornerEvent += NextCorner;
+            corners = aiController.SetNewDestinaction(nextArea.area.Position);
+            aiController.OnFinalPositionEvent += AreaReached;
+            aiController.OnFinalPositionEvent += NextCorner;
+            aiController.OnNextCornerEvent += NextCorner;
 
         }
 
@@ -139,7 +141,7 @@ namespace Poligon.Ai.States {
 
                 float triangleAreaSize = Mathf.Sqrt(circ * (circ - a) * (circ - b) * (circ - c));
 
-                if (triangleAreaSize < 10 || Vector3.Distance(enemyController.transform.position, triangleCenter) > 175f) {
+                if (triangleAreaSize < 10 || Vector3.Distance(aiController.transform.position, triangleCenter) > 175f) {
                     continue;
                 }
 

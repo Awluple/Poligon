@@ -379,8 +379,10 @@ public class DynamicCover : MonoBehaviour {
             try {
             foreach (var edge in edges) {
                 var hasPath = false;
-                if (agent == null) return new List<Edge>();
+                if (agent == null || !agent.isActiveAndEnabled) return new List<Edge>();
+
                 hasPath = agent.CalculatePath(edge.middle, path);
+                
                 if (!hasPath) continue;
                 float totalPath = CalculatePath(path.corners);
                 if (totalPath < distance) filteredEdges.Add(edge);

@@ -20,7 +20,7 @@ namespace Poligon.Ai.States {
 
         public override void EnterState() {
             lastCheckLeaderPosition = -squad.leader.transform.forward;
-            UpdatePositions();
+            GetFormationPositions();
             updatePositionCoroutine = UpdatePositionCoroutine();
             squad.StartCoroutine(updatePositionCoroutine);
 
@@ -29,10 +29,16 @@ namespace Poligon.Ai.States {
         }
 
         public override void UpdateState() {
-
+            foreach (var character in squad.characters) { 
+                if(character.attackingLogic.opponent != null) {
+                    squad.aiState = SquadAiState.EngagedState;
+                    break;
+                }
+            }
         }
         public override void ExitState() {
             squad.StopCoroutine(updatePositionCoroutine);
+            squad.StopCoroutine(trackLeaderPositionCoroutine);
         }
         private Vector3 GetNavmeshPosition(AiCharacterController member, Vector3 desiredPosition) {
             NavMesh.SamplePosition(desiredPosition, out NavMeshHit hit, 4f, NavMesh.AllAreas);
@@ -47,13 +53,14 @@ namespace Poligon.Ai.States {
             Vector3 lastCheckLeaderBack = -squad.leader.transform.forward;        
 
             for (; ; ) {
-                UpdatePositions();
+                GetFormationPositions();
                 yield return new WaitForSeconds(1.4f);
             }
         }
-        void UpdatePositions() {
+        void GetFormationPositions() {
             int[] degrees = { -60, -25, 0, 25, 60 };
             float[] distance = { 3f, 4f, 6f, 4f, 3f };
+            if (squad.leader == null) return;
             Vector3 leaderBack = squad.leader.transform.forward;
             if (Vector3.Distance(squad.leader.transform.position, lastCheckLeaderPosition) > 4f) {
                 for (int i = 0; i < degrees.Length; i++) {

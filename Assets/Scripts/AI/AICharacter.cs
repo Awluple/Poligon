@@ -54,19 +54,12 @@ public class AICharacter : Character, ISquadMember {
         base.Update();
         if (!stunned && health > 0) {
             Move();
-        }// else {
-         //    movement.x = 0;
-         //    movement.z = 0;
-         //}
+        }
 
         movement.y += Physics.gravity.y * fallingGravityStrength * Time.deltaTime;
 
         //if (isWalking == false) {
         //    isRunning = false;
-        //}
-        //if (characterController.isGrounded && jumped == false) {
-        //    movement.y = -1f;
-        //    characterController.stepOffset = originalStepOffset;
         //}
 
 
@@ -74,27 +67,10 @@ public class AICharacter : Character, ISquadMember {
             //Rotate(new Vector3(movement.x, 0f, movement.z));
             //Rotate(aimingTarget.transform.position);
         }
-        if(isAiming) {
+        if(isAiming && !GetAimPosition().destroyCancellationToken.IsCancellationRequested) {
             var turnTowardNavSteeringTarget = enemyController.navAgent.steeringTarget;
             transform.rotation = Quaternion.Slerp(transform.rotation, GetRotation(GetAimPosition().transform.position), rotationSpeed * Time.deltaTime);
         }
-        //if(health > 0) characterController.Move(movement * Time.deltaTime);
-
-        //int layer_mask = LayerMask.GetMask("Ground");
-        //bool hit = false;
-
-        //if (!characterController.isGrounded) {
-        //    hit = Physics.Raycast(transform.position, Vector3.down, 2f, layer_mask);
-        //}
-
-        //if (hit && movement.y < 0f) {
-        //    if (movement.y <= -25f) {
-        //        stunned = true;
-        //        StartCoroutine(HeavyFallStun());
-        //    }
-        //} else if (!characterController.isGrounded && !hit && !(movement.y >= 0f)) {
-        //    if (OnFalling != null) OnFalling(this, EventArgs.Empty);
-        //}
 
     }
 

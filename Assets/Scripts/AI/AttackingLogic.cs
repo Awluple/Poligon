@@ -6,6 +6,7 @@ using System;
 using System.Collections;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.TextCore.Text;
 
 public class AttackingLogic : MonoBehaviour {
     [SerializeField] CharactersSphere charactersSphere;
@@ -93,43 +94,54 @@ public class AttackingLogic : MonoBehaviour {
         aiController.aiCharacter.squad.UpdateLastKnownPosition(new LastKnownPosition(character, newPosition));
     }
     public void CallCharacter(Character opponent) {
-        if(aiController.aiState != IndividualAiState.StationaryAttacking && aiController.aiState != IndividualAiState.StationaryAttacking
+        bool hasVision = Methods.HasVisionOnCharacter(out Character hitChar, aiController, opponent, 70f);
+        if (hasVision && aiController.aiState != IndividualAiState.BehindCover && aiController.aiState != IndividualAiState.StationaryAttacking) {
+            if(aiController.aiState != IndividualAiState.Hiding) aiController.aiState = IndividualAiState.Hiding;
+        } else if (aiController.aiState != IndividualAiState.StationaryAttacking
             && aiController.aiState != IndividualAiState.BehindCover && aiController.aiState != IndividualAiState.Chasing
             ) {
             this.opponent = opponent;
+            Debug.Log("C " + aiController.aiCharacter.name);
             aiController.aiState = IndividualAiState.Chasing;
         }
     }
 
     public void EnemySpotted(Character character) {
-        bool hasVision = Methods.HasVisionOnCharacter(out Character hitChar, aiController, character, 70f);
-        if (hasVision && Vector3.Distance(transform.position, opponent.transform.position) < Vector3.Distance(transform.position, hitChar.transform.position)) {
+        bool hasVisionOnCharacter = Methods.HasVisionOnCharacter(out Character hitChar, aiController, character, 70f);
+        bool hasVisionOnOpponent = Methods.HasAimOnOpponent(out Character opponentChar, aiController, 70f);
+        if (hasVisionOnCharacter && Vector3.Distance(transform.position, opponent.transform.position) < Vector3.Distance(transform.position, hitChar.transform.position)) {
             opponent = hitChar;
         }
-        if (!hasVision && aiController.aiState != IndividualAiState.Chasing) {
+        if (!hasVisionOnCharacter && !hasVisionOnCharacter && aiController.aiState != IndividualAiState.Chasing && aiController.aiCharacter.squad.CanChase(aiController)) {
             aiController.aiCharacter.GetAimPosition().LockOnTarget(opponent, !aiController.aiCharacter.IsAiming());
-            if(aiController.aiState != IndividualAiState.Chasing) aiController.aiState = IndividualAiState.Chasing;
-        } else if (hasVision && aiController.aiState == IndividualAiState.StationaryAttacking) {
+            Debug.Log("B " + aiController.aiCharacter.name);
+            if (aiController.aiState != IndividualAiState.Chasing) aiController.aiState = IndividualAiState.Chasing;
+        //}
+        //else if (hasVisionOnCharacter && aiController.aiState == IndividualAiState.Patrolling) {
+        //    aiController.aiState = IndividualAiState.Hiding;
+        } else if(aiController.aiState != IndividualAiState.Hiding) {
             aiController.aiState = IndividualAiState.Hiding;
-        } else if (hasVision && aiController.aiState == IndividualAiState.Hiding) {
-
         }
     }
-
-    void ChangeOpponent() {
+    /// <summary>
+    /// Change the current opponent
+    /// </summary>
+    /// <param name="chase">If the character has no vision on an enemy, go to it's position</param>
+    void ChangeOpponent(bool chase = false) {
         opponent = GetOpponent();
         if (opponent != null) {
             aiController.aiCharacter.GetAimPosition().LockOnTarget(opponent, !aiController.aiCharacter.IsAiming());
             bool hasVision = Methods.HasVisionOnCharacter(out Character newOpponent, aiController, opponent);
-            if (aiController.aiState != IndividualAiState.Chasing && !hasVision) {
-                aiController.aiState = IndividualAiState.Chasing;
-            } else if(hasVision && aiController.aiState == IndividualAiState.BehindCover) {
+            if (hasVision && aiController.aiState == IndividualAiState.BehindCover) {
                 aiController.aiState = IndividualAiState.StationaryAttacking;
-            }
-            else if (aiController.aiState != IndividualAiState.Hiding) {
+            } else if (aiController.aiState != IndividualAiState.Hiding && hasVision) {
                 aiController.aiState = IndividualAiState.Hiding;
+            } else if (aiController.aiState != IndividualAiState.Chasing && !hasVision && chase) {
+                Debug.Log("A " + aiController.aiCharacter.name);
+                aiController.aiState = IndividualAiState.Chasing;
+            } else {
+
             }
-        } else {
         }
     }
 

@@ -7,6 +7,7 @@ namespace Poligon.Ai.States {
     public enum IndividualAiState {
         None,
         Patrolling,
+        ExecutingCommand,
         BehindCover,
         Hiding,
         Chasing,

@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using UnityEngine;
+using UnityEngine.AI;
 
 
 namespace Poligon.Ai.States.Utils {
@@ -161,6 +162,14 @@ namespace Poligon.Ai.States.Utils {
             }
             character = null;
             return false;
+        }
+        public static float GetPathLength(NavMeshPath path) {
+            float length = 0;
+            if (path.corners.Length < 2) return length;
+            for (int i = 1; i < path.corners.Length; i++) {
+                length += Vector3.Distance(path.corners[i - 1], path.corners[i]);
+            }
+            return length;
         }
     }
 }

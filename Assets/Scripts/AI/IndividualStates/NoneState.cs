@@ -7,6 +7,7 @@ namespace Poligon.Ai.States {
     public enum SquadAiState {
         None,
         FollowingState,
+        EngagedState,
     }
 
     public class SquadNoneState : SquadBaseState {

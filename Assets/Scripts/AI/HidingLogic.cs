@@ -49,14 +49,9 @@ public class HidingLogic : MonoBehaviour {
 
     private void Awake() {
         agent = gameObject.transform.parent.GetComponent<NavMeshAgent>();
-        //mesh = new Mesh();
-        player = FindObjectOfType<Player>();
+        player = FindFirstObjectByType<Player>();
         dynamicCover = FindFirstObjectByType<DynamicCover>();
 
-        //NavMeshTriangulation navmeshData = NavMesh.CalculateTriangulation();
-
-        //mesh.SetVertices(navmeshData.vertices.ToList());
-        //mesh.SetIndices(navmeshData.indices, MeshTopology.Triangles, 0);
 
         character = GetComponentInParent<Character>();
         hidingSphere = character.GetComponentInChildren<HidingCollisionSphere>();

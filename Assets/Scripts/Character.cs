@@ -146,7 +146,7 @@ public abstract class Character : MonoBehaviour, IKillable {
         if (currentWeapon == WeaponTypes.None) {
             return;
         }
-        if (isGrounded() && !stunned) {
+        if (isGrounded() && !stunned && health > 0) {
 
             if (OnAiming != null) OnAiming(this, EventArgs.Empty);
             isAiming = true;

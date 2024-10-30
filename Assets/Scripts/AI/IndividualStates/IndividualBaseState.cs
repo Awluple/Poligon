@@ -7,10 +7,10 @@ namespace Poligon.Ai.States {
     public abstract class IndividualBaseState : State<IndividualAiState> {
 
         public override IndividualAiState state { get; protected set; }
-        protected AiCharacterController enemyController;
+        protected AiCharacterController aiController;
 
         public IndividualBaseState(AiCharacterController controller) {
-            this.enemyController = controller;
+            this.aiController = controller;
         }
     }
 }

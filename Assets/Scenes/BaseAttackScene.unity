@@ -6277,7 +6277,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   baseMaterial: {fileID: 2100000, guid: 405766222e000144089bacf69420b5b6, type: 2}
-  currentOffset: {x: 526.48706, y: 382.832}
+  currentOffset: {x: 267.40033, y: 136.71147}
   rendererComponent: {fileID: 243814686}
 --- !u!1 &245847994
 GameObject:
@@ -10138,6 +10138,11 @@ Mesh:
     offset: 0
     size: 0
     path: 
+--- !u!4 &289636455 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 4028715265438406047, guid: 3242584b9a5cf47499c0b9c1fe468f56, type: 3}
+  m_PrefabInstance: {fileID: 1092985297}
+  m_PrefabAsset: {fileID: 0}
 --- !u!43 &291446749
 Mesh:
   m_ObjectHideFlags: 0
@@ -13168,6 +13173,7 @@ Transform:
   - {fileID: 1517809215}
   - {fileID: 705454940}
   - {fileID: 645537561}
+  - {fileID: 289636455}
   m_Father: {fileID: 1238085635}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &328563433
@@ -18895,7 +18901,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   baseMaterial: {fileID: 2100000, guid: 405766222e000144089bacf69420b5b6, type: 2}
-  currentOffset: {x: 80.86276, y: 756.9096}
+  currentOffset: {x: 198.30096, y: 576.28625}
   rendererComponent: {fileID: 466739317}
 --- !u!64 &466739316
 MeshCollider:
@@ -19076,6 +19082,14 @@ PrefabInstance:
     - target: {fileID: 1319538167934939892, guid: 3242584b9a5cf47499c0b9c1fe468f56, type: 3}
       propertyPath: stopped
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1666079562622170445, guid: 3242584b9a5cf47499c0b9c1fe468f56, type: 3}
+      propertyPath: _health
+      value: 10000
+      objectReference: {fileID: 0}
+    - target: {fileID: 1666079562622170445, guid: 3242584b9a5cf47499c0b9c1fe468f56, type: 3}
+      propertyPath: _maxHealth
+      value: 10000
       objectReference: {fileID: 0}
     - target: {fileID: 1687499180143291795, guid: 3242584b9a5cf47499c0b9c1fe468f56, type: 3}
       propertyPath: m_Name
@@ -21134,7 +21148,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   baseMaterial: {fileID: 2100000, guid: 405766222e000144089bacf69420b5b6, type: 2}
-  currentOffset: {x: 189.40973, y: 629.3254}
+  currentOffset: {x: 222.4282, y: 374.22842}
   rendererComponent: {fileID: 619832190}
 --- !u!64 &619832189
 MeshCollider:
@@ -30021,7 +30035,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   baseMaterial: {fileID: 2100000, guid: 405766222e000144089bacf69420b5b6, type: 2}
-  currentOffset: {x: 767.2093, y: 112.93042}
+  currentOffset: {x: 233.53017, y: 668.03766}
   rendererComponent: {fileID: 953447367}
 --- !u!64 &953447366
 MeshCollider:
@@ -36563,7 +36577,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   baseMaterial: {fileID: 2100000, guid: 405766222e000144089bacf69420b5b6, type: 2}
-  currentOffset: {x: 246.45389, y: 804.2555}
+  currentOffset: {x: 207.53801, y: 685.9311}
   rendererComponent: {fileID: 1044228166}
 --- !u!64 &1044228165
 MeshCollider:
@@ -44729,6 +44743,63 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cover: {fileID: 1311506395}
+--- !u!1001 &1092985297
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 328563432}
+    m_Modifications:
+    - target: {fileID: 1687499180143291795, guid: 3242584b9a5cf47499c0b9c1fe468f56, type: 3}
+      propertyPath: m_Name
+      value: Friend
+      objectReference: {fileID: 0}
+    - target: {fileID: 4028715265438406047, guid: 3242584b9a5cf47499c0b9c1fe468f56, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 74.08
+      objectReference: {fileID: 0}
+    - target: {fileID: 4028715265438406047, guid: 3242584b9a5cf47499c0b9c1fe468f56, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 25.86149
+      objectReference: {fileID: 0}
+    - target: {fileID: 4028715265438406047, guid: 3242584b9a5cf47499c0b9c1fe468f56, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -30.15
+      objectReference: {fileID: 0}
+    - target: {fileID: 4028715265438406047, guid: 3242584b9a5cf47499c0b9c1fe468f56, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4028715265438406047, guid: 3242584b9a5cf47499c0b9c1fe468f56, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4028715265438406047, guid: 3242584b9a5cf47499c0b9c1fe468f56, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4028715265438406047, guid: 3242584b9a5cf47499c0b9c1fe468f56, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4028715265438406047, guid: 3242584b9a5cf47499c0b9c1fe468f56, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4028715265438406047, guid: 3242584b9a5cf47499c0b9c1fe468f56, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4028715265438406047, guid: 3242584b9a5cf47499c0b9c1fe468f56, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 3242584b9a5cf47499c0b9c1fe468f56, type: 3}
 --- !u!43 &1093151724
 Mesh:
   m_ObjectHideFlags: 0
@@ -45157,7 +45228,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   baseMaterial: {fileID: 2100000, guid: 405766222e000144089bacf69420b5b6, type: 2}
-  currentOffset: {x: 496.00775, y: 598.7896}
+  currentOffset: {x: 86.35402, y: 877.872}
   rendererComponent: {fileID: 1116512581}
 --- !u!64 &1116512580
 MeshCollider:
@@ -46233,7 +46304,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   baseMaterial: {fileID: 2100000, guid: 405766222e000144089bacf69420b5b6, type: 2}
-  currentOffset: {x: 301.35577, y: 829.7118}
+  currentOffset: {x: 480.99155, y: 756.7534}
   rendererComponent: {fileID: 1218248406}
 --- !u!64 &1218248405
 MeshCollider:
@@ -47736,7 +47807,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   baseMaterial: {fileID: 2100000, guid: 405766222e000144089bacf69420b5b6, type: 2}
-  currentOffset: {x: 878.8118, y: 236.13739}
+  currentOffset: {x: 852.3116, y: 750.404}
   rendererComponent: {fileID: 1281233699}
 --- !u!64 &1281233698
 MeshCollider:
@@ -53235,7 +53306,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   baseMaterial: {fileID: 2100000, guid: 405766222e000144089bacf69420b5b6, type: 2}
-  currentOffset: {x: 743.16003, y: 208.34685}
+  currentOffset: {x: 782.2895, y: 708.29333}
   rendererComponent: {fileID: 1485114236}
 --- !u!64 &1485114235
 MeshCollider:
@@ -53287,7 +53358,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   baseMaterial: {fileID: 2100000, guid: 405766222e000144089bacf69420b5b6, type: 2}
-  currentOffset: {x: 281.13693, y: 281.3894}
+  currentOffset: {x: 517.656, y: 247.14505}
   rendererComponent: {fileID: 1486825543}
 --- !u!64 &1486825542
 MeshCollider:
@@ -53645,7 +53716,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   baseMaterial: {fileID: 2100000, guid: 405766222e000144089bacf69420b5b6, type: 2}
-  currentOffset: {x: 334.7617, y: 705.9953}
+  currentOffset: {x: 359.94177, y: 468.67795}
   rendererComponent: {fileID: 1508690235}
 --- !u!64 &1508690234
 MeshCollider:
@@ -61168,7 +61239,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   baseMaterial: {fileID: 2100000, guid: 405766222e000144089bacf69420b5b6, type: 2}
-  currentOffset: {x: 603.1378, y: 904.2108}
+  currentOffset: {x: 238.51442, y: 704.3831}
   rendererComponent: {fileID: 1669029431}
 --- !u!64 &1669029430
 MeshCollider:
@@ -61220,7 +61291,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   baseMaterial: {fileID: 2100000, guid: 405766222e000144089bacf69420b5b6, type: 2}
-  currentOffset: {x: 916.5103, y: 111.49871}
+  currentOffset: {x: 754.4238, y: 224.19644}
   rendererComponent: {fileID: 1671105492}
 --- !u!64 &1671105491
 MeshCollider:
@@ -64392,7 +64463,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   baseMaterial: {fileID: 2100000, guid: 405766222e000144089bacf69420b5b6, type: 2}
-  currentOffset: {x: 776.01587, y: 121.57428}
+  currentOffset: {x: 606.5349, y: 514.49316}
   rendererComponent: {fileID: 1730135009}
 --- !u!64 &1730135008
 MeshCollider:
@@ -67271,7 +67342,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   baseMaterial: {fileID: 2100000, guid: 405766222e000144089bacf69420b5b6, type: 2}
-  currentOffset: {x: 726.8549, y: 627.7107}
+  currentOffset: {x: 844.1176, y: 769.08826}
   rendererComponent: {fileID: 1811462474}
 --- !u!64 &1811462473
 MeshCollider:
@@ -68041,9 +68112,9 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 302100268}
+  - {fileID: 1127493465}
   - {fileID: 1807866446}
   - {fileID: 1190582217}
-  - {fileID: 1127493465}
   m_Father: {fileID: 1238085635}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1831197369
@@ -75293,6 +75364,14 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1831197368}
     m_Modifications:
+    - target: {fileID: 1666079562622170445, guid: 3242584b9a5cf47499c0b9c1fe468f56, type: 3}
+      propertyPath: _health
+      value: 10000
+      objectReference: {fileID: 0}
+    - target: {fileID: 1666079562622170445, guid: 3242584b9a5cf47499c0b9c1fe468f56, type: 3}
+      propertyPath: _maxHealth
+      value: 10000
+      objectReference: {fileID: 0}
     - target: {fileID: 1687499180143291795, guid: 3242584b9a5cf47499c0b9c1fe468f56, type: 3}
       propertyPath: m_Name
       value: Friend (5)
@@ -86479,7 +86558,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   baseMaterial: {fileID: 2100000, guid: 405766222e000144089bacf69420b5b6, type: 2}
-  currentOffset: {x: 841.548, y: 895.7126}
+  currentOffset: {x: 526.3984, y: 643.8696}
   rendererComponent: {fileID: 2134772924}
 --- !u!64 &2134772923
 MeshCollider:

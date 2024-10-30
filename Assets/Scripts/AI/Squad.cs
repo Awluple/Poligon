@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.UIElements.Experimental;
+using static UnityEngine.EventSystems.EventTrigger;
 
 namespace Poligon.Ai {
     public class Squad : MonoBehaviour, IStateManager {
@@ -15,6 +16,7 @@ namespace Poligon.Ai {
         private float enemySinceLastSeen = 0f;
         public Character _leader;
         private Action stateMashineCallback;
+        private LastKnownPosition lastEnemyLocation;
 
 
         [SerializeField] private SquadAiState _debugAiState;
@@ -61,15 +63,28 @@ namespace Poligon.Ai {
             }
             SquadNoneState none = new(this);
             FollowingState following = new(this);
+            EngagedState engaged = new(this);
             stateMashine = new AiStateMashine<SquadAiState>(none, this);
             Dictionary<StateTransition<SquadAiState>, State<SquadAiState>> transitions = new Dictionary<StateTransition<SquadAiState>, State<SquadAiState>>
         {
                 { new StateTransition<SquadAiState>(SquadAiState.None, SquadAiState.FollowingState), following },
+
+                { new StateTransition<SquadAiState>(SquadAiState.FollowingState, SquadAiState.EngagedState), engaged },
+                { new StateTransition<SquadAiState>(SquadAiState.FollowingState, SquadAiState.None), none },
+
+                { new StateTransition<SquadAiState>(SquadAiState.EngagedState, SquadAiState.FollowingState), following },
+                { new StateTransition<SquadAiState>(SquadAiState.EngagedState, SquadAiState.None), none },
         };
             stateMashine.SetupTransitions(transitions);
             aiState = SquadAiState.FollowingState;
         }
         private void Update() {
+            if (characters.Count == 0) {
+                SquadNoneState none = new(this);
+                stateMashine = new AiStateMashine<SquadAiState>(none, this);
+                StopAllCoroutines();
+                return;
+            }
             if (stateMashineCallback != null) stateMashineCallback();
             enemySinceLastSeen += Time.deltaTime;
             stateMashine.UpdateState();
@@ -85,38 +100,39 @@ namespace Poligon.Ai {
             lastKnownPosition.Remove(e.character);
             knownEnemies.Remove(e.character);
             e.character.OnDeath -= RemoveCharacter;
+            if (knownEnemies.Count == 0) {
+                lastEnemyLocation = new LastKnownPosition(e.character, e.character.transform.position);
+            }
         }
         public LastKnownPosition GetCharacterLastPosition(Character character) {
+            if(character == null) return null;
             return lastKnownPosition.GetValueOrDefault(character);
         }
         public LastKnownPosition GetChasingLocation() {
             if(lastKnownPosition.Count > 1 ) {
                 return lastKnownPosition.Values.ToList()[0];
             }
+            if (lastEnemyLocation != null) return lastEnemyLocation;
             return null;
         }
+
         public void EnemySpotted(Character chara) {
-            if (!knownEnemies.ContainsKey(chara)) {
+            if(chara == null) {
+                throw new ArgumentNullException("Spotted character cannot be null!");
+            }
+            if (!knownEnemies.ContainsKey(chara) && chara.health > 0) {
                 knownEnemies.Add(chara, chara);
                 chara.OnDeath += RemoveCharacter;
+                lastEnemyLocation = null;
             }
         }
 
-        //IEnumerator CheckLastSeen() {
-        //    for (; ; ) {
-        //        if (Time.time - enemySinceLastSeen > 50f && enemyController.aiState != AiState.Chasing) {
-        //            enemyController.aiState = AiState.Chasing;
-        //            enemyController.SetNewDestinaction(enemyController.enemy.squad.lastKnownPosition);
+        public bool CanChase(AiCharacterController characterController) {
+            int chasingCharacters = characters.Count(character => character.aiState == IndividualAiState.Chasing);
 
-        //            enemyController.RunCancel();
-        //            enemyController.enemy.GetAimPosition().Reset();
-        //        } else if (Time.time - enemySinceLastSeen > 60f) {
-        //            //StopAttacking();
-        //            enemyController.aiState = AiState.Searching;
-        //            StopCoroutine(checkLastSeen);
-        //        }
-        //        yield return new WaitForSeconds(1f);
-        //    }
-        //}
+            if (characters.Count > 2 && chasingCharacters < 2) return true;
+            if (characters.Count <= 2 && chasingCharacters == 0) return true;
+            return false;
+        }
     }
 }

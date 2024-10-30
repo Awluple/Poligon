@@ -1,6 +1,10 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Poligon.Ai.States;
+using Poligon.Ai.States.Utils;
+using UnityEngine.AI;
+using UnityEngine.InputSystem.XR;
 namespace Poligon.Ai.Commands {
     public class EnemySpottedCommand : SquadCommand {
         private Character enemy;
@@ -10,11 +14,16 @@ namespace Poligon.Ai.Commands {
 
         public override void execute() {
             squad.UpdateLastKnownPosition(new LastKnownPosition(enemy, enemy.transform.position));
-            
-            foreach(var character in squad.characters) {
-                if(character.attackingLogic.opponent == null) {
+            if(squad.aiState == SquadAiState.FollowingState) squad.aiState = SquadAiState.EngagedState;
+            NavMeshPath path = new NavMeshPath();
+            foreach (var character in squad.characters) {
+                if (character.attackingLogic.opponent == null) {
                     character.EnemySpotted(enemy);
-                } else if (squad.knownEnemies.Count == 1) {
+                    continue;
+                }
+                character.navAgent.CalculatePath(character.aiCharacter.transform.position, path);
+                if (squad.knownEnemies.Count == 1 && character.aiState != IndividualAiState.Chasing
+                    && Methods.GetPathLength(path) > 20f && !Methods.HasVisionOnCharacter(out Character opChar, character, enemy)) {
                     character.attackingLogic.CallCharacter(enemy);
                 }
             }

@@ -18,32 +18,32 @@ namespace Poligon.Ai.States {
         }
         public override void ExitState() {
             if(waitInPatrolPositionCoroutine != null) {
-                enemyController.StopCoroutine(waitInPatrolPositionCoroutine);
+                aiController.StopCoroutine(waitInPatrolPositionCoroutine);
             }
         }
 
         public void SetPatrollingPath(object sender = null, System.EventArgs e = null) {
-            if (enemyController.patrolPositions.Length == 0) {
-                enemyController.onFinalPosition = true;
+            if (aiController.patrolPositions.Length == 0) {
+                aiController.onFinalPosition = true;
 
                 return;
             };
-            if ((currentPatrolPosition == -1 || enemyController.onFinalPosition) && enemyController.aiState == IndividualAiState.Patrolling) {
+            if ((currentPatrolPosition == -1 || aiController.onFinalPosition) && aiController.aiState == IndividualAiState.Patrolling) {
                 waitInPatrolPositionCoroutine = WaitInPatrollingPosition();
-                enemyController.StartCoroutine(waitInPatrolPositionCoroutine);
+                aiController.StartCoroutine(waitInPatrolPositionCoroutine);
             }
         }
 
         private void patrolPointSelection() {
             System.Random random = new System.Random();
-            currentPatrolPosition = random.Next(0, enemyController.patrolPositions.Length);
-            enemyController.SetNewDestinaction(enemyController.patrolPositions[currentPatrolPosition].transform.position);
-            enemyController.OnFinalPositionEvent += SetPatrollingPath;
+            currentPatrolPosition = random.Next(0, aiController.patrolPositions.Length);
+            aiController.SetNewDestinaction(aiController.patrolPositions[currentPatrolPosition].transform.position);
+            aiController.OnFinalPositionEvent += SetPatrollingPath;
         }
         private IEnumerator RecalculatePath() {
-            while (!enemyController.onFinalPosition) {
-                enemyController.currentCorner = 1;
-                enemyController.navAgent.CalculatePath(enemyController.destination.corners[enemyController.destination.corners.Length - 1], enemyController.destination);
+            while (!aiController.onFinalPosition) {
+                aiController.currentCorner = 1;
+                aiController.navAgent.CalculatePath(aiController.destination.corners[aiController.destination.corners.Length - 1], aiController.destination);
                 yield return new WaitForSeconds(.5f);
             }
         }
@@ -53,10 +53,10 @@ namespace Poligon.Ai.States {
             yield return new WaitForSeconds(waitTime);
 
             patrolPointSelection();
-            if (pathRecalcCoroutine != null) enemyController.StopCoroutine(pathRecalcCoroutine);
+            if (pathRecalcCoroutine != null) aiController.StopCoroutine(pathRecalcCoroutine);
             pathRecalcCoroutine = RecalculatePath();
-            enemyController.StartCoroutine(pathRecalcCoroutine);
-            enemyController.StopCoroutine(waitInPatrolPositionCoroutine);
+            aiController.StartCoroutine(pathRecalcCoroutine);
+            aiController.StopCoroutine(waitInPatrolPositionCoroutine);
         }
     }
 }

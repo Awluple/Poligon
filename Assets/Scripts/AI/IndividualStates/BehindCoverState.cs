@@ -12,32 +12,32 @@ namespace Poligon.Ai.States {
         public override IndividualAiState state { get; protected set; } = IndividualAiState.BehindCover;
 
         public override void EnterState() {
-            enemyController.ShootCancel();
-            if (!enemyController.aiCharacter.IsCrouching()) {
-                enemyController.CrouchStart();
-                enemyController.aiCharacter.RotateSelf(-enemyController.hidingLogic.currentCoverEdge.forward);
+            aiController.ShootCancel();
+            if (!aiController.aiCharacter.IsCrouching()) {
+                aiController.CrouchStart();
+                aiController.aiCharacter.RotateSelf(-aiController.hidingLogic.currentCoverEdge.forward);
             }
-            enemyController.AimCancel();
-            enemyController.OnHealthLoss += HealthLost;
+            aiController.AimCancel();
+            aiController.OnHealthLoss += HealthLost;
             checkVisionCoroutine = CheckVision();
-            enemyController.StartCoroutine(checkVisionCoroutine);
+            aiController.StartCoroutine(checkVisionCoroutine);
             coveredAttackCoroutine = ContinueAttackingWhileCovered();
-            enemyController.StartCoroutine(coveredAttackCoroutine);
+            aiController.StartCoroutine(coveredAttackCoroutine);
 
         }
         public override void ExitState() {
-            enemyController.OnHealthLoss -= HealthLost;
-            if (checkVisionCoroutine != null) enemyController.StopCoroutine(checkVisionCoroutine);
-            if(coveredAttackCoroutine != null) enemyController.StopCoroutine(coveredAttackCoroutine);
+            aiController.OnHealthLoss -= HealthLost;
+            if (checkVisionCoroutine != null) aiController.StopCoroutine(checkVisionCoroutine);
+            if(coveredAttackCoroutine != null) aiController.StopCoroutine(coveredAttackCoroutine);
         }
 
         private void HealthLost(object sender, BulletDataEventArgs eventArgs) {
-            enemyController.aiState = IndividualAiState.StationaryAttacking;
+            aiController.aiState = IndividualAiState.StationaryAttacking;
         }
         private IEnumerator CheckVision() {
             for (; ; ) {
-                if (Methods.HasAimOnOpponent(out Character character, enemyController, 40f)) {
-                    enemyController.aiState = IndividualAiState.StationaryAttacking;
+                if (Methods.HasAimOnOpponent(out Character character, aiController, 40f)) {
+                    aiController.aiState = IndividualAiState.StationaryAttacking;
                 }
                 yield return new WaitForSeconds(0.2f);
             }
@@ -47,7 +47,7 @@ namespace Poligon.Ai.States {
 
             for (; ; ) {
                 yield return new WaitForSeconds(Random.Range(4f, 8f));
-                if(enemyController.aiState == IndividualAiState.BehindCover)enemyController.aiState = IndividualAiState.StationaryAttacking;
+                if (aiController.aiState == IndividualAiState.BehindCover)aiController.aiState = IndividualAiState.StationaryAttacking;
                 //    if (Methods.HasAimOnOpponent(out Character character, enemyController)) {
                 //        enemyController.aiState = AiState.Attacking;
                 //        goto End;

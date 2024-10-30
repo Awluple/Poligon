@@ -230,9 +230,6 @@ public class EnemyAimPosition : AimPosition {
         MoveToCharacter(character, ref moveAimCalled, null, immediately);
         opponent = character;
         opponentDetectionPoint = character.detectionPoints[0];
-        //if (OnLineOfSight != null) {
-        //    OnLineOfSight(this, new CharacterEventArgs(character));
-        //};
         checkCoroutine = DoCheck(false);
         StartCoroutine(checkCoroutine);
     }

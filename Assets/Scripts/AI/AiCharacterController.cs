@@ -86,6 +86,7 @@ public class AiCharacterController : MonoBehaviour, IAICharacterController, ISta
 
         NoneState none = new(this);
         PatrollingState patrolling = new(this);
+        ExecutingCommandState executingCommand = new(this);
         HidingState hiding = new(this);
         BehindCoverState behindCover = new(this);
         StationaryAttackState attacking = new(this);
@@ -119,6 +120,7 @@ public class AiCharacterController : MonoBehaviour, IAICharacterController, ISta
             { new StateTransition<IndividualAiState>(IndividualAiState.StationaryAttacking, IndividualAiState.Chasing), chasing },
             { new StateTransition<IndividualAiState>(IndividualAiState.StationaryAttacking, IndividualAiState.Hiding), hiding },
             { new StateTransition<IndividualAiState>(IndividualAiState.StationaryAttacking, IndividualAiState.BehindCover), behindCover },
+            { new StateTransition<IndividualAiState>(IndividualAiState.StationaryAttacking, IndividualAiState.Searching), searching },
 
             { new StateTransition<IndividualAiState>(IndividualAiState.Chasing, IndividualAiState.Hiding), hiding },
             { new StateTransition<IndividualAiState>(IndividualAiState.Chasing, IndividualAiState.StationaryAttacking), attacking },
@@ -127,6 +129,24 @@ public class AiCharacterController : MonoBehaviour, IAICharacterController, ISta
 
             { new StateTransition<IndividualAiState>(IndividualAiState.Searching, IndividualAiState.Hiding), hiding },
             { new StateTransition<IndividualAiState>(IndividualAiState.Searching, IndividualAiState.Chasing), chasing },
+
+
+
+            { new StateTransition<IndividualAiState>(IndividualAiState.None, IndividualAiState.ExecutingCommand), executingCommand },
+            { new StateTransition<IndividualAiState>(IndividualAiState.Patrolling, IndividualAiState.ExecutingCommand), executingCommand },
+            { new StateTransition<IndividualAiState>(IndividualAiState.Hiding, IndividualAiState.ExecutingCommand), executingCommand },
+            { new StateTransition<IndividualAiState>(IndividualAiState.BehindCover, IndividualAiState.ExecutingCommand), executingCommand },
+            { new StateTransition<IndividualAiState>(IndividualAiState.StationaryAttacking, IndividualAiState.ExecutingCommand), executingCommand },
+            { new StateTransition<IndividualAiState>(IndividualAiState.Chasing, IndividualAiState.ExecutingCommand), executingCommand },
+            { new StateTransition<IndividualAiState>(IndividualAiState.Searching, IndividualAiState.ExecutingCommand), executingCommand },
+
+            { new StateTransition<IndividualAiState>(IndividualAiState.ExecutingCommand, IndividualAiState.None), none },
+            { new StateTransition<IndividualAiState>(IndividualAiState.ExecutingCommand, IndividualAiState.Patrolling), patrolling },
+            { new StateTransition<IndividualAiState>(IndividualAiState.ExecutingCommand, IndividualAiState.Hiding), hiding },
+            { new StateTransition<IndividualAiState>(IndividualAiState.ExecutingCommand, IndividualAiState.BehindCover), behindCover },
+            { new StateTransition<IndividualAiState>(IndividualAiState.ExecutingCommand, IndividualAiState.StationaryAttacking), attacking},
+            { new StateTransition<IndividualAiState>(IndividualAiState.ExecutingCommand, IndividualAiState.Chasing), chasing },
+            { new StateTransition<IndividualAiState>(IndividualAiState.ExecutingCommand, IndividualAiState.Searching), searching },
 
 
 
@@ -193,6 +213,7 @@ public class AiCharacterController : MonoBehaviour, IAICharacterController, ISta
     }
 
     public Vector3[] SetNewDestinaction(Vector3 spot, object sender = null) {
+        if (!navAgent.isActiveAndEnabled) return new Vector3[0];
         currentCorner = 1;
         onFinalPosition = false;
         OnFinalPositionEvent = null;

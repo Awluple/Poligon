@@ -15,11 +15,15 @@ namespace Poligon.Ai.States {
         public StationaryAttackState(AiCharacterController controller) : base(controller) {
         }
         public override void UpdateState() {
+            if(aiController.aiState != state) return;
             timeInState += Time.deltaTime;
-            if (timeInState > 14f) {
-                bool hasVision = Methods.HasAimOnOpponent(out Character character, enemyController, 40f);
-                if (!hasVision) {
-                    enemyController.aiState = IndividualAiState.Chasing;
+            if (timeInState > 9f) {
+                bool hasVision = Methods.HasAimOnOpponent(out Character character, aiController, 40f);
+                int enemies = aiController.aiCharacter.squad.knownEnemies.Count;
+                if ((!hasVision && enemies > 0) || aiController.hidingLogic.currentCoverSubEdge == null) {
+                    aiController.aiState = IndividualAiState.Hiding;
+                } else {
+                    //aiController.aiState = IndividualAiState.Searching;
                 }
                 timeInState = 0f;
             }
@@ -30,52 +34,53 @@ namespace Poligon.Ai.States {
         }
 
         public override void EnterState() {
-            bool hasVision = Methods.HasAimOnOpponent(out Character character, enemyController, 40f);
-            enemyController.aiCharacter.OnShoot += ResetTimer;
-            enemyController.aiCharacter.OnHealthLoss += TryToHide;
+            aiController.SetNewDestinaction(aiController.aiCharacter.transform.position);
+            bool hasVision = Methods.HasAimOnOpponent(out Character character, aiController, 40f);
+            aiController.aiCharacter.OnShoot += ResetTimer;
+            aiController.aiCharacter.OnHealthLoss += TryToHide;
 
-            if (enemyController.aiCharacter.IsCrouching() && !hasVision) {
-                enemyController.CrouchCancel();
+            if (aiController.aiCharacter.IsCrouching() && !hasVision) {
+                aiController.CrouchCancel();
             }
-            if(!enemyController.aiCharacter.IsAiming()) {
-                enemyController.AimStart();
+            if(!aiController.aiCharacter.IsAiming()) {
+                aiController.AimStart();
             }
-            shootingCoroutine = Coroutines.ShootingCoroutine(enemyController);
-            enemyController.StartCoroutine(shootingCoroutine);
-            if (enemyController.hidingLogic.currentCoverSubEdge != null && !hasVision) {
-                Vector3 pos = enemyController.hidingLogic.currentCoverEdge.forward * 4 + enemyController.eyes.transform.position;
-                LastKnownPosition opponentPosition = enemyController.aiCharacter.squad.GetCharacterLastPosition(enemyController.attackingLogic.opponent);
+            shootingCoroutine = Coroutines.ShootingCoroutine(aiController);
+            aiController.StartCoroutine(shootingCoroutine);
+            if (aiController.hidingLogic.currentCoverSubEdge != null && !hasVision) {
+                Vector3 pos = aiController.hidingLogic.currentCoverEdge.forward * 4 + aiController.eyes.transform.position;
+                LastKnownPosition opponentPosition = aiController.aiCharacter.squad.GetCharacterLastPosition(aiController.attackingLogic.opponent);
                 if(opponentPosition != null) {
-                    Vector3 aimPosition = (opponentPosition.position == Vector3.zero) ? pos : enemyController.aiCharacter.squad.GetCharacterLastPosition(enemyController.attackingLogic.opponent).position;
+                    Vector3 aimPosition = (opponentPosition.position == Vector3.zero) ? pos : aiController.aiCharacter.squad.GetCharacterLastPosition(aiController.attackingLogic.opponent).position;
 
-                    enemyController.aiCharacter.GetAimPosition().MoveAim(aimPosition, 80f);
-                    enemyController.aiCharacter.RotateSelf(enemyController.hidingLogic.currentCoverEdge.forward);
+                    aiController.aiCharacter.GetAimPosition().MoveAim(aimPosition, 80f);
+                    aiController.aiCharacter.RotateSelf(aiController.hidingLogic.currentCoverEdge.forward);
                 }
             }
         }
 
         public void TryToHide(object sender, EventArgs args) {
-            if (enemyController.aiCharacter.health / enemyController.aiCharacter.maxHealth > 0.6) {
+            if (aiController.aiCharacter.health / aiController.aiCharacter.maxHealth > 0.6) {
                 return;
             } else if (UnityEngine.Random.Range(0, 10) > 7) {
                 return;
             }
-            if (enemyController.hidingLogic.currentCoverSubEdge != null) {
-                enemyController.aiState = IndividualAiState.BehindCover;
+            if (aiController.hidingLogic.currentCoverSubEdge != null) {
+                aiController.aiState = IndividualAiState.BehindCover;
             } else {
                 //enemyController.hidingLogic.GetHidingPosition(enemyController.attackingLogic.opponent.transform.position, enemyController.enemy);
-                enemyController.aiState = IndividualAiState.Hiding;
+                aiController.aiState = IndividualAiState.Hiding;
             }
         }
 
         public override void ExitState() {
-            enemyController.aiCharacter.OnHealthLoss -= TryToHide;
+            aiController.aiCharacter.OnHealthLoss -= TryToHide;
             if (shootingCoroutine != null) {
-                enemyController.StopCoroutine(shootingCoroutine);
+                aiController.StopCoroutine(shootingCoroutine);
                 shootingCoroutine = null;
             }
-            enemyController.aiCharacter.OnShoot -= ResetTimer;
-            enemyController.ShootCancel();
+            aiController.aiCharacter.OnShoot -= ResetTimer;
+            aiController.ShootCancel();
         }
     }
 
